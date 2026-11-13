@@ -72,7 +72,7 @@ Test: `ssh juu-vps whoami` prints `juu`.
 
 ```bash
 ssh juu-vps
-curl -fsSo ~/nvm-install.sh https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh
+curl -fsSo ~/nvm-install.sh https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh
 bash ~/nvm-install.sh && rm ~/nvm-install.sh
 . ~/.nvm/nvm.sh
 nvm install 22
@@ -138,7 +138,7 @@ Juu uses its own copy of `cloudflared`, not the system one, so an update on eith
 
 ```bash
 mkdir -p ~/.local/bin
-V=<latest release, from github.com/cloudflare/cloudflared/releases>
+V=2026.11.0     # or the latest release, from github.com/cloudflare/cloudflared/releases
 curl -fsSLo ~/.local/bin/cloudflared "https://github.com/cloudflare/cloudflared/releases/download/$V/cloudflared-linux-amd64"
 chmod +x ~/.local/bin/cloudflared
 ~/.local/bin/cloudflared --version
@@ -263,7 +263,8 @@ browser never needs CORS for them. `CORS_ORIGINS` on the server additionally let
 
 ### V1 to V5 (VERCEL)
 
-1. **V1** Create both projects and set each root directory and framework as in the table.
+1. **V1** Create both projects and set each root directory and framework as in the table, install command
+   `cd .. && npm ci` (the workspace root is `frontend/`).
 2. **V2** Connect both to the GitHub repo, production branch `main`.
 3. **V3** Add the environment variables above for Production and Preview.
 4. **V4** Add the domains: `playjuu.xyz` to `juu-landing`, `app.playjuu.xyz` to `juu-app`.
@@ -275,7 +276,35 @@ In Cloudflare, DNS, Records, with the proxy **off** (grey cloud, "DNS only") so 
 
 | Type | Name | Content |
 | --- | --- | --- |
-| A | `@` (playjuu.xyz) | the A value Vercel shows for `playjuu.xyz` |
-| CNAME | `app` | the CNAME value Vercel shows for `app.playjuu.xyz` |
+| A | `@` (playjuu.xyz) | `216.198.79.1` |
+| A | `@` (playjuu.xyz) | `64.29.17.1` |
+| CNAME | `app` | `454ac131ed0b9e07.vercel-dns-017.com` |
 
-Leave the `api` record that the tunnel created as it is (proxied).
+These are the values Vercel gave for these two domains on 13 Nov 2026 (its domain settings show them too). Leave the
+`api` record that the tunnel created as it is (proxied). Vercel issues the certificates once the records resolve.
+
+## What was done (13 Nov 2026)
+
+* A1 by the admin: user `juu` created (no sudo), key login as `juu-vps`. Checked: ufw active with only 22/tcp in, no
+  Docker containers running, sshd `permitrootlogin no`, `passwordauthentication no`, `pubkeyauthentication yes`.
+* J1: nvm v0.41.0, Node v22.23.5, pm2 7.1.2, pm2-logrotate 3.0.1.
+* J2: deploy key "juu server (read only)" added with `gh repo deploy-key add` (read only); repo cloned to `~/juu`.
+  GitHub's host key checked against its published fingerprint (`SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU`).
+* J3: `.env` written with mode 600 from the start; `KEEPER_KEY` piped from the laptop's `.env`, never printed.
+* J4: cloudflared 2026.11.0 in `~/.local/bin`, sha256 matched the release notes
+  (`51f7c68b57ed7269164075d7e789efce5b59355982f06392deeb037d982a51fd`).
+* L1: laptop keeper stopped, then `backend/data/*.json` copied (jackpot secrets checksum matched on both sides).
+* J5: `juu-backend`, `juu-mcp`, `juu-tunnel` online under pm2; the keeper's first server transaction was a veBTC harvest
+  (tx 0xf2749c0e28627e5e152e2847a26f3c6dc50866aa1645eab5385f10c5de9f0d3e). Tunnel: 4 connections registered. The token
+  shows neither in the process list nor in `~/.pm2/dump.pm2`. All three ports on 127.0.0.1 only.
+* CORS checked on the server: `https://app.playjuu.xyz` and `https://playjuu.xyz` get `Access-Control-Allow-Origin`, any
+  other origin gets none.
+* Vercel: projects `juu-app` (prj_fbdVpXyPGknJ4yu6sxiqlvL1KFq7) and `juu-landing` (prj_dfat8rCZAA9uVar4PdYeYcfR3IdQ) on
+  the Hobby team, root directories `frontend/app` and `frontend/landing`, install command `cd .. && npm ci`, linked to
+  the GitHub repo (branch `main`), environment variables as above, domains `app.playjuu.xyz` and `playjuu.xyz` added.
+  First production deployments made with the Vercel CLI from a clean `git archive` of the commit (so no untracked file
+  such as `.env` could be uploaded): landing dpl_3BGPWFxe2tJsHkNv5sqRtw6FARiR, app dpl_4AgU5x9NcrjuoJmcSMkbbuJkfko5.
+  Until the DNS records exist they answer at `https://juu-landing.vercel.app` and `https://juu-app.vercel.app`.
+
+Rollback for a Vercel deployment: in the project's Deployments list, pick the previous one and "Promote to Production",
+or `vercel rollback <deployment url>`.
