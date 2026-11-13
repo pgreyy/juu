@@ -140,14 +140,17 @@ export default function MUSDash() {
 
   return (
     <div className="dash">
+      {/* One grid for both columns: title, then ladder | order form, then LIVE | your position. Shared rows keep
+          the two section dividers at the same height whatever the content, as two separate lines. */}
+      <div className="title-row">
+        <h1 className="h1">MUSDASH · THE LADDER</h1>
+        {cheer != null && <Agaruzo floor={cheer} />}
+      </div>
       <section aria-label="The tower" className="tower">
-        <div className="title-row">
-          <h1 className="h1">MUSDASH · THE LADDER</h1>
-          {cheer != null && <Agaruzo floor={cheer} />}
-        </div>
         <Ladder mark={mark} change={m.change} rows={rows} selected={floor} onPick={setFloor} />
         <div className="ladder-caption">ORDER-BOOK VIEW · EACH FLOOR IS A PRICE LADDER RUNG · SHADE = POOL DEPTH</div>
-        <section aria-label="Live" className="live">
+      </section>
+      <section aria-label="Live" className="live">
           <div className="label">LIVE</div>
           {m.feed && m.feed.length === 0 && <div className="empty">No moves yet on this stack.</div>}
           {!m.feed && <div className="empty">Loading the live feed…</div>}
@@ -160,99 +163,96 @@ export default function MUSDash() {
               </div>
             );
           })}
-        </section>
       </section>
 
-      <aside className="aside">
-        <section aria-label="Place a position" className="slip">
-          <div className="sides">
-            <button type="button" className="side-btn bull" aria-pressed={side === "Bull"} onClick={() => setSide("Bull")}>▲ BULL</button>
-            <button type="button" className="side-btn bear" aria-pressed={side === "Bear"} onClick={() => setSide("Bear")}>BEAR ▼</button>
-          </div>
-          <div className="label mt16">CHIPS</div>
-          <div className="chips">
-            {(["MUSD", "Y", "P"] as Chip[]).map((c) => (
-              <button key={c} type="button" className="chip" aria-pressed={chip === c} onClick={() => setChip(c)} disabled={c !== "MUSD" && !series} title={chipLabel(c)}>
-                {chipLabel(c)}
-              </button>
-            ))}
-          </div>
-          <label htmlFor="amt" className="label mt16" style={{ display: "block" }}>AMOUNT</label>
-          <div className="amount-row">
-            <input id="amt" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" />
-            <span className="unit">{unit}</span>
-          </div>
-          <PctButtons balance={chipBal} decimals={chip === "MUSD" ? 2 : 6} onPick={setAmount} label={unit.toLowerCase()} />
-          {chip === "MUSD" && short && (
-            <a className="getmusd" href={"/portfolio?tab=swap&to=MUSD" + (stack === "demo" ? "&stack=demo" : "")}>Not enough MUSD. Get MUSD →</a>
-          )}
-          <div className="label mt16">FLOOR</div>
-          <div className="picks">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((f) => (
-              <button key={f} type="button" className="pick" aria-pressed={floor === f} onClick={() => setFloor(f)}>{f}</button>
-            ))}
-          </div>
-          <dl className="readout">
-            <dt>Leverage</dt><dd>{lev(floor)}×</dd>
-            <dt>Exposure</dt><dd>{fmt(exposure)} MUSD</dd>
-            <dt>Collapses at</dt><dd className="c-bear">{mark == null ? "—" : usd(collapsePrice(mark, floor, side))}</dd>
-            <dt>Fee</dt><dd>{tradingFee == null ? "—" : fmt(exposure * tradingFee, 2) + " MUSD"}</dd>
-            <dt>Climb premium</dt><dd className="c-muted">{premiumText}</dd>
-          </dl>
-          {tooBig && <p className="txnote error">The Bank can cover up to {fmt(bank.data!.largestBetSizeNowMUSD)} MUSD of exposure right now. Try a smaller amount.</p>}
-          <button type="button" className="btn-strong open-btn" onClick={open} disabled={busy(w.tx, "open") || n <= 0 || short}>
-            {busy(w.tx, "open") ? "OPENING…" : n <= 0 ? "ENTER AN AMOUNT" : short ? `NOT ENOUGH ${chip === "MUSD" ? "MUSD" : unit}` : `OPEN ON FLOOR ${floor}`}
-          </button>
-          <p className="open-risk">Your chips can be lost if this floor collapses. Fees and funding apply.</p>
-          <TxNote k="open" />
-        </section>
+      <section aria-label="Place a position" className="slip">
+        <div className="sides">
+          <button type="button" className="side-btn bull" aria-pressed={side === "Bull"} onClick={() => setSide("Bull")}>▲ BULL</button>
+          <button type="button" className="side-btn bear" aria-pressed={side === "Bear"} onClick={() => setSide("Bear")}>BEAR ▼</button>
+        </div>
+        <div className="label mt16">CHIPS</div>
+        <div className="chips">
+          {(["MUSD", "Y", "P"] as Chip[]).map((c) => (
+            <button key={c} type="button" className="chip" aria-pressed={chip === c} onClick={() => setChip(c)} disabled={c !== "MUSD" && !series} title={chipLabel(c)}>
+              {chipLabel(c)}
+            </button>
+          ))}
+        </div>
+        <label htmlFor="amt" className="label mt16" style={{ display: "block" }}>AMOUNT</label>
+        <div className="amount-row">
+          <input id="amt" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" />
+          <span className="unit">{unit}</span>
+        </div>
+        <PctButtons balance={chipBal} decimals={chip === "MUSD" ? 2 : 6} onPick={setAmount} label={unit.toLowerCase()} />
+        {chip === "MUSD" && short && (
+          <a className="getmusd" href={"/portfolio?tab=swap&to=MUSD" + (stack === "demo" ? "&stack=demo" : "")}>Not enough MUSD. Get MUSD →</a>
+        )}
+        <div className="label mt16">FLOOR</div>
+        <div className="picks">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((f) => (
+            <button key={f} type="button" className="pick" aria-pressed={floor === f} onClick={() => setFloor(f)}>{f}</button>
+          ))}
+        </div>
+        <dl className="readout">
+          <dt>Leverage</dt><dd>{lev(floor)}×</dd>
+          <dt>Exposure</dt><dd>{fmt(exposure)} MUSD</dd>
+          <dt>Collapses at</dt><dd className="c-bear">{mark == null ? "—" : usd(collapsePrice(mark, floor, side))}</dd>
+          <dt>Fee</dt><dd>{tradingFee == null ? "—" : fmt(exposure * tradingFee, 2) + " MUSD"}</dd>
+          <dt>Climb premium</dt><dd className="c-muted">{premiumText}</dd>
+        </dl>
+        {tooBig && <p className="txnote error">The Bank can cover up to {fmt(bank.data!.largestBetSizeNowMUSD)} MUSD of exposure right now. Try a smaller amount.</p>}
+        <button type="button" className="btn-strong open-btn" onClick={open} disabled={busy(w.tx, "open") || n <= 0 || short}>
+          {busy(w.tx, "open") ? "OPENING…" : n <= 0 ? "ENTER AN AMOUNT" : short ? `NOT ENOUGH ${chip === "MUSD" ? "MUSD" : unit}` : `OPEN ON FLOOR ${floor}`}
+        </button>
+        <p className="open-risk">Your chips can be lost if this floor collapses. Fees and funding apply.</p>
+        <TxNote k="open" />
+      </section>
 
-        <section aria-label="Your position" className="yours">
-          <FloorBadge floor={pos ? pos.floor : null} />
-          <div className="info">
-            {!pos ? (
-              <>
-                <div className="l1"><span className="mono" style={{ fontSize: 14 }}>NO OPEN POSITION</span></div>
-                <div className="l2">{w.address ? "Pick a side and a floor, then open." : "Connect a wallet to see your position."}</div>
-              </>
-            ) : (
-              <>
-                <div className="l1">
-                  <span className={"mono " + (pos.side === "Bull" ? "c-bull" : "c-bear")} style={{ fontSize: 14 }}>
-                    {pos.side === "Bull" ? `▲ BULL · ${lev(pos.floor)}×` : `BEAR ▼ · ${lev(pos.floor)}×`}
-                  </span>
-                  <span className={"mono " + (pnl >= 0 ? "c-bull" : "c-bear")} style={{ fontSize: 18 }}>{signed(pnl)}</span>
+      <section aria-label="Your position" className="yours">
+        <FloorBadge floor={pos ? pos.floor : null} />
+        <div className="info">
+          {!pos ? (
+            <>
+              <div className="l1"><span className="mono" style={{ fontSize: 14 }}>NO OPEN POSITION</span></div>
+              <div className="l2">{w.address ? "Pick a side and a floor, then open." : "Connect a wallet to see your position."}</div>
+            </>
+          ) : (
+            <>
+              <div className="l1">
+                <span className={"mono " + (pos.side === "Bull" ? "c-bull" : "c-bear")} style={{ fontSize: 14 }}>
+                  {pos.side === "Bull" ? `▲ BULL · ${lev(pos.floor)}×` : `BEAR ▼ · ${lev(pos.floor)}×`}
+                </span>
+                <span className={"mono " + (pnl >= 0 ? "c-bull" : "c-bear")} style={{ fontSize: 18 }}>{signed(pnl)}</span>
+              </div>
+              <div className="l2">
+                {amt(pos.chipValue ?? 0)} {posUnit} · collapses at {pos.collapsePrice ? usd(pos.collapsePrice) : "—"}
+                {pos.isAgent && " · played by your agent"}
+              </div>
+              <div className="acts">
+                <button type="button" onClick={() => move(pos.floor - 1)} disabled={pos.isAgent || pos.floor <= 1 || busy(w.tx, "move")}>↓ DROP</button>
+                <button type="button" className="climb" onClick={() => move(pos.floor + 1)} disabled={pos.isAgent || pos.floor >= 10 || busy(w.tx, "move")}>↑ CLIMB</button>
+                <button type="button" onClick={cashOut} disabled={busy(w.tx, "move")}>CASH OUT</button>
+              </div>
+              {mine.length > 1 && (
+                <div className="pos-switch" aria-label="Your open positions">
+                  {mine.map((p) => (
+                    <button key={p.id} type="button" aria-pressed={p.id === pos.id} onClick={() => setPick(p.id)}>
+                      #{p.id} · {p.side === "Bull" ? "▲" : "▼"} {pad2(p.floor)}
+                    </button>
+                  ))}
                 </div>
-                <div className="l2">
-                  {amt(pos.chipValue ?? 0)} {posUnit} · collapses at {pos.collapsePrice ? usd(pos.collapsePrice) : "—"}
-                  {pos.isAgent && " · played by your agent"}
-                </div>
-                <div className="acts">
-                  <button type="button" onClick={() => move(pos.floor - 1)} disabled={pos.isAgent || pos.floor <= 1 || busy(w.tx, "move")}>↓ DROP</button>
-                  <button type="button" className="climb" onClick={() => move(pos.floor + 1)} disabled={pos.isAgent || pos.floor >= 10 || busy(w.tx, "move")}>↑ CLIMB</button>
-                  <button type="button" onClick={cashOut} disabled={busy(w.tx, "move")}>CASH OUT</button>
-                </div>
-                {mine.length > 1 && (
-                  <div className="pos-switch" aria-label="Your open positions">
-                    {mine.map((p) => (
-                      <button key={p.id} type="button" aria-pressed={p.id === pos.id} onClick={() => setPick(p.id)}>
-                        #{p.id} · {p.side === "Bull" ? "▲" : "▼"} {pad2(p.floor)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-            {w.address && (
-              <label className="check">
-                <input type="checkbox" checked={Boolean(loopOn)} onChange={toggleLoop} disabled={!series || busy(w.tx, "loop")} />
-                Loop winnings into my BTC lock
-              </label>
-            )}
-            <TxNote k={["move", "loop"]} wallet={false} />
-          </div>
-        </section>
-      </aside>
+              )}
+            </>
+          )}
+          {w.address && (
+            <label className="check">
+              <input type="checkbox" checked={Boolean(loopOn)} onChange={toggleLoop} disabled={!series || busy(w.tx, "loop")} />
+              Loop winnings into my BTC lock
+            </label>
+          )}
+          <TxNote k={["move", "loop"]} wallet={false} />
+        </div>
+      </section>
     </div>
   );
 }
