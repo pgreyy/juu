@@ -1,4 +1,4 @@
-import { Footer, StackMark, ThemeToggle } from "@juu/ui";
+import { Footer, StackMark, ThemeToggle, Wordmark } from "@juu/ui";
 import Link from "next/link";
 import { DocNav } from "@/components/DocNav";
 import { nav } from "@/lib/docs";
@@ -13,7 +13,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <header className="lp-head juu-head">
           <Link href="/" className="lp-brand" aria-label="Juu home">
             <StackMark size={40} />
-            <span className="word">JUU</span>
+            <Wordmark size={38} />
             <span className="tag">DOCS</span>
           </Link>
           <nav className="lp-nav" aria-label="Sections">

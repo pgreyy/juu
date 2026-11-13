@@ -1,5 +1,5 @@
 "use client";
-import { Footer, Icon, StackMark, ThemeToggle, Ticker, shortAddr, tickerItems, type TickItem } from "@juu/ui";
+import { Footer, Icon, StackMark, Wordmark, ThemeToggle, Ticker, shortAddr, tickerItems, type TickItem } from "@juu/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -133,7 +133,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <header className="head juu-head">
             <Link href="/" className="brand" aria-label="Juu, MUSDash">
               <StackMark size={40} />
-              <span className="word">JUU</span>
+              <Wordmark size={38} />
               <span className="tag">THE MUSDASH TOTE</span>
             </Link>
             <div className="head-right">

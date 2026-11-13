@@ -8,7 +8,7 @@
      Dark:  sand #12110E · #1A1914 · #23211B; olive #1B1D12 · #262A15; olive accent #B8C24A (button fill, dark text).
      Ink band (Agents): light #101010 / dark #0A0A08 with sand text. Header: head #D9DDB5 / #262A15 (from @juu/ui).
      Buttons: primary = ink fill, secondary = olive fill, tertiary = outline, sand fill on the ink band.
-   Type: Geist for headlines and body; Geist Mono for labels and mono buttons; Martian Mono for every number.
+   Type: Geist for headlines and body; Geist Mono for labels and mono buttons; Azeret Mono 500 for every number.
    Shape: radius 0 everywhere, borders 1.5px, dividers 1px, touch targets at least 44px.
    Assets: Stack logo and favicon from docs/design/assets; page icons from docs/design/assets/icons.
    Visuals: product parts only (Ladder, ticker, starburst, floor badges, Agaruzo! banner) from @juu/ui. */
@@ -47,7 +47,10 @@ html[data-theme="dark"] .s-band { border-top-color: var(--oliveX); }
 /* Header */
 .lp-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px var(--pad); }
 .lp-brand { display: flex; align-items: center; min-height: 44px; gap: 14px; flex-wrap: wrap; color: inherit; text-decoration: none; }
-.lp-brand .word { font-family: var(--fD); font-weight: 700; font-size: 38px; letter-spacing: 0.04em; line-height: 1; }
+/* The JUU wordmark is an outlined SVG (Bricolage Grotesque 700, see @juu/ui Wordmark). */
+.lp-brand .word { display: block; flex: 0 0 auto; }
+/* Hero: just the label above the ladder preview, no badge. */
+.lp-titlerow.lp-hero-label { min-height: 0; margin-bottom: 10px; }
 .lp-brand .tag { font-family: var(--fN); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
 .lp-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; }
 .lp-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-family: var(--fN); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; color: var(--onHead); }
@@ -169,7 +172,7 @@ html[data-theme="dark"] .s-band { border-top-color: var(--oliveX); }
   .lp-page { --gut: 16px; }
   .lp-head { padding-top: 14px; padding-bottom: 14px; }
   .lp-nav { display: none; }
-  .lp-brand .word { font-size: 30px; }
+  .lp-brand .word { height: 20.2px; width: auto; }
   .lp-sec { padding-top: 52px; padding-bottom: 52px; }
   .lp-sec.first { padding-top: 32px; }
   .lp-earn { grid-template-columns: minmax(0, 1fr); }

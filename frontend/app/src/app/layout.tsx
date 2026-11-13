@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* Geist and Geist Mono from Google Fonts; Martian Mono (numbers) is served from /fonts (see @juu/ui/juu.css). */}
+        {/* Geist and Geist Mono from Google Fonts; Azeret Mono (numbers) is served from /fonts (see @juu/ui/juu.css). */}
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link rel="stylesheet" href={FONTS_URL} />
       </head>

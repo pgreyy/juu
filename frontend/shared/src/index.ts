@@ -8,3 +8,4 @@ export * from "./Agaruzo";
 export * from "./Footer";
 export * from "./tickerData";
 export * from "./ThemeToggle";
+export { Wordmark } from "./Wordmark";

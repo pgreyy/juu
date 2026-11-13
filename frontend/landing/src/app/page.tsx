@@ -1,4 +1,4 @@
-import { Agaruzo, Footer, Icon, LEV, Ladder, StackMark, ThemeToggle, pad2, type LadderRow } from "@juu/ui";
+import { Agaruzo, Footer, Icon, LEV, Ladder, StackMark, ThemeToggle, Wordmark, pad2, type LadderRow } from "@juu/ui";
 import { BoardPreview, JackpotBurst, LiveLadder, LiveTicker } from "@/components/Live";
 
 const APP = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -25,7 +25,7 @@ export default function Landing() {
         <header className="lp-head juu-head">
           <a href="#top" className="lp-brand" aria-label="Juu">
             <StackMark size={40} />
-            <span className="word">JUU</span>
+            <Wordmark size={38} />
             <span className="tag">THE MUSDASH TOTE</span>
           </a>
           <nav className="lp-nav" aria-label="Sections">
@@ -61,11 +61,10 @@ export default function Landing() {
               </div>
             </div>
             <div className="lp-breathe" aria-label="Preview of the MUSDash tower" role="group">
-              <div className="lp-titlerow">
+              <div className="lp-titlerow lp-hero-label">
                 <span className="label" style={{ color: "var(--ink)" }}><span className="lp-wide">MUSDASH · </span>THE LADDER</span>
-                <div className="lp-cheer"><Agaruzo floor={8} decorative /></div>
               </div>
-              <Ladder mark={71000} rows={PREVIEW} selected={5} flash={8} />
+              <Ladder mark={71000} rows={PREVIEW} selected={5} />
               <div className="lp-caption">GAME PREVIEW · SAMPLE POOLS AT A $71,000 MARK</div>
             </div>
           </section>
