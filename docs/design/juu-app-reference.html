@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Juu · product reference (exact design)</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;700&amp;family=Inter:wght@400;500;600&amp;family=Silkscreen:wght@400;700&amp;family=Space+Mono:wght@400;700&amp;family=Martian+Mono:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Bricolage+Grotesque:wght@500;700;800&amp;family=DM+Mono:wght@400;500&amp;family=VT323&amp;family=Instrument+Serif&amp;family=Syne:wght@600;700;800&amp;family=Azeret+Mono:wght@400;500;600&amp;family=Red+Hat+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid currentColor;outline-offset:3px}
+@keyframes juuTick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.juu-tick{display:flex;width:max-content;animation:juuTick 52s linear infinite}
+.juu-tickwrap:hover .juu-tick{animation-play-state:paused}
+.juu-car{transition:top .5s cubic-bezier(.2,.8,.2,1)}
+.juu-logo .ic-logo{display:flex}.juu-logo .ic-toggle{display:none}
+.juu-logo:hover .ic-logo,.juu-logo:focus-visible .ic-logo,.juu-logo.open .ic-logo{display:none}
+.juu-logo:hover .ic-toggle,.juu-logo:focus-visible .ic-toggle,.juu-logo.open .ic-toggle{display:flex}
+@media (prefers-reduced-motion: reduce){.juu-tick{animation:none}.juu-car{transition:none}}
+</style>
+
+</head>
+<body>
+<!-- Juu product reference. Open this file in a browser to see and click through the exact design.
+     The template below is the markup, the Component class is the logic and sample data.
+     A tiny renderer at the bottom draws it. The real app should be rebuilt in the project's own stack. -->
+<div id="app"></div>
+<script type="text/plain" id="juu-template">
+
+<div style="min-height: 1400px; background: {{t.bg}}; color: {{t.ink}}; font-family: {{t.fB}}; padding: 24px 28px 32px; box-sizing: border-box; display: grid; grid-template-columns: {{gridCols}}; gap: 20px; align-items: start">
+
+
+
+<div style="min-width: 0; background-color: {{t.surf}}; background-image: {{t.tex}}; background-size: 24px 24px; border: 1.5px solid {{t.rule}}; border-radius: {{t.rS}}; min-height: 1340px; display: flex; overflow: clip; box-shadow: {{t.shadow}}">
+
+<template data-scif value="{{L.rail}}" hint-placeholder-val="{{ false }}">
+<nav aria-label="Main" style="flex: 0 0 {{railW}}; background: {{t.bg}}; border-right: 1.5px solid {{t.rule2}}; padding: 22px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+<button type="button" class="juu-logo {{logoCls}}" onClick="{{toggleRail}}" aria-label="{{railToggleLabel}}" aria-expanded="{{railExp}}" title="{{railToggleLabel}}" style="width: 52px; height: 52px; margin: 0 auto 14px; background: transparent; border: 0; color: {{t.ink}}; display: flex; align-items: center; justify-content: center; cursor: pointer"><span class="ic-logo" style="width: 32px; height: 32px; align-items: center; justify-content: center"><template data-scif value="{{logo.stack}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="17" width="18" height="4"/><rect x="6" y="11" width="12" height="4"/><rect x="9" y="5" width="6" height="4"/></svg></template><template data-scif value="{{logo.ascent}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 21h16M6 17h12M8 13h8"/><path d="M12 3l5 6H7z" fill="currentColor" stroke="none"/></svg></template><template data-scif value="{{logo.stepj}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h5v11a7 7 0 0 1-7 7H5v-5h7a2 2 0 0 0 2-2z"/><rect x="5" y="3" width="5" height="5"/></svg></template><template data-scif value="{{logo.tendots}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><circle cx="16" cy="3.5" r="1.9" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="3.5" r="1.9"/><circle cx="8" cy="8" r="1.9"/><circle cx="16" cy="8" r="1.9"/><circle cx="8" cy="12.5" r="1.9"/><circle cx="16" cy="12.5" r="1.9"/><circle cx="8" cy="17" r="1.9"/><circle cx="16" cy="17" r="1.9"/><circle cx="8" cy="21.5" r="1.9"/><circle cx="16" cy="21.5" r="1.9"/></svg></template><template data-scif value="{{logo.burst}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5M4.2 4.2l3.5 3.5M16.3 16.3l3.5 3.5M4.2 19.8l3.5-3.5M16.3 7.7l3.5-3.5"/></svg></template><template data-scif value="{{logo.word}}" hint-placeholder-val="{{ false }}"><span style="font-family: {{t.fD}}; font-weight: 700; font-size: 14px; letter-spacing: 0.04em; line-height: 1">JUU</span></template></span><span class="ic-toggle" style="width: 26px; height: 26px; align-items: center; justify-content: center"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></span></button>
+<template data-scfor list="{{tabs}}" as="x" hint-placeholder-count="8">
+<button type="button" aria-current="{{x.cur}}" aria-label="{{x.label}}" title="{{x.label}}" onClick="{{x.go}}" style="min-height: 56px; display: flex; align-items: center; justify-content: {{railJustify}}; gap: 8px; padding: 0 12px; background: {{x.railBg}}; color: {{x.railFg}}; border: 1.5px solid {{x.railLine}}; border-radius: {{t.rB}}; font-family: {{t.fN}}; font-size: 13px; cursor: pointer">
+<span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: {{x.dot}}; flex: 0 0 6px"></span>
+<span aria-hidden="true" style="display: flex"><template data-scif value="{{x.ic.dash}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21V7l6-4 6 4v14M6 11h12M6 15h12M10 21v-3h4v3"/></svg></template><template data-scif value="{{x.ic.pos}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5zM3 12.5l9 5 9-5M3 17l9 5 9-5"/></svg></template><template data-scif value="{{x.ic.doors}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21V3h10v18M3 21h18M13 12h.01"/></svg></template><template data-scif value="{{x.ic.bank}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-5 9 5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/></svg></template><template data-scif value="{{x.ic.market}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="8" cy="8" r="1.5"/></svg></template><template data-scif value="{{x.ic.jackpot}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H4a3 3 0 0 0 4 4M16 6h4a3 3 0 0 1-4 4M12 13v4M8 21h8M9.5 17h5"/></svg></template><template data-scif value="{{x.ic.agents}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 4v4M9 13h.01M15 13h.01M9.5 16h5"/></svg></template><template data-scif value="{{x.ic.board}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21v-7h6v7M9 21V9h6v12M15 21v-5h6v5M3 21h18"/></svg></template></span>
+<template data-scif value="{{railOpen}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="font-family: {{t.fB}}; font-size: 13px; font-weight: {{x.railW}}; white-space: nowrap">{{x.label}}</span></template>
+</button>
+</template>
+</nav>
+</template>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+
+<template data-scif value="{{L.brandHead}}" hint-placeholder-val="{{ true }}">
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 32px 14px">
+<div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+<template data-scif value="{{logoIcon}}" hint-placeholder-val="{{ true }}"><span style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center"><template data-scif value="{{logo.stack}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="17" width="18" height="4"/><rect x="6" y="11" width="12" height="4"/><rect x="9" y="5" width="6" height="4"/></svg></template><template data-scif value="{{logo.ascent}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 21h16M6 17h12M8 13h8"/><path d="M12 3l5 6H7z" fill="currentColor" stroke="none"/></svg></template><template data-scif value="{{logo.stepj}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h5v11a7 7 0 0 1-7 7H5v-5h7a2 2 0 0 0 2-2z"/><rect x="5" y="3" width="5" height="5"/></svg></template><template data-scif value="{{logo.tendots}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><circle cx="16" cy="3.5" r="1.9" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="3.5" r="1.9"/><circle cx="8" cy="8" r="1.9"/><circle cx="16" cy="8" r="1.9"/><circle cx="8" cy="12.5" r="1.9"/><circle cx="16" cy="12.5" r="1.9"/><circle cx="8" cy="17" r="1.9"/><circle cx="16" cy="17" r="1.9"/><circle cx="8" cy="21.5" r="1.9"/><circle cx="16" cy="21.5" r="1.9"/></svg></template><template data-scif value="{{logo.burst}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5M4.2 4.2l3.5 3.5M16.3 16.3l3.5 3.5M4.2 19.8l3.5-3.5M16.3 7.7l3.5-3.5"/></svg></template></span></template>
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 38px; letter-spacing: 0.04em; line-height: 1; text-shadow: {{t.glow}}">JUU</span>
+<span style="font-family: {{t.fN}}; font-size: 12px; letter-spacing: 0.12em; color: {{t.muted}}">THE MUSDASH TOTE</span>
+</div>
+<button type="button" style="height: 46px; padding: 0 16px; background: transparent; color: {{t.ink}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; font-family: {{t.fN}}; font-size: 13px; cursor: pointer">0x5Ac8…C5eA</button>
+</header>
+</template>
+
+<template data-scif value="{{L.railHead}}" hint-placeholder-val="{{ false }}">
+<header style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 22px 32px 14px">
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 30px; letter-spacing: 0.04em; text-shadow: {{t.glow}}">{{curLabelUp}}</span>
+<span style="font-family: {{t.fN}}; font-size: 12px; color: {{t.muted}}; letter-spacing: 0.1em">MEZO TESTNET</span>
+</header>
+</template>
+
+<template data-scif value="{{L.consoleHead}}" hint-placeholder-val="{{ false }}">
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; border-bottom: 1.5px solid {{t.rule}}; font-family: {{t.fN}}; font-size: 14px">
+<span style="text-shadow: {{t.glow}}">{{cmd}}<span aria-hidden="true" style="display: inline-block; width: 9px; height: 16px; margin-left: 4px; vertical-align: middle; background: {{t.ink}}"></span></span>
+<span style="color: {{t.muted}}">JUU · MEZO TESTNET · 0x5Ac8…C5eA</span>
+</header>
+</template>
+
+<div class="juu-tickwrap" role="region" aria-label="Market ticker" style="overflow: hidden; border-top: 1px solid {{t.rule2}}; border-bottom: 1px solid {{t.rule2}}">
+<div class="juu-tick">
+<template data-scfor list="{{ticker}}" as="k" hint-placeholder-count="20">
+<div aria-hidden="{{k.dup}}" style="display: flex; align-items: center; gap: 10px; padding: 8px 26px; border-right: 1px solid {{t.rule2}}; white-space: nowrap; min-height: 44px">
+<template data-scif value="{{k.oi}}" hint-placeholder-val="{{ false }}">
+<span aria-hidden="true" style="position: relative; width: 40px; height: 40px; display: inline-block; flex: 0 0 40px">
+<template data-scfor list="{{raysMini}}" as="r" hint-placeholder-count="36"><span style="position: absolute; left: 50%; top: 50%; width: {{r.w}}; height: {{r.len}}; margin-left: -1px; background: {{r.c}}; transform-origin: 50% 0; transform: rotate({{r.deg}}) translateY(7px)"></span></template>
+</span>
+</template>
+<span style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">{{k.label}}</span>
+<span style="font-family: {{t.fN}}; font-size: 18px; font-weight: 500; color: {{k.c}}; text-shadow: {{t.glow}}">{{k.value}}</span>
+<template data-scif value="{{k.sub}}" hint-placeholder-val="{{ false }}"><span style="font-family: {{t.fN}}; font-size: 12px; color: {{k.subC}}">{{k.sub}}</span></template>
+</div>
+</template>
+</div>
+</div>
+
+<template data-scif value="{{L.topNav}}" hint-placeholder-val="{{ true }}">
+<nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 2px 6px; padding: 0 24px; border-bottom: 1.5px solid {{t.rule}}">
+<template data-scfor list="{{tabs}}" as="x" hint-placeholder-count="8">
+<button type="button" aria-current="{{x.cur}}" onClick="{{x.go}}" style="min-height: 48px; padding: 0 10px; background: transparent; border: 0; border-bottom: 4px solid {{x.line}}; color: {{x.lineFg}}; font-family: {{t.fN}}; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer">{{x.label}}</button>
+</template>
+</nav>
+</template>
+
+<template data-scif value="{{L.stageNav}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; padding: 16px 24px; border-bottom: 1.5px solid {{t.rule}}">
+<button type="button" onClick="{{prevTab}}" aria-label="Previous page" style="width: 48px; height: 48px; background: transparent; color: {{t.ink}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; font-size: 18px; cursor: pointer">◀</button>
+<span style="min-width: 240px; text-align: center; font-family: {{t.fD}}; font-weight: 700; font-size: 26px; letter-spacing: 0.06em; text-shadow: {{t.glow}}">{{curLabelUp}}</span>
+<button type="button" onClick="{{nextTab}}" aria-label="Next page" style="width: 48px; height: 48px; background: transparent; color: {{t.ink}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; font-size: 18px; cursor: pointer">▶</button>
+<button type="button" onClick="{{toggleMenu}}" aria-expanded="{{menuExp}}" style="min-height: 48px; padding: 0 16px; background: {{t.strong}}; color: {{t.onStrong}}; border: 0; border-radius: {{t.rB}}; font-family: {{t.fN}}; font-size: 12px; letter-spacing: 0.1em; cursor: pointer">{{menuLabel}}</button>
+</div>
+<template data-scif value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; padding: 16px 24px; border-bottom: 1.5px solid {{t.rule}}">
+<template data-scfor list="{{tabs}}" as="x" hint-placeholder-count="8">
+<button type="button" aria-current="{{x.cur}}" onClick="{{x.goClose}}" style="min-height: 64px; text-align: left; padding: 10px 14px; background: {{x.bg}}; color: {{x.fg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; font-family: {{t.fD}}; font-size: 16px; cursor: pointer"><span style="display: block; font-family: {{t.fN}}; font-size: 11px">{{x.code}}</span>{{x.label}}</button>
+</template>
+</div>
+</template>
+</template>
+
+<main style="flex: 1; min-width: 0; padding: {{L.mainPad}}">
+<template data-scif value="{{isDash}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; flex-direction: {{L.dashDir}}; gap: 28px">
+<section aria-label="The tower" style="flex: {{L.towerFlex}}; min-width: 0">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px">
+<h1 style="margin: 0; font-family: {{t.fD}}; font-weight: 700; font-size: 34px; letter-spacing: 0.04em; text-shadow: {{t.glow}}">MUSDASH · {{towerName}}</h1>
+<template data-scif value="{{agaruzo}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="background: {{t.strong}}; color: {{t.onStrong}}; padding: 10px 18px; border-radius: {{t.rB}}; display: flex; align-items: baseline; gap: 12px; box-shadow: {{t.shadow}}">
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 24px; letter-spacing: 0.06em">AGARUZO!</span>
+<span style="font-family: {{t.fN}}; font-size: 12px">FLOOR {{posFloor}}</span>
+</div>
+</template>
+</div>
+
+<template data-scif value="{{tw.bars}}" hint-placeholder-val="{{ true }}">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr) 120px; gap: 10px; padding-bottom: 8px; border-bottom: 1.5px solid {{t.rule}}; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em">
+<span style="text-align: right; color: {{t.bull}}">▲ BULL POOL</span><span style="text-align: center; color: {{t.muted}}">FLOOR</span><span style="color: {{t.bear}}">BEAR POOL ▼</span><span style="color: {{t.muted}}">STATUS</span>
+</div>
+<template data-scfor list="{{floors}}" as="f" hint-placeholder-count="10">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 110px minmax(0, 1fr) 120px; gap: 10px; align-items: center; height: 58px; border-bottom: 1px solid {{t.rule2}}; background: {{f.rowBg}}">
+<div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px">
+<template data-scif value="{{f.you}}" hint-placeholder-val="{{ false }}"><span style="background: {{t.strong}}; color: {{t.onStrong}}; font-family: {{t.fN}}; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: {{t.rB}}">YOU</span></template>
+<span style="font-family: {{t.fN}}; font-size: 13px; color: {{t.muted}}">{{f.bullAmt}}</span>
+<span aria-hidden="true" style="height: 16px; width: {{f.bullW}}; background: {{t.bullBar}}; border-radius: {{t.rBar}}"></span>
+</div>
+<button type="button" onClick="{{f.pick}}" aria-label="Pick floor {{f.num}}" style="display: flex; align-items: baseline; justify-content: center; gap: 6px; height: 50px; background: transparent; border: 0; color: {{t.ink}}; cursor: pointer">
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 28px; color: {{f.numC}}">{{f.num}}</span>
+<span style="font-family: {{t.fN}}; font-size: 13px; color: {{t.muted}}">{{f.lev}}×</span>
+</button>
+<div style="display: flex; align-items: center; gap: 10px">
+<span aria-hidden="true" style="height: 16px; width: {{f.bearW}}; box-sizing: border-box; background: {{t.bearBar}}; border: 1.5px solid {{t.bearLine}}; border-radius: {{t.rBar}}"></span>
+<span style="font-family: {{t.fN}}; font-size: 13px; color: {{t.muted}}">{{f.bearAmt}}</span>
+<template data-scif value="{{f.agents}}" hint-placeholder-val="{{ false }}"><span style="font-family: {{t.fN}}; font-size: 11px; border: 1.5px dashed {{t.ink}}; padding: 1px 6px">AGENT ×{{f.agents}}</span></template>
+</div>
+<span style="font-family: {{t.fN}}; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 6px 8px; text-align: center; background: {{f.stBg}}; color: {{f.stFg}}; border-radius: {{t.rB}}">{{f.status}}</span>
+</div>
+</template>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 12px; font-family: {{t.fN}}; font-size: 11px; color: {{t.muted}}; letter-spacing: 0.08em">
+<span>SOLID = BULL · OUTLINED = BEAR · CLICK A FLOOR NUMBER TO PICK IT</span>
+<span>PREMIUM = CLIMB PREMIUM, FLOORS 7 TO 10</span>
+</div>
+</template>
+
+<template data-scif value="{{tw.building}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; align-items: center; padding-top: 6px">
+<div aria-hidden="true" style="width: 2px; height: 30px; background: {{t.ink}}"></div>
+<div aria-hidden="true" style="width: 0; height: 0; border-left: 70px solid transparent; border-right: 70px solid transparent; border-bottom: 24px solid {{t.ink}}"></div>
+<template data-scfor list="{{floors}}" as="f" hint-placeholder-count="10">
+<button type="button" onClick="{{f.pick}}" aria-label="Floor {{f.num}}: bull {{f.bullAmt}}, bear {{f.bearAmt}}, {{f.status}}" style="width: {{f.slabW}}; min-height: 56px; margin-top: 4px; display: grid; grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr); align-items: center; gap: 10px; padding: 6px 12px; box-sizing: border-box; background: {{f.slabBg}}; border: 2px {{f.slabLine}} {{f.slabEdge}}; color: {{t.ink}}; cursor: pointer">
+<span style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px">
+<template data-scif value="{{f.collapsed}}" hint-placeholder-val="{{ false }}"><span style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.1em; color: {{t.neg}}">LIGHTS OUT</span></template>
+<template data-scfor list="{{f.bullWin}}" as="w" hint-placeholder-count="6"><span aria-hidden="true" style="width: 10px; height: 14px; background: {{w.c}}; box-shadow: inset 0 0 0 1.5px {{w.l}}; outline: {{w.o}}; outline-offset: 1px"></span></template>
+</span>
+<span style="display: flex; flex-direction: column; align-items: center; line-height: 1.1">
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 22px; color: {{f.numC}}">{{f.num}}</span>
+<span style="font-family: {{t.fN}}; font-size: 11px; color: {{t.muted}}">{{f.lev}}× {{f.premTag}}</span>
+</span>
+<span style="display: flex; flex-wrap: wrap; gap: 4px">
+<template data-scfor list="{{f.bearWin}}" as="w" hint-placeholder-count="6"><span aria-hidden="true" style="width: 10px; height: 14px; background: {{w.c}}; box-shadow: inset 0 0 0 1.5px {{w.l}}"></span></template>
+</span>
+</button>
+</template>
+<div aria-hidden="true" style="width: 100%; height: 8px; background: {{t.ink}}; margin-top: 6px"></div>
+<div style="display: flex; justify-content: space-between; width: 100%; margin-top: 10px; font-family: {{t.fN}}; font-size: 11px; color: {{t.muted}}; letter-spacing: 0.1em">
+<span style="color: {{t.bull}}">▲ BULL WINDOWS</span><span>1 LIT WINDOW = 1 POSITION · CLICK A FLOOR</span><span style="color: {{t.bear}}">BEAR WINDOWS ▼</span>
+</div>
+</div>
+</template>
+
+<template data-scif value="{{tw.shaft}}" hint-placeholder-val="{{ false }}">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr); font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; padding-bottom: 8px">
+<span style="text-align: right; padding-right: 14px; color: {{t.bull}}">▲ BULL POOL</span><span style="text-align: center; color: {{t.muted}}">SHAFT</span><span style="padding-left: 14px; color: {{t.bear}}">BEAR POOL ▼</span>
+</div>
+<div style="position: relative">
+<template data-scfor list="{{floors}}" as="f" hint-placeholder-count="10">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr); height: 58px; align-items: center">
+<div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding-right: 14px; height: 100%; border-top: 1px dashed {{t.rule2}}">
+<template data-scif value="{{f.collapsed}}" hint-placeholder-val="{{ false }}"><span style="font-family: {{t.fN}}; font-size: 12px; color: {{t.neg}}">✕ CABLE CUT</span></template>
+<template data-scif value="{{f.live}}" hint-placeholder-val="{{ true }}"><span style="font-family: {{t.fN}}; font-size: 13px; color: {{t.bull}}">{{f.bullAmt}}</span><span aria-hidden="true" style="height: 6px; width: {{f.bullW}}; background: {{t.bullBar}}"></span></template>
+</div>
+<button type="button" onClick="{{f.pick}}" aria-label="Pick floor {{f.num}}" style="height: 100%; border: 0; border-left: 3px solid {{t.ink}}; border-right: 3px solid {{t.ink}}; border-top: 1px dashed {{t.rule2}}; background: {{f.shaftBg}}; color: {{f.numC}}; font-family: {{t.fD}}; font-weight: 700; font-size: 18px; cursor: pointer">{{f.num}}<span style="display: block; font-family: {{t.fN}}; font-size: 10px; font-weight: 400; color: {{t.muted}}">{{f.lev}}×</span></button>
+<div style="display: flex; align-items: center; gap: 10px; padding-left: 14px; height: 100%; border-top: 1px dashed {{t.rule2}}">
+<span aria-hidden="true" style="height: 6px; width: {{f.bearW}}; background: {{t.bearLine}}"></span><span style="font-family: {{t.fN}}; font-size: 13px; color: {{t.bear}}">{{f.bearAmt}}</span>
+<template data-scif value="{{f.prem}}" hint-placeholder-val="{{ false }}"><span style="font-family: {{t.fN}}; font-size: 10px; color: {{t.hi}}; border: 1px solid {{t.hi}}; padding: 1px 5px">PREMIUM {{f.prem}}×</span></template>
+</div>
+</div>
+</template>
+<div class="juu-car" style="position: absolute; left: 50%; margin-left: -42px; top: {{carTop}}; width: 84px; height: 50px; background: {{t.strong}}; color: {{t.onStrong}}; border-radius: 6px; box-shadow: {{t.shadow}}; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none">
+<span style="font-family: {{t.fN}}; font-size: 10px; letter-spacing: 0.1em">YOU ▲</span>
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 20px; line-height: 1">{{posFloor}}</span>
+</div>
+</div>
+<div style="margin-top: 12px; font-family: {{t.fN}}; font-size: 11px; color: {{t.muted}}; letter-spacing: 0.1em">THE CAR IS YOU. CLIMB AND WATCH IT RIDE. CLICK THE SHAFT TO PICK A FLOOR.</div>
+</template>
+
+<template data-scif value="{{tw.rings}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: center">
+<div style="position: relative; width: 420px; height: 420px; flex: 0 0 auto; max-width: 100%">
+<template data-scfor list="{{rings}}" as="g" hint-placeholder-count="10">
+<button type="button" onClick="{{g.pick}}" aria-label="Floor {{g.num}}: bull {{g.pct}} percent of the pool" style="position: absolute; left: 50%; top: 50%; width: {{g.d}}; height: {{g.d}}; margin-left: {{g.m}}; margin-top: {{g.m}}; border-radius: 50%; background: {{g.bg}}; border: 4px solid {{g.edge}}; box-sizing: border-box; padding: 0; cursor: pointer"></button>
+</template>
+<template data-scfor list="{{rings}}" as="g" hint-placeholder-count="10">
+<span aria-hidden="true" style="position: absolute; left: 50%; top: {{g.labTop}}; transform: translateX(-50%); font-family: {{t.fN}}; font-size: 10px; background: {{t.surf}}; color: {{t.ink}}; padding: 0 4px; pointer-events: none">{{g.num}}</span>
+</template>
+<div style="position: absolute; left: 50%; top: 50%; width: 70px; height: 70px; margin: -35px 0 0 -35px; border-radius: 50%; background: {{t.strong}}; color: {{t.onStrong}}; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none">
+<span style="font-family: {{t.fN}}; font-size: 9px">YOU</span><span style="font-family: {{t.fD}}; font-weight: 700; font-size: 20px; line-height: 1">{{posFloor}}</span>
+</div>
+</div>
+<div style="flex: 1 1 220px; min-width: 0">
+<div style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">TOP-DOWN VIEW · OUTER RING = FLOOR 1</div>
+<template data-scfor list="{{floors}}" as="f" hint-placeholder-count="10">
+<div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid {{t.rule2}}; font-family: {{t.fN}}; font-size: 12px; background: {{f.rowBg}}">
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 16px; color: {{f.numC}}">{{f.num}}</span><span style="color: {{t.bull}}">▲ {{f.bullAmt}}</span><span style="color: {{t.bear}}">▼ {{f.bearAmt}}</span><span style="color: {{t.muted}}">{{f.short}}</span>
+</div>
+</template>
+</div>
+</div>
+</template>
+
+<template data-scif value="{{tw.book}}" hint-placeholder-val="{{ false }}">
+<div style="border: 1.5px solid {{t.rule}}">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; padding: 10px 14px; font-family: {{t.fN}}; font-size: 10px; letter-spacing: 0.12em; color: {{t.muted}}; border-bottom: 1px solid {{t.rule2}}">
+<span>BULL POOL</span><span style="text-align: right">BULL FALLS AT</span><span style="text-align: center">FLOOR</span><span>BEAR FALLS AT</span><span style="text-align: right">BEAR POOL</span>
+</div>
+<div style="display: flex; justify-content: center; align-items: baseline; gap: 12px; padding: 10px; background: {{t.strong}}; color: {{t.onStrong}}; font-family: {{t.fN}}">
+<span style="font-size: 11px; letter-spacing: 0.12em">MARK</span><span style="font-size: 22px; font-weight: 600">$71,000.00</span><span style="font-size: 12px">▲ 1.24%</span>
+</div>
+<template data-scfor list="{{floors}}" as="f" hint-placeholder-count="10">
+<button type="button" onClick="{{f.pick}}" aria-label="Pick floor {{f.num}}" style="position: relative; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: center; height: 46px; padding: 0 14px; background: {{f.rowBg}}; border: 0; border-bottom: 1px solid {{t.rule2}}; color: {{t.ink}}; font-family: {{t.fN}}; font-size: 14px; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="position: absolute; left: 0; top: 4px; bottom: 4px; width: {{f.bullDepth}}; background: {{t.bullBar}}; opacity: 0.18"></span>
+<span aria-hidden="true" style="position: absolute; right: 0; top: 4px; bottom: 4px; width: {{f.bearDepth}}; background: {{t.bearLine}}; opacity: 0.18"></span>
+<span style="position: relative; color: {{t.bull}}">{{f.bullAmt}}</span>
+<span style="position: relative; text-align: right; color: {{t.bull}}">{{f.liqBull}}</span>
+<span style="position: relative; text-align: center; font-family: {{t.fD}}; font-weight: 700; font-size: 18px; color: {{f.numC}}">{{f.num}}</span>
+<span style="position: relative; color: {{t.bear}}">{{f.liqBear}}</span>
+<span style="position: relative; text-align: right; color: {{t.bear}}">{{f.bearAmt}}</span>
+</button>
+</template>
+</div>
+<div style="margin-top: 12px; font-family: {{t.fN}}; font-size: 11px; color: {{t.muted}}; letter-spacing: 0.1em">ORDER-BOOK VIEW · EACH FLOOR IS A PRICE LADDER RUNG · SHADE = POOL DEPTH</div>
+</template>
+<section aria-label="Live" style="border-top: 1.5px solid {{t.rule}}; padding-top: 18px; margin-top: 56px">
+<div style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">LIVE</div>
+<template data-scfor list="{{feed}}" as="e" hint-placeholder-count="5">
+<div style="display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid {{t.rule2}}; font-family: {{t.fN}}; font-size: 12px"><span style="color: {{t.muted}}; flex: 0 0 44px">{{e.t}}</span><span style="color: {{e.c}}">{{e.m}}</span></div>
+</template>
+</section>
+</section>
+
+<aside style="flex: {{L.asideFlex}}; min-width: 0; display: {{L.asideDisp}}; flex-direction: column; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; align-items: {{L.asideAlign}}">
+<section aria-label="Place a position" style="border-top: 1.5px solid {{t.rule}}; padding-top: 18px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button type="button" aria-pressed="{{bullOn}}" onClick="{{pickBull}}" style="height: 52px; font-family: {{t.fD}}; font-weight: 700; font-size: 16px; letter-spacing: 0.06em; background: {{bullBg}}; color: {{bullFg}}; border: 1.5px solid {{t.bullLine}}; border-radius: {{t.rB}}; cursor: pointer">▲ BULL</button>
+<button type="button" aria-pressed="{{bearOn}}" onClick="{{pickBear}}" style="height: 52px; font-family: {{t.fD}}; font-weight: 700; font-size: 16px; letter-spacing: 0.06em; background: {{bearBg}}; color: {{bearFg}}; border: 1.5px solid {{t.bearLine}}; border-radius: {{t.rB}}; cursor: pointer">BEAR ▼</button>
+</div>
+<div style="margin-top: 16px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">CHIPS</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px">
+<template data-scfor list="{{chips}}" as="c" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="min-height: 44px; min-width: 0; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0; background: {{c.bg}}; color: {{c.fg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">{{c.label}}</button>
+</template>
+</div>
+<label for="amtC" style="display: block; margin-top: 16px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">AMOUNT</label>
+<div style="display: flex; align-items: baseline; border-bottom: 1.5px solid {{t.rule}}; margin-top: 6px">
+<input id="amtC" value="{{amountStr}}" onChange="{{onAmt}}" inputmode="decimal" style="flex: 1 1 auto; width: 0; min-width: 0; border: 0; background: transparent; font-family: {{t.fN}}; font-weight: 500; font-size: 30px; padding: 6px 0; color: {{t.ink}}">
+<span style="font-family: {{t.fN}}; font-size: 12px; color: {{t.muted}}">{{chipUnit}}</span>
+</div>
+<div style="margin-top: 16px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">FLOOR</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin-top: 8px">
+<template data-scfor list="{{picks}}" as="p" hint-placeholder-count="10">
+<button type="button" aria-pressed="{{p.on}}" onClick="{{p.pick}}" style="min-height: 44px; padding: 0; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; background: {{p.bg}}; color: {{p.fg}}; font-family: {{t.fN}}; font-weight: 600; font-size: 14px; cursor: pointer">{{p.n}}</button>
+</template>
+</div>
+<dl style="margin: 16px 0 0; display: grid; grid-template-columns: auto auto; row-gap: 8px; font-family: {{t.fN}}; font-size: 13px">
+<dt style="color: {{t.muted}}">Leverage</dt><dd style="margin: 0; text-align: right">{{slip.lev}}×</dd>
+<dt style="color: {{t.muted}}">Exposure</dt><dd style="margin: 0; text-align: right">{{slip.exp}} MUSD</dd>
+<dt style="color: {{t.muted}}">Collapses at</dt><dd style="margin: 0; text-align: right; color: {{t.neg}}">${{slip.liq}}</dd>
+<dt style="color: {{t.muted}}">Fee</dt><dd style="margin: 0; text-align: right">{{slip.fee}} MUSD</dd>
+<dt style="color: {{t.muted}}">Climb premium</dt><dd style="margin: 0; text-align: right; color: {{t.muted}}">{{slip.prem}}</dd>
+</dl>
+<button type="button" onClick="{{openPos}}" style="margin-top: 18px; width: 100%; height: 56px; background: {{t.strong}}; color: {{t.onStrong}}; border: 0; border-radius: {{t.rB}}; box-shadow: {{t.shadow}}; font-family: {{t.fD}}; font-weight: 700; font-size: 17px; letter-spacing: 0.08em; cursor: pointer">OPEN ON FLOOR {{slip.floor}}</button>
+</section>
+
+<section aria-label="Your position" style="display: flex; gap: 16px; align-items: stretch; border-top: 1.5px solid {{t.rule}}; padding-top: 18px">
+<div style="flex: 0 0 84px; background: {{t.panel}}; color: {{t.onPanel}}; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: {{t.rB}}">
+<span style="font-family: {{t.fN}}; font-size: 10px; letter-spacing: 0.12em">FLOOR</span>
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 36px; line-height: 1">{{posFloor}}</span>
+</div>
+<div style="flex: 1; min-width: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-family: {{t.fN}}; font-size: 14px; color: {{t.bull}}">▲ BULL · {{posLev}}×</span><span style="font-family: {{t.fN}}; font-size: 18px; color: {{t.pos}}">+84.20</span></div>
+<div style="font-family: {{t.fN}}; font-size: 12px; color: {{t.muted}}; margin-top: 4px">1,250 MUSD · collapses at ${{posLiq}}</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px">
+<button type="button" onClick="{{dropPos}}" style="min-height: 44px; font-family: {{t.fN}}; font-size: 12px; background: transparent; color: {{t.ink}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">↓ DROP</button>
+<button type="button" onClick="{{climbPos}}" style="min-height: 44px; font-family: {{t.fN}}; font-size: 12px; background: {{t.strong}}; color: {{t.onStrong}}; border: 1.5px solid {{t.strong}}; border-radius: {{t.rB}}; cursor: pointer">↑ CLIMB</button>
+<button type="button" style="min-height: 44px; font-family: {{t.fN}}; font-size: 12px; background: transparent; color: {{t.ink}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">CASH OUT</button>
+</div>
+<label style="display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; cursor: pointer">
+<input type="checkbox" checked="{{loop}}" onChange="{{toggleLoop}}" style="width: 18px; height: 18px; accent-color: {{t.ink}}">
+Loop winnings into my BTC lock
+</label>
+</div>
+</section>
+
+
+</aside>
+</div>
+</template>
+
+<template data-scif value="{{isPos}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
+<div><div style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">TOTAL IN JUU</div><div style="font-family: {{t.fN}}; font-weight: 500; font-size: 48px; line-height: 1.1">0.0260 <span style="font-size: 16px; color: {{t.muted}}">BTC</span></div></div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer"><input type="checkbox" checked="{{loop}}" onChange="{{toggleLoop}}" style="width: 18px; height: 18px; accent-color: {{t.ink}}">Loop winnings into my BTC lock</label>
+</div>
+<div style="margin-top: 24px; overflow-x: auto">
+<table style="width: 100%; min-width: 620px; border-collapse: collapse; font-family: {{t.fN}}; font-size: 14px">
+<thead><tr style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}"><th style="text-align: left; padding: 10px 0; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">SERIES</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">PRINCIPAL · BTC BACK</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">YIELD</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">EARNED</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">ENDS</th></tr></thead>
+<tbody>
+<template data-scfor list="{{series}}" as="s" hint-placeholder-count="3">
+<tr><td style="padding: 16px 0; border-bottom: 1px solid {{t.rule2}}; font-weight: 600">{{s.name}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}">{{s.p}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}">{{s.y}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}; color: {{t.pos}}">{{s.earned}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}; color: {{t.muted}}">{{s.left}}</td></tr>
+</template>
+</tbody>
+</table>
+</div>
+<div style="margin-top: 28px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">OPEN BETS</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 10px">
+<div style="display: flex; gap: 14px; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; padding: 14px">
+<div style="flex: 0 0 64px; background: {{t.panel}}; color: {{t.onPanel}}; display: flex; align-items: center; justify-content: center; font-family: {{t.fD}}; font-weight: 700; font-size: 26px; border-radius: {{t.rB}}">{{posFloor}}</div>
+<div style="flex: 1; font-family: {{t.fN}}"><div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: {{t.bull}}">▲ BULL · MUSD</span><span style="color: {{t.pos}}">+84.20</span></div><div style="font-size: 12px; color: {{t.muted}}; margin-top: 4px">1,250 MUSD · collapses at ${{posLiq}}</div></div>
+</div>
+<div style="display: flex; gap: 14px; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; padding: 14px">
+<div style="flex: 0 0 64px; border: 1.5px solid {{t.bearLine}}; display: flex; align-items: center; justify-content: center; font-family: {{t.fD}}; font-weight: 700; font-size: 26px; border-radius: {{t.rB}}">02</div>
+<div style="flex: 1; font-family: {{t.fN}}"><div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: {{t.bear}}">BEAR ▼ · YIELD CHIPS</span><span style="color: {{t.neg}}">−3.10</span></div><div style="font-size: 12px; color: {{t.muted}}; margin-top: 4px">0.0100 Yield · collapses at $105,080</div></div>
+</div>
+</div>
+</template>
+
+<template data-scif value="{{isDoors}}" hint-placeholder-val="{{ false }}">
+<h1 style="margin: 0; font-family: {{t.fD}}; font-weight: 700; font-size: 34px; letter-spacing: 0.04em">DOORS</h1>
+<p style="margin: 6px 0 20px; font-size: 15px; color: {{t.muted}}">Bring something in. Juu splits it into Principal and Yield.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
+<template data-scfor list="{{doors}}" as="d" hint-placeholder-count="4">
+<button type="button" aria-pressed="{{d.on}}" onClick="{{d.pick}}" style="text-align: left; padding: 18px; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer; background: {{d.bg}}; color: {{d.fg}}; font-family: {{t.fB}}">
+<span style="display: block; font-family: {{t.fN}}; font-size: 28px">{{d.code}}</span>
+<span style="display: block; font-family: {{t.fD}}; font-weight: 700; font-size: 16px; margin-top: 8px; letter-spacing: 0.06em">{{d.title}}</span>
+<span style="display: block; font-size: 13px; margin-top: 6px; line-height: 1.5">{{d.desc}}</span>
+</button>
+</template>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 28px; margin-top: 26px; border-top: 1.5px solid {{t.rule}}; padding-top: 22px">
+<div style="flex: 1 1 320px; min-width: 0">
+<div style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">{{door.title}}</div>
+<label for="doorAmt" style="display: block; margin-top: 14px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">AMOUNT</label>
+<div style="display: flex; align-items: baseline; border-bottom: 1.5px solid {{t.rule}}; margin-top: 6px">
+<input id="doorAmt" value="0.0100" inputmode="decimal" style="flex: 1 1 auto; width: 0; min-width: 0; border: 0; background: transparent; font-family: {{t.fN}}; font-size: 30px; padding: 6px 0; color: {{t.ink}}">
+<span style="font-family: {{t.fN}}; font-size: 12px; color: {{t.muted}}">{{door.unit}}</span>
+</div>
+<div style="margin-top: 16px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">SERIES (END DATE)</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px">
+<template data-scfor list="{{seriesPicks}}" as="s" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{s.on}}" onClick="{{s.pick}}" style="min-height: 44px; padding: 0 14px; font-family: {{t.fN}}; font-size: 12px; background: {{s.bg}}; color: {{s.fg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">{{s.name}}</button>
+</template>
+</div>
+<p style="font-size: 13px; color: {{t.muted}}; line-height: 1.6; margin: 14px 0 0">{{door.note}}</p>
+</div>
+<div style="flex: 1 1 280px; min-width: 0; background: {{t.panel}}; color: {{t.onPanel}}; border-radius: {{t.rB}}; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; font-family: {{t.fN}}">
+<div>
+<div style="font-size: 11px; letter-spacing: 0.12em">YOU GET</div>
+<div style="display: flex; justify-content: space-between; margin-top: 14px; font-size: 14px"><span>Principal · {{pickedSeries}}</span><span style="font-size: 20px">0.0100</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px"><span>Yield · {{pickedSeries}}</span><span style="font-size: 20px">0.0100</span></div>
+<p style="font-family: {{t.fB}}; font-size: 13px; margin: 14px 0 0; line-height: 1.5">Your BTC stays locked in Juu until {{pickedSeries}}.</p>
+</div>
+<button type="button" style="height: 54px; background: {{t.strong}}; color: {{t.onStrong}}; border: 1.5px solid {{t.onPanel}}; border-radius: {{t.rB}}; font-family: {{t.fD}}; font-weight: 700; font-size: 15px; letter-spacing: 0.06em; cursor: pointer">ENTER THROUGH THIS DOOR</button>
+</div>
+</div>
+</template>
+
+<template data-scif value="{{isBank}}" hint-placeholder-val="{{ false }}">
+<div style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">YOUR SHARE OF THE BANK</div>
+<div style="font-family: {{t.fN}}; font-weight: 500; font-size: 48px; line-height: 1.1">0.0112 <span style="font-size: 16px; color: {{t.muted}}">BTC</span></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: 22px; border-top: 1.5px solid {{t.rule}}; border-bottom: 1.5px solid {{t.rule}}; font-family: {{t.fN}}">
+<div style="padding: 16px 0"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">BANK HOLDS</div><div style="font-size: 24px; margin-top: 4px">0.0900 BTC</div></div>
+<div style="padding: 16px 0"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">TROVE SAFETY</div><div style="font-size: 24px; margin-top: 4px; color: {{t.pos}}">300%</div></div>
+<div style="padding: 16px 0"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">MUSD TO PAY WINNERS</div><div style="font-size: 24px; margin-top: 4px">1,937</div></div>
+<div style="padding: 16px 0"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">CASH RESERVE RULE</div><div style="font-size: 24px; margin-top: 4px; color: {{t.hi}}">20% MUSD</div></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 32px; margin-top: 24px">
+<section style="flex: 1 1 340px; min-width: 0">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px">
+<button type="button" aria-pressed="{{depOn}}" onClick="{{pickDep}}" style="height: 48px; font-family: {{t.fN}}; font-size: 13px; background: {{depBg}}; color: {{depFg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">DEPOSIT</button>
+<button type="button" aria-pressed="{{wdOn}}" onClick="{{pickWd}}" style="height: 48px; font-family: {{t.fN}}; font-size: 13px; background: {{wdBg}}; color: {{wdFg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">WITHDRAW</button>
+</div>
+<label for="bankAmt" style="display: block; margin-top: 16px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">{{bankVerb}} BTC</label>
+<div style="display: flex; align-items: baseline; border-bottom: 1.5px solid {{t.rule}}; margin-top: 6px">
+<input id="bankAmt" value="0.0100" inputmode="decimal" style="flex: 1 1 auto; width: 0; min-width: 0; border: 0; background: transparent; font-family: {{t.fN}}; font-size: 30px; padding: 6px 0; color: {{t.ink}}">
+<span style="font-family: {{t.fN}}; font-size: 12px; color: {{t.muted}}">BTC</span>
+</div>
+<p style="font-size: 13px; color: {{t.muted}}; line-height: 1.6">{{bankNote}}</p>
+<button type="button" style="width: 100%; height: 54px; background: {{t.strong}}; color: {{t.onStrong}}; border: 0; border-radius: {{t.rB}}; font-family: {{t.fD}}; font-weight: 700; font-size: 15px; letter-spacing: 0.06em; cursor: pointer">{{bankCta}}</button>
+</section>
+<section style="flex: 1 1 340px; min-width: 0">
+<div style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">WHERE THE BANK EARNS</div>
+<template data-scfor list="{{earn}}" as="e" hint-placeholder-count="4">
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 13px 0; border-bottom: 1px solid {{t.rule2}}; font-size: 14px"><span>{{e.k}}</span><span style="font-family: {{t.fN}}; font-size: 13px; text-align: right">{{e.v}}</span></div>
+</template>
+</section>
+</div>
+</template>
+
+<template data-scif value="{{isMarket}}" hint-placeholder-val="{{ false }}">
+<h1 style="margin: 0; font-family: {{t.fD}}; font-weight: 700; font-size: 34px; letter-spacing: 0.04em">PRINCIPAL MARKET</h1>
+<p style="margin: 6px 0 20px; font-size: 15px; color: {{t.muted}}">Buy bitcoin below full price. Get the full bitcoin on the end date. No game.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 32px">
+<section style="flex: 999 1 540px; min-width: 0; overflow-x: auto">
+<table style="width: 100%; min-width: 540px; border-collapse: collapse; font-family: {{t.fN}}; font-size: 14px">
+<thead><tr style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}"><th style="text-align: left; padding: 10px 0; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">SERIES</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">PRICE</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">DISCOUNT</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">FIXED RETURN</th><th style="border-bottom: 1.5px solid {{t.rule}}"><span style="position: absolute; left: -9999px">Select</span></th></tr></thead>
+<tbody>
+<template data-scfor list="{{market}}" as="m" hint-placeholder-count="3">
+<tr style="background: {{m.rowBg}}"><td style="padding: 16px 8px 16px 0; border-bottom: 1px solid {{t.rule2}}"><div style="font-weight: 600">Principal · {{m.name}}</div><div style="font-size: 11px; color: {{t.muted}}">{{m.left}}</div></td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}">{{m.price}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}">{{m.disc}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}; color: {{t.pos}}">{{m.ret}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}; padding-left: 12px"><button type="button" onClick="{{m.pick}}" style="min-height: 40px; padding: 0 12px; font-family: {{t.fN}}; font-size: 12px; background: {{m.btnBg}}; color: {{m.btnFg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">{{m.btn}}</button></td></tr>
+</template>
+</tbody>
+</table>
+</section>
+<section style="flex: 1 1 300px; min-width: 0; background: {{t.panel}}; color: {{t.onPanel}}; border-radius: {{t.rB}}; padding: 22px; font-family: {{t.fN}}">
+<div style="font-size: 11px; letter-spacing: 0.12em">BUY PRINCIPAL · {{mk.name}}</div>
+<div style="font-size: 46px; margin-top: 10px">{{mk.ret}}</div>
+<div style="font-family: {{t.fB}}; font-size: 13px">fixed return if you hold to the end date</div>
+<label for="mkAmt" style="display: block; font-size: 11px; letter-spacing: 0.12em; margin-top: 18px">PAY (BTC)</label>
+<input id="mkAmt" value="{{mk.price}}" inputmode="decimal" style="width: 100%; box-sizing: border-box; margin-top: 6px; background: transparent; border: 0; border-bottom: 1.5px solid {{t.onPanel}}; color: {{t.onPanel}}; font-family: {{t.fN}}; font-size: 28px; padding: 6px 0">
+<div style="display: flex; justify-content: space-between; margin-top: 14px; font-size: 13px"><span>You get</span><span>1.0000 Principal → 1.0000 BTC</span></div>
+<button type="button" style="margin-top: 20px; width: 100%; height: 54px; background: {{t.strong}}; color: {{t.onStrong}}; border: 1.5px solid {{t.onPanel}}; border-radius: {{t.rB}}; font-family: {{t.fD}}; font-weight: 700; font-size: 15px; letter-spacing: 0.06em; cursor: pointer">BUY AT {{mk.disc}} OFF</button>
+</section>
+</div>
+</template>
+
+<template data-scif value="{{isJackpot}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: center">
+<div style="flex: 1 1 320px; min-width: 0; font-family: {{t.fN}}">
+<div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">THIS WEEK'S JACKPOT</div>
+<div style="font-size: 80px; line-height: 1.05; color: {{t.hi}}">431 <span style="font-size: 18px; color: {{t.muted}}">MUSD</span></div>
+<div style="font-family: {{t.fB}}; font-size: 14px; color: {{t.muted}}">Paid from the safety jar's overflow</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 26px; border-top: 1.5px solid {{t.rule}}">
+<div style="padding: 14px 0"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">DRAW IN</div><div style="font-size: 24px; margin-top: 4px">5d 21h</div></div>
+<div style="padding: 14px 0"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">YOUR ODDS</div><div style="font-size: 24px; margin-top: 4px; color: {{t.pos}}">3.1%</div></div>
+<div style="padding: 14px 0; border-top: 1px solid {{t.rule2}}"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">YOUR TICKETS</div><div style="font-size: 24px; margin-top: 4px">1,284</div></div>
+<div style="padding: 14px 0; border-top: 1px solid {{t.rule2}}"><div style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">ALL TICKETS</div><div style="font-size: 24px; margin-top: 4px">41,402</div></div>
+</div>
+<p style="font-family: {{t.fB}}; font-size: 13px; color: {{t.muted}}">Tickets = position size × time held this week.</p>
+</div>
+<div style="flex: 1 1 420px; min-width: 0; display: flex; justify-content: center">
+<div role="img" aria-label="Ticket chamber: each ray is a ticket holder, length is their ticket count" style="position: relative; width: 440px; height: 440px; max-width: 100%">
+<template data-scfor list="{{raysBig}}" as="r" hint-placeholder-count="120">
+<span aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: {{r.w}}; height: {{r.len}}; margin-left: -1px; background: {{r.c}}; transform-origin: 50% 0; transform: rotate({{r.deg}}) translateY(66px)"></span>
+</template>
+<div style="position: absolute; left: 50%; top: 50%; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%; background: {{t.surf}}; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: {{t.fN}}">
+<span style="font-size: 24px">THU</span><span style="font-size: 10px; color: {{t.muted}}; letter-spacing: 0.12em">DRAW</span>
+</div>
+</div>
+</div>
+</div>
+<div style="margin-top: 24px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">PAST WINNERS</div>
+<template data-scfor list="{{winners}}" as="w" hint-placeholder-count="2">
+<div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid {{t.rule2}}; font-family: {{t.fN}}; font-size: 13px"><span>{{w.when}} · {{w.who}}</span><span style="color: {{t.hi}}">{{w.amt}}</span></div>
+</template>
+</template>
+
+<template data-scif value="{{isAgents}}" hint-placeholder-val="{{ false }}">
+<h1 style="margin: 0; font-family: {{t.fD}}; font-weight: 700; font-size: 34px; letter-spacing: 0.04em">AGENTS</h1>
+<p style="margin: 6px 0 20px; font-size: 15px; color: {{t.muted}}">Let your bot play. You set the rules. You can pull the plug any time.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px">
+<template data-scfor list="{{agents}}" as="a" hint-placeholder-count="2">
+<section style="border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; padding: 20px; opacity: {{a.dim}}">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: {{t.fD}}; font-weight: 700; font-size: 22px">{{a.name}}</span><span style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.08em; padding: 4px 10px; border-radius: {{t.rB}}; background: {{a.stBg}}; color: {{a.stFg}}; border: 1.5px solid {{t.rule}}">{{a.status}}</span></div>
+<div style="font-family: {{t.fN}}; font-size: 30px; margin-top: 10px; color: {{a.pnlC}}">{{a.pnl}}</div>
+<div style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">TODAY</div>
+<dl style="margin: 14px 0 0; display: grid; grid-template-columns: auto auto; row-gap: 8px; font-family: {{t.fN}}; font-size: 13px">
+<dt style="color: {{t.muted}}">Max per bet</dt><dd style="margin: 0; text-align: right">{{a.max}}</dd>
+<dt style="color: {{t.muted}}">Highest floor</dt><dd style="margin: 0; text-align: right">{{a.floor}}</dd>
+<dt style="color: {{t.muted}}">Daily loss stop</dt><dd style="margin: 0; text-align: right">{{a.loss}}</dd>
+<dt style="color: {{t.muted}}">Expires</dt><dd style="margin: 0; text-align: right">{{a.exp}}</dd>
+</dl>
+<button type="button" onClick="{{a.revoke}}" style="margin-top: 16px; width: 100%; height: 50px; font-family: {{t.fN}}; font-size: 13px; letter-spacing: 0.06em; background: {{a.btnBg}}; color: {{a.btnFg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">{{a.btn}}</button>
+</section>
+</template>
+<section style="background: {{t.panel}}; color: {{t.onPanel}}; border-radius: {{t.rB}}; padding: 20px">
+<div style="font-family: {{t.fD}}; font-weight: 700; font-size: 22px">+ NEW AGENT</div>
+<label for="agAddrC" style="display: block; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; margin-top: 14px">AGENT ADDRESS</label>
+<input id="agAddrC" placeholder="0x…" style="width: 100%; box-sizing: border-box; margin-top: 6px; background: transparent; border: 0; border-bottom: 1.5px solid {{t.onPanel}}; color: {{t.onPanel}}; font-family: {{t.fN}}; font-size: 16px; padding: 8px 0">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; font-family: {{t.fN}}">
+<div><label for="agMaxC" style="font-size: 11px; letter-spacing: 0.12em">MAX PER BET</label><input id="agMaxC" value="500 MUSD" style="width: 100%; box-sizing: border-box; margin-top: 6px; background: transparent; border: 0; border-bottom: 1.5px solid {{t.onPanel}}; color: {{t.onPanel}}; font-family: {{t.fN}}; font-size: 15px; padding: 8px 0"></div>
+<div><label for="agFloorC" style="font-size: 11px; letter-spacing: 0.12em">HIGHEST FLOOR</label><select id="agFloorC" style="width: 100%; box-sizing: border-box; margin-top: 6px; background: {{t.panel}}; border: 0; border-bottom: 1.5px solid {{t.onPanel}}; color: {{t.onPanel}}; font-family: {{t.fN}}; font-size: 15px; padding: 8px 0"><option>6</option><option>8</option><option>10</option></select></div>
+<div><label for="agLossC" style="font-size: 11px; letter-spacing: 0.12em">DAILY LOSS STOP</label><input id="agLossC" value="200 MUSD" style="width: 100%; box-sizing: border-box; margin-top: 6px; background: transparent; border: 0; border-bottom: 1.5px solid {{t.onPanel}}; color: {{t.onPanel}}; font-family: {{t.fN}}; font-size: 15px; padding: 8px 0"></div>
+<div><label for="agExpC" style="font-size: 11px; letter-spacing: 0.12em">EXPIRES IN</label><input id="agExpC" value="7 days" style="width: 100%; box-sizing: border-box; margin-top: 6px; background: transparent; border: 0; border-bottom: 1.5px solid {{t.onPanel}}; color: {{t.onPanel}}; font-family: {{t.fN}}; font-size: 15px; padding: 8px 0"></div>
+</div>
+<p style="font-size: 13px; line-height: 1.5; margin: 14px 0 0">Every agent move pays a small extra fee, split between the safety jar and the Bank.</p>
+<button type="button" style="margin-top: 14px; width: 100%; height: 52px; background: {{t.strong}}; color: {{t.onStrong}}; border: 1.5px solid {{t.onPanel}}; border-radius: {{t.rB}}; font-family: {{t.fD}}; font-weight: 700; font-size: 14px; letter-spacing: 0.06em; cursor: pointer">GIVE PERMISSION</button>
+</section>
+</div>
+</template>
+
+<template data-scif value="{{isBoard}}" hint-placeholder-val="{{ false }}">
+<h1 style="margin: 0; font-family: {{t.fD}}; font-weight: 700; font-size: 34px; letter-spacing: 0.04em">LEADERBOARD</h1>
+<p style="margin: 6px 0 16px; font-size: 15px; color: {{t.muted}}">Humans vs agents. Same rules, same tower.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px">
+<template data-scfor list="{{lbTabs}}" as="x" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{x.on}}" onClick="{{x.pick}}" style="min-height: 44px; padding: 0 16px; font-family: {{t.fN}}; font-size: 12px; letter-spacing: 0.08em; background: {{x.bg}}; color: {{x.fg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; cursor: pointer">{{x.label}}</button>
+</template>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 560px; border-collapse: collapse; font-family: {{t.fN}}; font-size: 14px">
+<thead><tr style="font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}"><th style="text-align: left; padding: 10px 0; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">#</th><th style="text-align: left; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">PLAYER</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">PROFIT</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">BEST FLOOR</th><th style="text-align: right; font-weight: 400; border-bottom: 1.5px solid {{t.rule}}">COLLAPSES SURVIVED</th></tr></thead>
+<tbody>
+<template data-scfor list="{{board}}" as="r" hint-placeholder-count="6">
+<tr><td style="padding: 14px 0; border-bottom: 1px solid {{t.rule2}}; font-size: 20px">{{r.rank}}</td><td style="border-bottom: 1px solid {{t.rule2}}"><span style="font-weight: 600">{{r.name}}</span> <span style="font-size: 10px; letter-spacing: 0.08em; padding: 2px 8px; margin-left: 6px; border-radius: {{t.rB}}; background: {{r.bBg}}; color: {{r.bFg}}; border: 1.5px {{r.bLine}} {{t.rule}}">{{r.kind}}</span></td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}; color: {{r.pnlC}}">{{r.pnl}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}">{{r.best}}</td><td style="text-align: right; border-bottom: 1px solid {{t.rule2}}">{{r.surv}}</td></tr>
+</template>
+</tbody>
+</table>
+</div>
+</template>
+
+</main>
+
+<template data-scif value="{{L.fkeys}}" hint-placeholder-val="{{ false }}">
+<nav aria-label="Main" style="display: flex; flex-wrap: wrap; border-top: 1.5px solid {{t.rule}}">
+<template data-scfor list="{{tabs}}" as="x" hint-placeholder-count="8">
+<button type="button" aria-current="{{x.cur}}" onClick="{{x.go}}" style="flex: 1 1 120px; min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: {{x.bg}}; color: {{x.fg}}; border: 0; border-right: 1px solid {{t.rule2}}; font-family: {{t.fN}}; font-size: 13px; cursor: pointer"><span style="border: 1px solid {{x.fg}}; padding: 1px 5px; font-size: 11px">{{x.fkey}}</span>{{x.label}}</button>
+</template>
+</nav>
+</template>
+
+<template data-scif value="{{L.dock}}" hint-placeholder-val="{{ false }}">
+<div style="position: sticky; bottom: 18px; display: flex; justify-content: center; padding: 0 16px 18px; pointer-events: none">
+<nav aria-label="Main" style="pointer-events: auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 6px; background: {{t.strong}}; border-radius: 999px; box-shadow: {{t.shadow}}">
+<template data-scfor list="{{tabs}}" as="x" hint-placeholder-count="8">
+<button type="button" aria-current="{{x.cur}}" onClick="{{x.go}}" style="min-height: 44px; padding: 0 14px; background: {{x.dockBg}}; color: {{x.dockFg}}; border: 0; border-radius: 999px; font-family: {{t.fN}}; font-size: 12px; letter-spacing: 0.06em; cursor: pointer">{{x.label}}</button>
+</template>
+</nav>
+</div>
+</template>
+
+<footer style="border-top: 1.5px solid {{t.rule}}; background: {{t.bg}}; padding: 48px 40px 28px; font-family: {{t.fB}}">
+<div style="display: flex; flex-wrap: wrap; gap: 40px 48px">
+<div style="flex: 2 1 300px; min-width: 0; max-width: 380px">
+<div style="display: flex; align-items: center; gap: 12px">
+<template data-scif value="{{logoIcon}}" hint-placeholder-val="{{ true }}"><span style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center"><template data-scif value="{{logo.stack}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="17" width="18" height="4"/><rect x="6" y="11" width="12" height="4"/><rect x="9" y="5" width="6" height="4"/></svg></template><template data-scif value="{{logo.ascent}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 21h16M6 17h12M8 13h8"/><path d="M12 3l5 6H7z" fill="currentColor" stroke="none"/></svg></template><template data-scif value="{{logo.stepj}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h5v11a7 7 0 0 1-7 7H5v-5h7a2 2 0 0 0 2-2z"/><rect x="5" y="3" width="5" height="5"/></svg></template><template data-scif value="{{logo.tendots}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><circle cx="16" cy="3.5" r="1.9" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="3.5" r="1.9"/><circle cx="8" cy="8" r="1.9"/><circle cx="16" cy="8" r="1.9"/><circle cx="8" cy="12.5" r="1.9"/><circle cx="16" cy="12.5" r="1.9"/><circle cx="8" cy="17" r="1.9"/><circle cx="16" cy="17" r="1.9"/><circle cx="8" cy="21.5" r="1.9"/><circle cx="16" cy="21.5" r="1.9"/></svg></template><template data-scif value="{{logo.burst}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5M4.2 4.2l3.5 3.5M16.3 16.3l3.5 3.5M4.2 19.8l3.5-3.5M16.3 7.7l3.5-3.5"/></svg></template></span></template>
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 26px">Juu</span>
+</div>
+<p style="margin: 16px 0 0; font-size: 14px; line-height: 1.6; color: {{t.ink}}">Bring your Bitcoin positions in, split them into Principal and Yield, then play them, save with them or lock in a fixed return.</p>
+</div>
+<template data-scfor list="{{footCols}}" as="col" hint-placeholder-count="4">
+<div style="flex: 1 1 150px; min-width: 0">
+<div style="font-family: {{t.fD}}; font-weight: 700; font-size: 16px">{{col.title}}</div>
+<ul style="list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px">
+<template data-scfor list="{{col.links}}" as="lk" hint-placeholder-count="4">
+<li>
+<template data-scif value="{{lk.go}}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{lk.go}}" style="min-height: 32px; padding: 0; background: transparent; border: 0; color: {{t.ink}}; font-family: {{t.fB}}; font-size: 14px; text-align: left; cursor: pointer">{{lk.label}}</button></template>
+<template data-scif value="{{lk.href}}" hint-placeholder-val="{{ false }}"><a href="{{lk.href}}" style="display: inline-block; min-height: 32px; line-height: 32px; color: {{t.ink}}; font-size: 14px; text-decoration: none">{{lk.label}}</a></template>
+</li>
+</template>
+</ul>
+<template data-scif value="{{col.note}}" hint-placeholder-val="{{ false }}"><p style="margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: {{t.muted}}">{{col.note}}</p></template>
+</div>
+</template>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 40px; padding-top: 18px; border-top: 1px solid {{t.rule2}}; font-size: 12px; color: {{t.muted}}">
+<span>Mezo testnet only. No mainnet contracts yet.</span>
+<span>Figures shown are sample data for design review.</span>
+</div>
+</footer>
+</div>
+</div>
+
+<template data-scif value="{{panelOpen}}" hint-placeholder-val="{{ true }}">
+<aside aria-label="Customize" style="width: 300px; position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow-y: auto; background-color: {{t.surf}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rS}}; padding: 18px; box-sizing: border-box; box-shadow: {{t.shadow}}">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-family: {{t.fD}}; font-weight: 700; font-size: 18px; letter-spacing: 0.06em">MIX LAB</span>
+<button type="button" onClick="{{hidePanel}}" style="min-height: 40px; padding: 0 12px; background: transparent; color: {{t.ink}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; font-family: {{t.fN}}; font-size: 11px; cursor: pointer">HIDE</button>
+</div>
+<p style="margin: 8px 0 0; font-size: 12px; color: {{t.muted}}; line-height: 1.5">Pick a preset, or mix any colour, font, numbers, tower and layout.</p>
+<div style="margin-top: 14px; border: 1.5px dashed {{t.rule}}; border-radius: {{t.rB}}; padding: 12px">
+<label for="mixOut" style="font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">YOUR MIX</label>
+<textarea id="mixOut" readOnly="{{ true }}" value="{{mixText}}" rows="6" style="display: block; width: 100%; box-sizing: border-box; margin-top: 6px; resize: none; background: transparent; color: {{t.ink}}; border: 0; font-family: {{t.fN}}; font-size: 12px; line-height: 1.5"></textarea>
+<button type="button" onClick="{{copyMix}}" style="margin-top: 8px; width: 100%; min-height: 46px; background: {{t.strong}}; color: {{t.onStrong}}; border: 0; border-radius: {{t.rB}}; font-family: {{t.fN}}; font-size: 13px; letter-spacing: 0.08em; cursor: pointer">{{copyLabel}}</button>
+<template data-scif value="{{copyManual}}" hint-placeholder-val="{{ false }}"><p role="status" style="margin: 8px 0 0; font-size: 12px; color: {{t.muted}}">Your browser blocked auto copy. Select the text above and copy it.</p></template>
+</div>
+<div style="margin-top: 18px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">LOGO</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px">
+<template data-scfor list="{{logos}}" as="lo" hint-placeholder-count="6">
+<button type="button" aria-pressed="{{lo.on}}" onClick="{{lo.pick}}" style="min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: {{lo.bg}}; color: {{lo.fg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; font-family: {{t.fN}}; font-size: 11px; cursor: pointer"><span style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center"><template data-scif value="{{lo.k.stack}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="17" width="18" height="4"/><rect x="6" y="11" width="12" height="4"/><rect x="9" y="5" width="6" height="4"/></svg></template><template data-scif value="{{lo.k.ascent}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 21h16M6 17h12M8 13h8"/><path d="M12 3l5 6H7z" fill="currentColor" stroke="none"/></svg></template><template data-scif value="{{lo.k.stepj}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h5v11a7 7 0 0 1-7 7H5v-5h7a2 2 0 0 0 2-2z"/><rect x="5" y="3" width="5" height="5"/></svg></template><template data-scif value="{{lo.k.tendots}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="currentColor"><circle cx="16" cy="3.5" r="1.9" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="3.5" r="1.9"/><circle cx="8" cy="8" r="1.9"/><circle cx="16" cy="8" r="1.9"/><circle cx="8" cy="12.5" r="1.9"/><circle cx="16" cy="12.5" r="1.9"/><circle cx="8" cy="17" r="1.9"/><circle cx="16" cy="17" r="1.9"/><circle cx="8" cy="21.5" r="1.9"/><circle cx="16" cy="21.5" r="1.9"/></svg></template><template data-scif value="{{lo.k.burst}}" hint-placeholder-val="{{ false }}"><svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5M4.2 4.2l3.5 3.5M16.3 16.3l3.5 3.5M4.2 19.8l3.5-3.5M16.3 7.7l3.5-3.5"/></svg></template><template data-scif value="{{lo.k.word}}" hint-placeholder-val="{{ false }}"><span style="font-family: {{t.fD}}; font-weight: 700; font-size: 14px; letter-spacing: 0.04em; line-height: 1">JUU</span></template></span>{{lo.label}}</button>
+</template>
+</div>
+<template data-scfor list="{{groups}}" as="g" hint-placeholder-count="6">
+<div style="margin-top: 18px; font-family: {{t.fN}}; font-size: 11px; letter-spacing: 0.12em; color: {{t.muted}}">{{g.title}}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px">
+<template data-scfor list="{{g.opts}}" as="o" hint-placeholder-count="5">
+<button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}" style="min-height: 40px; max-width: 100%; padding: 6px 10px; display: flex; align-items: center; gap: 8px; text-align: left; line-height: 1.2; background: {{o.bg}}; color: {{o.fg}}; border: 1.5px solid {{t.rule}}; border-radius: {{t.rB}}; font-family: {{o.font}}; font-size: 13px; cursor: pointer">
+<template data-scif value="{{o.sw}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="display: flex; gap: 2px"><span style="width: 8px; height: 16px; background: {{o.s1}}; border: 1px solid {{o.fg}}"></span><span style="width: 8px; height: 16px; background: {{o.s2}}; border: 1px solid {{o.fg}}"></span><span style="width: 8px; height: 16px; background: {{o.s3}}; border: 1px solid {{o.fg}}"></span></span></template>
+{{o.label}}
+</button>
+</template>
+</div>
+</template>
+</aside>
+</template>
+<template data-scif value="{{panelClosed}}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{showPanel}}" style="position: fixed; right: 20px; bottom: 20px; min-height: 52px; padding: 0 18px; background: {{t.strong}}; color: {{t.onStrong}}; border: 0; border-radius: {{t.rB}}; box-shadow: {{t.shadow}}; font-family: {{t.fN}}; font-size: 13px; letter-spacing: 0.1em; cursor: pointer; z-index: 5">MIX LAB</button>
+</template>
+</div>
+</script>
+<script>
+
+class DCLogic { constructor(props) { this.props = props || {}; this.state = {}; }
+  setState(p) { this.state = Object.assign({}, this.state, typeof p === 'function' ? p(this.state) : p); schedule(); }
+  forceUpdate() { schedule(); } }
+const SVGNS = 'http://www.w3.org/2000/svg';
+function get(scope, path) { path = path.trim(); if (path === 'true') return true; if (path === 'false') return false;
+  if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path); let o = scope; for (const k of path.split('.')) { if (o == null) return undefined; o = o[k]; } return o; }
+const HOLE = /\{\{\s*([^}]+?)\s*\}\}/g;
+function interp(str, scope) { const m = str.match(/^\{\{\s*([^}]+?)\s*\}\}$/); if (m) return get(scope, m[1]);
+  return str.replace(HOLE, (_, p) => { const v = get(scope, p); return v == null ? '' : String(v); }); }
+function renderNodes(nodes, scope, parent, inSvg) { for (const n of nodes) renderNode(n, scope, parent, inSvg); }
+function renderNode(n, scope, parent, inSvg) {
+  if (n.nodeType === 3) { parent.appendChild(document.createTextNode(interp(n.nodeValue, scope))); return; }
+  if (n.nodeType !== 1) return;
+  const tag = n.localName;
+  if (tag === 'template') { const kids = n.content.childNodes;
+    if (n.hasAttribute('data-scif')) { if (interp(n.getAttribute('value'), scope)) renderNodes(kids, scope, parent, inSvg); return; }
+    if (n.hasAttribute('data-scfor')) { const list = interp(n.getAttribute('list'), scope) || []; const as = n.getAttribute('as');
+      list.forEach((item, i) => { const sc = Object.create(scope); sc[as] = item; sc.$index = i; renderNodes(kids, sc, parent, inSvg); }); }
+    return; }
+  const svg = inSvg || tag === 'svg';
+  const el = svg ? document.createElementNS(SVGNS, tag) : document.createElement(tag);
+  for (const a of Array.from(n.attributes)) { const name = a.name; if (name.indexOf('hint-') === 0) continue;
+    const v = interp(a.value, scope);
+    if (/^on[a-z]+$/.test(name)) { if (typeof v === 'function') el.addEventListener(name.slice(2), v); continue; }
+    if (name === 'checked') { el.checked = !!v; continue; }
+    if (name === 'value' && (tag === 'input' || tag === 'textarea')) { el.value = v == null ? '' : String(v); continue; }
+    if (name === 'readonly') { if (v) el.setAttribute('readonly', ''); continue; }
+    if (v === false || v == null) continue;
+    el.setAttribute(name, v === true ? '' : String(v)); }
+  renderNodes(n.childNodes, scope, el, svg);
+  parent.appendChild(el); }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { logo: 'stack', copied: false, copyManual: false, railOpen: false, numFont: 'auto', color: 'asc', mode: 'light', font: 'zine', tower: 'book', layout: 'rail', panel: false, menu: false, screen: 'dash', side: 'bull', floor: 5, chip: 'MUSD', amount: 1600, posFloor: 4, agaruzo: false, loop: false, door: 'btc', series: '31 DEC 26', bank: 'dep', mk: 1, lb: 'all', revoked: {} };
+    this._geoM = this.geo(36, 13, 3);
+    this._geoB = this.geo(120, 150, 13);
+  }
+  geo(n, maxLen, seed) {
+    const out = [];
+    let x = seed;
+    const rnd = () => { x = (x * 9301 + 49297) % 233280; return x / 233280; };
+    for (let i = 0; i < n; i++) {
+      const deg = (360 / n) * i;
+      const major = i % 2 === 0;
+      const base = major ? 0.35 + rnd() * 0.65 : 0.85 + rnd() * 0.15;
+      out.push({ deg: deg.toFixed(1) + 'deg', len: Math.max(2, Math.round(base * maxLen)) + 'px', w: major ? (maxLen < 20 ? '2px' : '3px') : '1px', major, bull: deg > 0 && deg < 180 });
+    }
+    return out;
+  }
+  palettes() {
+    const none = { tex: 'none', shadow: 'none', glow: 'none' };
+    const bpGridD = 'linear-gradient(rgba(234,242,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(234,242,255,.08) 1px, transparent 1px)';
+    const bpGridL = 'linear-gradient(rgba(15,44,107,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(15,44,107,.07) 1px, transparent 1px)';
+    return {
+      sage: { label: 'Sage', rS: '28px', rB: '4px', rBar: '0px',
+        light: { ...none, bg: '#A8AD98', surf: '#C3C7B1', ink: '#1E261D', muted: '#434C3E', rule: '#1E261D', rule2: '#8F977F', strong: '#1E261D', onStrong: '#E6E8DB', panel: '#4A5444', onPanel: '#E6E8DB', bull: '#1E4D24', bear: '#7E3219', bullBar: '#1E4D24', bearBar: '#E2CDBF', bearLine: '#7E3219', bullLine: '#1E4D24', hi: '#1E261D', sel: '#B8BCA5', rMinor: '#8F977F', rBull: '#1E4D24', rBear: '#9A4A2C' },
+        dark: { ...none, bg: '#0E120D', surf: '#182017', ink: '#DDE2CF', muted: '#A3AC94', rule: '#DDE2CF', rule2: '#344031', strong: '#DDE2CF', onStrong: '#182017', panel: '#2A3427', onPanel: '#DDE2CF', bull: '#9BE08A', bear: '#E59A7A', bullBar: '#9BE08A', bearBar: '#3A2A22', bearLine: '#E59A7A', bullLine: '#9BE08A', hi: '#DDE2CF', sel: '#222B20', rMinor: '#3E4A3A', rBull: '#9BE08A', rBear: '#E59A7A' } },
+      asc: { label: 'Ascension', rS: '0px', rB: '0px', rBar: '0px',
+        dark: { ...none, bg: '#0A0A0A', surf: '#101010', ink: '#F0E9D8', muted: '#929292', rule: '#3A3A3A', rule2: '#222222', strong: '#E6F05A', onStrong: '#101010', panel: '#1C1C1C', onPanel: '#F0E9D8', bull: '#3DDC84', bear: '#F04427', bullBar: '#3DDC84', bearBar: '#F04427', bearLine: '#F04427', bullLine: '#3DDC84', hi: '#E6F05A', sel: '#1E1E1E', rMinor: '#2E2E2E', rBull: '#3DDC84', rBear: '#F04427' },
+        light: { ...none, bg: '#E6E1D5', surf: '#F6F2E8', ink: '#101010', muted: '#55524B', rule: '#101010', rule2: '#D6CFBF', strong: '#101010', onStrong: '#F6F2E8', panel: '#ECE6D8', onPanel: '#101010', bull: '#12804A', bear: '#C8361B', bullBar: '#1FAF66', bearBar: '#E2452A', bearLine: '#C8361B', bullLine: '#12804A', hi: '#6B7300', sel: '#ECE6D8', rMinor: '#D6CFBF', rBull: '#1FAF66', rBear: '#E2452A' } },
+      line: { label: 'Line', rS: '26px', rB: '999px', rBar: '999px',
+        light: { ...none, bg: '#EDEAE2', surf: '#F7F5F0', ink: '#111111', muted: '#555555', rule: '#111111', rule2: '#CFCBC2', strong: '#111111', onStrong: '#FFFFFF', panel: '#111111', onPanel: '#FFFFFF', bull: '#111111', bear: '#111111', bullBar: '#111111', bearBar: '#FFFFFF', bearLine: '#111111', bullLine: '#111111', hi: '#111111', sel: '#E6E2D8', rMinor: '#CFCBC2', rBull: '#111111', rBear: '#8A867D' },
+        dark: { ...none, bg: '#000000', surf: '#111111', ink: '#F5F3EE', muted: '#A9A59C', rule: '#F5F3EE', rule2: '#333333', strong: '#F5F3EE', onStrong: '#111111', panel: '#F5F3EE', onPanel: '#111111', bull: '#F5F3EE', bear: '#F5F3EE', bullBar: '#F5F3EE', bearBar: '#111111', bearLine: '#F5F3EE', bullLine: '#F5F3EE', hi: '#F5F3EE', sel: '#1E1E1E', rMinor: '#333333', rBull: '#F5F3EE', rBear: '#77736B' } },
+      blueprint: { label: 'Blueprint', rS: '2px', rB: '2px', rBar: '0px',
+        dark: { ...none, tex: bpGridD, bg: '#0B2257', surf: '#133780', ink: '#EAF2FF', muted: '#A9C1EA', rule: '#EAF2FF', rule2: '#2F55A0', strong: '#EAF2FF', onStrong: '#133780', panel: '#0F2C6B', onPanel: '#EAF2FF', bull: '#5BE39A', bear: '#FF7A59', bullBar: '#5BE39A', bearBar: 'transparent', bearLine: '#FF7A59', bullLine: '#5BE39A', hi: '#FFE066', sel: '#1A4594', rMinor: '#2F55A0', rBull: '#5BE39A', rBear: '#FF7A59' },
+        light: { ...none, tex: bpGridL, bg: '#DCE6F2', surf: '#F2F6FB', ink: '#0F2C6B', muted: '#3D5A8C', rule: '#0F2C6B', rule2: '#B9CBE3', strong: '#0F2C6B', onStrong: '#F2F6FB', panel: '#E3ECF7', onPanel: '#0F2C6B', bull: '#12804A', bear: '#B8331A', bullBar: '#1FAF66', bearBar: 'transparent', bearLine: '#B8331A', bullLine: '#12804A', hi: '#0F2C6B', sel: '#E3ECF7', rMinor: '#B9CBE3', rBull: '#1FAF66', rBear: '#B8331A' } },
+      riso: { label: 'Riso', rS: '18px', rB: '10px', rBar: '4px',
+        light: { ...none, shadow: '5px 5px 0 #FF48B0', bg: '#EEE5D6', surf: '#F6F0E6', ink: '#1F1A4D', muted: '#4E4877', rule: '#1F1A4D', rule2: '#D9CDB8', strong: '#FF48B0', onStrong: '#1F1A4D', panel: '#FFE800', onPanel: '#1F1A4D', bull: '#00804A', bear: '#C0136F', bullBar: '#00A95C', bearBar: '#FF48B0', bearLine: '#C0136F', bullLine: '#00804A', hi: '#1F1A4D', sel: '#FFF4A3', rMinor: '#D9CDB8', rBull: '#00A95C', rBear: '#FF48B0' },
+        dark: { ...none, shadow: '5px 5px 0 #FF48B0', bg: '#15123A', surf: '#1F1A4D', ink: '#F6F0E6', muted: '#C9C2E8', rule: '#F6F0E6', rule2: '#3A3470', strong: '#FF48B0', onStrong: '#15123A', panel: '#FFE800', onPanel: '#15123A', bull: '#4BE08F', bear: '#FF6BC0', bullBar: '#4BE08F', bearBar: '#FF48B0', bearLine: '#FF6BC0', bullLine: '#4BE08F', hi: '#FFE800', sel: '#2A2463', rMinor: '#3A3470', rBull: '#4BE08F', rBear: '#FF48B0' } },
+      phosphor: { label: 'Phosphor', rS: '0px', rB: '0px', rBar: '0px',
+        dark: { ...none, glow: '0 0 8px rgba(124,255,138,.55)', bg: '#030603', surf: '#0A110A', ink: '#7CFF8A', muted: '#55B862', rule: '#2E6B35', rule2: '#173A1C', strong: '#7CFF8A', onStrong: '#050805', panel: '#0E1A0F', onPanel: '#7CFF8A', bull: '#7CFF8A', bear: '#FF5A4A', bullBar: '#7CFF8A', bearBar: 'transparent', bearLine: '#FF5A4A', bullLine: '#7CFF8A', hi: '#E8FFEA', sel: '#10220F', rMinor: '#173A1C', rBull: '#7CFF8A', rBear: '#FF5A4A' },
+        light: { ...none, bg: '#E4DCC6', surf: '#F8F2E2', ink: '#1E3A20', muted: '#42613F', rule: '#1E3A20', rule2: '#CFC6AE', strong: '#1E3A20', onStrong: '#F8F2E2', panel: '#EFE7D1', onPanel: '#1E3A20', bull: '#1E6B2A', bear: '#A3341F', bullBar: '#2E8B3E', bearBar: 'transparent', bearLine: '#A3341F', bullLine: '#1E6B2A', hi: '#1E3A20', sel: '#EFE7D1', rMinor: '#CFC6AE', rBull: '#2E8B3E', rBear: '#A3341F' } }
+    };
+  }
+  fonts() {
+    return {
+      chakra: { label: 'Chakra + Plex', fD: "'Chakra Petch', sans-serif", fN: "'IBM Plex Mono', monospace", fB: "'Chakra Petch', sans-serif" },
+      grotesk: { label: 'Grotesk + Plex', fD: "'Space Grotesk', sans-serif", fN: "'IBM Plex Mono', monospace", fB: "Inter, sans-serif" },
+      pixel: { label: 'Pixel arcade', fD: "'Silkscreen', monospace", fN: "'Silkscreen', monospace", fB: "'Space Mono', monospace" },
+      draft: { label: 'Draft', fD: "'Martian Mono', monospace", fN: "'JetBrains Mono', monospace", fB: "Inter, sans-serif" },
+      zine: { label: 'Zine', fD: "'Bricolage Grotesque', sans-serif", fN: "'DM Mono', monospace", fB: "'Bricolage Grotesque', sans-serif" },
+      terminal: { label: 'Terminal', fD: "'VT323', monospace", fN: "'VT323', monospace", fB: "'IBM Plex Mono', monospace" },
+      editorial: { label: 'Editorial serif', fD: "'Instrument Serif', serif", fN: "'DM Mono', monospace", fB: "Inter, sans-serif" },
+      syne: { label: 'Syne', fD: "'Syne', sans-serif", fN: "'JetBrains Mono', monospace", fB: "'Syne', sans-serif" }
+    };
+  }
+  layouts() {
+    const base = { rail: false, brandHead: true, railHead: false, consoleHead: false, topNav: false, stageNav: false, fkeys: false, dock: false, dashDir: 'row', towerFlex: '999 1 560px', asideFlex: '1 1 380px', asideDisp: 'flex', asideAlign: 'stretch', mainPad: '24px 32px 32px' };
+    return {
+      top: { ...base, label: 'Overhead tabs', topNav: true },
+      rail: { ...base, label: 'Left sidebar', rail: true },
+      console: { ...base, label: 'Console', brandHead: false, consoleHead: true, fkeys: true, mainPad: '20px 20px 24px' },
+      dock: { ...base, label: 'Floating dock', dock: true, dashDir: 'column', towerFlex: '1 1 auto', asideFlex: '1 1 auto', asideDisp: 'grid', asideAlign: 'start', mainPad: '28px 48px 40px' },
+      stage: { ...base, label: 'Stage', stageNav: true, dashDir: 'column', towerFlex: '1 1 auto', asideFlex: '1 1 auto', asideDisp: 'grid', asideAlign: 'start', mainPad: '28px 40px 36px' }
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const PAL = this.palettes(), FON = this.fonts(), LAY = this.layouts();
+    const fam = PAL[s.color], fo = FON[s.font], L = LAY[s.layout];
+    const isConsole = s.layout === 'console';
+    const NUMF = { auto: ['Match font', null], plex: ['IBM Plex Mono', "'IBM Plex Mono', monospace"], jet: ['JetBrains Mono', "'JetBrains Mono', monospace"], dm: ['DM Mono', "'DM Mono', monospace"], spacemono: ['Space Mono', "'Space Mono', monospace"], martian: ['Martian Mono', "'Martian Mono', monospace"], azeret: ['Azeret Mono', "'Azeret Mono', monospace"], redhat: ['Red Hat Mono', "'Red Hat Mono', monospace"], vt: ['VT323', "'VT323', monospace"], pixel: ['Silkscreen', "'Silkscreen', monospace"], chakra: ['Chakra Petch', "'Chakra Petch', sans-serif"] };
+    const numFam = s.numFont === 'auto' ? fo.fN : NUMF[s.numFont][1];
+    const t = { ...fam[s.mode], fD: fo.fD, fN: numFam, fB: isConsole ? numFam : fo.fB, rS: isConsole ? '0px' : fam.rS, rB: isConsole ? '0px' : fam.rB, rBar: isConsole ? '0px' : fam.rBar };
+    t.pos = t.bull; t.neg = t.bear;
+    const on = (c) => ({ bg: c ? t.strong : 'transparent', fg: c ? t.onStrong : t.ink });
+    const LEV = [0, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const PREM = { 7: '1.00', 8: '1.10', 9: '1.10', 10: '1.21' };
+    const price = 71000;
+    const fmt = (n, d) => n.toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+    const liqOf = (fl, side) => { const m = 1 / LEV[fl] - 0.02; return side === 'bull' ? price * (1 - m) : price * (1 + m); };
+    const tabsDef = [['dash', 'MUSDash'], ['pos', 'Positions'], ['doors', 'Doors'], ['bank', 'Bank'], ['market', 'Principal Market'], ['jackpot', 'Jackpot'], ['agents', 'Agents'], ['board', 'Leaderboard']];
+    const curIdx = tabsDef.findIndex(([k]) => k === s.screen);
+    const tabs = tabsDef.map(([k, label], i) => {
+      const c = s.screen === k;
+      return { label, code: String(i + 1).padStart(2, '0'), fkey: 'F' + (i + 1), go: () => this.setState({ screen: k }), goClose: () => this.setState({ screen: k, menu: false }),
+        cur: c ? 'page' : 'false', line: c ? (s.color === 'asc' ? t.hi : t.ink) : 'transparent', lineFg: c && s.color === 'asc' ? t.hi : t.ink,
+        bg: c ? t.strong : 'transparent', fg: c ? t.onStrong : t.ink, ic: { dash: k === 'dash', pos: k === 'pos', doors: k === 'doors', bank: k === 'bank', market: k === 'market', jackpot: k === 'jackpot', agents: k === 'agents', board: k === 'board' }, railBg: 'transparent', railFg: t.ink, railW: c ? 700 : 400, railLine: 'transparent', dot: c ? t.bull : 'transparent', dockBg: c ? t.surf : 'transparent', dockFg: c ? t.ink : t.onStrong };
+    });
+    const rows = [[10, 620, 180, 0, 4, 2], [9, 0, 410, 0, 0, 3], [8, 980, 540, 0, 6, 4], [7, 1240, 900, 1, 7, 5], [6, 1610, 1320, 0, 9, 8], [5, 2050, 1780, 0, 12, 11], [4, 2380, 2010, 0, 14, 12], [3, 1960, 2240, 2, 11, 13], [2, 1420, 1180, 0, 9, 7], [1, 980, 1050, 0, 6, 6]];
+    const floors = rows.map(([n, bull, bear, ag, bn, brn]) => {
+      const collapsed = bull === 0, selected = n === s.floor;
+      let status = 'OPEN', short = 'open', stBg = 'transparent', stFg = t.muted;
+      if (collapsed) { status = 'BULLS DOWN'; short = 'bulls down'; stBg = t.neg; stFg = t.surf; }
+      else if (PREM[n]) { status = 'PREMIUM ' + PREM[n]; short = 'prem ' + PREM[n]; stBg = t.strong; stFg = t.onStrong; }
+      const youHere = n === s.posFloor;
+      return {
+        n, num: String(n).padStart(2, '0'), lev: LEV[n], you: youHere, agents: ag || false, collapsed, live: !collapsed,
+        bullAmt: fmt(bull), bearAmt: fmt(bear),
+        bullW: Math.round((bull / 2400) * 62) + '%', bearW: Math.round((bear / 2400) * 62) + '%',
+        bullDepth: Math.round((bull / 2400) * 48) + '%', bearDepth: Math.round((bear / 2400) * 48) + '%',
+        status, short, stBg, stFg, prem: PREM[n] || false, premTag: PREM[n] ? '· prem ' + PREM[n] : '',
+        rowBg: selected ? t.sel : 'transparent', numC: n >= 7 ? t.hi : t.ink,
+        pick: () => this.setState({ floor: n }),
+        liqBull: '$' + fmt(liqOf(n, 'bull')), liqBear: '$' + fmt(liqOf(n, 'bear')),
+        slabW: (100 - (n - 1) * 4.5) + '%', slabBg: selected ? t.sel : 'transparent', slabLine: collapsed ? 'dashed' : 'solid', slabEdge: n >= 9 ? t.hi : t.rule,
+        shaftBg: selected ? t.sel : 'transparent',
+        bullWin: Array.from({ length: collapsed ? 6 : Math.min(bn, 12) }, (_, i) => ({ c: collapsed ? 'transparent' : (youHere && i === 0 ? t.hi : t.bullBar), l: collapsed ? t.rule2 : (youHere && i === 0 ? t.hi : t.bullBar), o: youHere && i === 0 ? '2px solid ' + t.ink : 'none' })),
+        bearWin: Array.from({ length: Math.min(brn, 12) }, () => ({ c: t.bearBar, l: t.bearLine }))
+      };
+    });
+    const rings = floors.slice().reverse().map((f) => {
+      const d = 420 - (f.n - 1) * 36;
+      const p = Math.round((rows.find((r) => r[0] === f.n)[1] / (rows.find((r) => r[0] === f.n)[1] + rows.find((r) => r[0] === f.n)[2])) * 100);
+      const bearC = t.bearBar === 'transparent' ? t.rMinor : t.bearBar;
+      return { num: f.num, pct: p, d: d + 'px', m: (-d / 2) + 'px', labTop: (210 - d / 2 + 3) + 'px', pick: f.pick,
+        bg: 'conic-gradient(' + t.bullBar + ' 0 ' + p + '%, ' + bearC + ' ' + p + '% 100%)', edge: f.n === s.floor ? t.hi : t.surf };
+    });
+    const lev = LEV[s.floor];
+    const exp = s.amount * lev;
+    const slip = { floor: s.floor, lev, exp: fmt(exp), liq: fmt(liqOf(s.floor, s.side)), fee: fmt(exp * 0.0001, 2), prem: PREM[s.floor] ? PREM[s.floor] + '×' : 'floors 7 to 10 only' };
+    const picks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => ({ n, on: String(n === s.floor), pick: () => this.setState({ floor: n }), ...on(n === s.floor) }));
+    const chips = ['MUSD', 'Y', 'P'].map((c) => ({ label: c === 'MUSD' ? 'MUSD' : (c === 'Y' ? 'Yield' : 'Principal') + ' 31 DEC', on: String(s.chip === c), pick: () => this.setState({ chip: c }), ...on(s.chip === c) }));
+    const flash = () => { clearTimeout(this._t); this._t = setTimeout(() => this.setState({ agaruzo: false }), 1800); };
+    const series = [
+      { name: '10 DEC 26', left: '27 days left', p: '0.0010', y: '0.0010', earned: '0.0000' },
+      { name: '31 DEC 26', left: '48 days left', p: '0.0200', y: '0.0200', earned: '0.0001' },
+      { name: '25 MAR 27', left: '132 days left', p: '0.0050', y: '0.0050', earned: '0.0000' }
+    ];
+    const doorsDef = [
+      { k: 'btc', code: '01', title: 'BTC', desc: 'One click: locked on Mezo, then split into Principal and Yield.', unit: 'BTC', note: 'Zap: your BTC is locked as veBTC by Mezo and held by Juu until the end date.' },
+      { k: 've', code: '02', title: 'veBTC LOCK', desc: 'Already locked on Mezo? Bring the NFT in.', unit: 'veBTC', note: 'Collect your own rewards first. Anything unclaimed moves with the lock.' },
+      { k: 'smusd', code: '03', title: 'sMUSD', desc: "Mezo's savings token, split into Principal and Yield.", unit: 'sMUSD', note: 'Principal is your MUSD back. Yield is the savings yield stream.' },
+      { k: 'trove', code: '04', title: 'TROVE', desc: 'A fresh Mezo loan inside your own Juu account.', unit: 'BTC', note: "Opens a new trove in your Juu account. Mezo's minimum loan is 2,000 MUSD. Or just bring the MUSD you borrowed." }
+    ];
+    const marketDef = [
+      { name: '10 DEC 26', left: '27 days left', price: '0.9921', disc: '0.79%', ret: '0.80%' },
+      { name: '31 DEC 26', left: '48 days left', price: '0.9604', disc: '3.96%', ret: '4.12%' },
+      { name: '25 MAR 27', left: '132 days left', price: '0.9380', disc: '6.20%', ret: '6.61%' }
+    ];
+    const agentsDef = [
+      { id: 'k', name: 'kaidan.bot', max: '500 MUSD', floor: 'Up to 6', loss: '200 MUSD', exp: 'In 6 days', pnl: '+212.40', up: true },
+      { id: 's', name: 'scout-7', max: '150 MUSD', floor: 'Up to 3', loss: '50 MUSD', exp: 'In 2 days', pnl: '−18.20', up: false }
+    ];
+    const people = [
+      { name: 'kaidan.bot', kind: 'AGENT', pnl: '+1,204.10', best: '09', surv: '14', up: true },
+      { name: '0x8f…c2', kind: 'HUMAN', pnl: '+988.40', best: '10', surv: '9', up: true },
+      { name: 'yieldwitch', kind: 'HUMAN', pnl: '+640.00', best: '07', surv: '11', up: true },
+      { name: 'floor-six', kind: 'AGENT', pnl: '+512.75', best: '06', surv: '20', up: true },
+      { name: '0x5Ac8 (you)', kind: 'HUMAN', pnl: '+84.20', best: '05', surv: '2', up: true },
+      { name: 'scout-7', kind: 'AGENT', pnl: '−18.20', best: '03', surv: '4', up: false }
+    ];
+    const isDep = s.bank === 'dep';
+    const ray = (g) => ({ ...g, c: g.major ? (g.bull ? t.rBull : t.rBear) : t.rMinor });
+    const tickItems = [
+      { label: 'BTC / USD', value: '$71,000.00', c: t.ink, sub: '▲ 1.24%', subC: t.pos },
+      { oi: true, label: 'OPEN INTEREST', value: '27,850', c: t.ink, sub: '55% bull · 45% bear', subC: t.muted },
+      { label: 'BULL OPEN', value: '15,240', c: t.bull },
+      { label: 'BEAR OPEN', value: '12,610', c: t.bear },
+      { label: 'FUNDING', value: '0.0038%/h', c: t.ink, sub: 'bulls pay', subC: t.muted },
+      { label: 'SAFETY JAR', value: '842', c: t.ink, sub: 'MUSD', subC: t.muted },
+      { label: 'JACKPOT', value: '431', c: t.hi, sub: 'draws Thu', subC: t.muted },
+      { label: 'FLOOR 09', value: 'BULLS DOWN', c: t.neg },
+      { label: 'FLOOR 10 PREMIUM', value: '1.21×', c: t.hi },
+      { label: 'TOP AGENT', value: 'kaidan.bot +1,204', c: t.bear }
+    ].map((k) => ({ oi: false, sub: false, subC: t.muted, ...k }));
+    const ticker = tickItems.map((k) => ({ ...k, dup: 'false' })).concat(tickItems.map((k) => ({ ...k, dup: 'true' })));
+    const towerNames = { bars: 'TEN FLOORS', building: 'THE BUILDING', shaft: 'THE SHAFT', rings: 'THE RINGS', book: 'THE LADDER' };
+    const presets = {
+      juu: { label: 'Juu (your pick)', color: 'asc', mode: 'light', font: 'zine', tower: 'book', layout: 'rail' },
+      tote: { label: 'Sage Tote', color: 'sage', mode: 'light', font: 'chakra', tower: 'bars', layout: 'top' },
+      blueprint: { label: 'Blueprint', color: 'blueprint', mode: 'dark', font: 'draft', tower: 'building', layout: 'rail' },
+      riso: { label: 'Riso Pop', color: 'riso', mode: 'light', font: 'zine', tower: 'rings', layout: 'dock' },
+      phosphor: { label: 'Phosphor Console', color: 'phosphor', mode: 'dark', font: 'terminal', tower: 'book', layout: 'console' },
+      stage: { label: 'Ascension Stage', color: 'asc', mode: 'dark', font: 'grotesk', tower: 'shaft', layout: 'stage' }
+    };
+    const opt = (label, isOn, pick, extra) => ({ label, on: String(isOn), pick, sw: false, s1: '', s2: '', s3: '', font: t.fN, ...on(isOn), ...(extra || {}) });
+    const LOGO_DEF = [['stack', 'Stack'], ['ascent', 'Ascent'], ['stepj', 'Step J'], ['tendots', 'Ten dots'], ['burst', 'Burst'], ['word', 'Wordmark']];
+    const flags = (key) => ({ stack: key === 'stack', ascent: key === 'ascent', stepj: key === 'stepj', tendots: key === 'tendots', burst: key === 'burst', word: key === 'word' });
+    const logoName = LOGO_DEF.find(([k]) => k === s.logo)[1];
+    const mixText = 'Juu Mix Lab pick\nLogo: ' + logoName + '\nColour: ' + PAL[s.color].label + ' (' + s.mode + ')\nHeadline + body font: ' + FON[s.font].label + '\nNumber font: ' + (s.numFont === 'auto' ? 'match font' : NUMF[s.numFont][0]) + '\nTower: ' + towerNames[s.tower].replace('THE ', '').toLowerCase() + '\nLayout: ' + LAY[s.layout].label;
+    const groups = [
+      { title: 'PRESETS', opts: Object.entries(presets).map(([k, p]) => opt(p.label, s.color === p.color && s.mode === p.mode && s.font === p.font && s.tower === p.tower && s.layout === p.layout, () => this.setState({ color: p.color, mode: p.mode, font: p.font, tower: p.tower, layout: p.layout, numFont: 'auto' }))) },
+      { title: 'COLOUR', opts: Object.entries(PAL).map(([k, p]) => { const sw = p[s.mode]; return opt(p.label, s.color === k, () => this.setState({ color: k }), { sw: true, s1: sw.surf, s2: sw.bullBar, s3: sw.bearLine }); }) },
+      { title: 'MODE', opts: [opt('Light', s.mode === 'light', () => this.setState({ mode: 'light' })), opt('Dark', s.mode === 'dark', () => this.setState({ mode: 'dark' }))] },
+      { title: 'HEADLINE + BODY FONT', opts: Object.entries(FON).map(([k, f]) => opt(f.label, s.font === k, () => this.setState({ font: k }), { font: f.fD })) },
+      { title: 'NUMBER FONT', opts: Object.entries(NUMF).map(([k, f]) => opt(k === 'auto' ? 'Match font' : '0123 ' + f[0], s.numFont === k, () => this.setState({ numFont: k }), { font: k === 'auto' ? t.fN : f[1] })) },
+      { title: 'TOWER', opts: Object.entries(towerNames).map(([k, n]) => opt(n.replace('THE ', '').replace('TEN FLOORS', 'Bars').toLowerCase().replace(/^./, (c) => c.toUpperCase()), s.tower === k, () => this.setState({ tower: k }))) },
+      { title: 'LAYOUT', opts: Object.entries(LAY).map(([k, l]) => opt(l.label, s.layout === k, () => this.setState({ layout: k }))) }
+    ];
+    return {
+      t, L, groups,
+      footCols: [
+        { title: 'Play', note: false, links: [['dash', 'MUSDash'], ['jackpot', 'Jackpot'], ['board', 'Leaderboard'], ['agents', 'Agents']].map(([k, label]) => ({ label, href: false, go: () => this.setState({ screen: k }) })) },
+        { title: 'Earn', note: false, links: [['doors', 'Doors'], ['pos', 'Positions'], ['bank', 'Bank'], ['market', 'Principal Market']].map(([k, label]) => ({ label, href: false, go: () => this.setState({ screen: k }) })) },
+        { title: 'Build', note: false, links: ['Docs', 'Data API', 'MCP server', 'Source on GitHub'].map((label) => ({ label, href: '#', go: false })) },
+        { title: 'On the network', note: 'Runs on Mezo testnet (matsnet).', links: ['Contracts on explorer', '@playjuu on X', 'Mezo Discord'].map((label) => ({ label, href: '#', go: false })) }
+      ],
+      logo: flags(s.logo), logoIcon: s.logo !== 'word', logoCls: s.railOpen ? 'open' : '',
+      logos: LOGO_DEF.map(([k, label]) => ({ label, k: flags(k), on: String(s.logo === k), pick: () => this.setState({ logo: k }), ...on(s.logo === k) })),
+      gridCols: s.panel ? 'minmax(0, 1fr) 300px' : 'minmax(0, 1fr)',
+      railOpen: s.railOpen, railExp: String(s.railOpen), railW: s.railOpen ? '220px' : '96px', railJustify: s.railOpen ? 'flex-start' : 'center',
+      railToggleLabel: s.railOpen ? 'Collapse sidebar' : 'Expand sidebar', toggleRail: () => this.setState({ railOpen: !s.railOpen }),
+      mixText, copyLabel: s.copied ? 'COPIED ✓' : 'COPY MY MIX', copyManual: s.copyManual,
+      copyMix: () => {
+        const done = (ok) => { this.setState({ copied: ok, copyManual: !ok }); clearTimeout(this._c); this._c = setTimeout(() => this.setState({ copied: false }), 2000); };
+        try { navigator.clipboard.writeText(mixText).then(() => done(true), () => done(false)); } catch (e) { done(false); }
+      },
+      tw: { bars: s.tower === 'bars', building: s.tower === 'building', shaft: s.tower === 'shaft', rings: s.tower === 'rings', book: s.tower === 'book' },
+      towerName: towerNames[s.tower],
+      mixLabel: [PAL[s.color].label, s.mode, FON[s.font].label, towerNames[s.tower].replace('THE ', '').toLowerCase(), LAY[s.layout].label].join(' · ').toUpperCase(),
+      panelOpen: s.panel, panelClosed: !s.panel, hidePanel: () => this.setState({ panel: false }), showPanel: () => this.setState({ panel: true }),
+      menuOpen: s.menu, menuExp: String(s.menu), menuLabel: s.menu ? 'CLOSE' : 'ALL PAGES', toggleMenu: () => this.setState({ menu: !s.menu }),
+      prevTab: () => this.setState({ screen: tabsDef[(curIdx + tabsDef.length - 1) % tabsDef.length][0] }),
+      nextTab: () => this.setState({ screen: tabsDef[(curIdx + 1) % tabsDef.length][0] }),
+      curLabelUp: tabsDef[curIdx][1].toUpperCase(),
+      cmd: 'juu@mezo:~$ ' + s.screen + ' --side ' + s.side + ' --floor ' + s.floor,
+      ticker, raysMini: this._geoM.map(ray), raysBig: this._geoB.map(ray),
+      carTop: ((10 - s.posFloor) * 58 + 4) + 'px',
+      tabs, floors, rings, picks, chips, slip, series,
+      doors: doorsDef.map((d) => ({ ...d, on: String(s.door === d.k), pick: () => this.setState({ door: d.k }), bg: s.door === d.k ? t.strong : 'transparent', fg: s.door === d.k ? t.onStrong : t.ink })),
+      door: doorsDef.find((d) => d.k === s.door),
+      seriesPicks: series.map((x) => ({ name: x.name, on: String(s.series === x.name), pick: () => this.setState({ series: x.name }), ...on(s.series === x.name) })),
+      market: marketDef.map((m, i) => ({ ...m, pick: () => this.setState({ mk: i }), btn: s.mk === i ? 'SELECTED' : 'SELECT', btnBg: on(s.mk === i).bg, btnFg: on(s.mk === i).fg, rowBg: s.mk === i ? t.sel : 'transparent' })),
+      mk: marketDef[s.mk],
+      agents: agentsDef.map((a) => { const r = !!s.revoked[a.id]; return { ...a, pnlC: a.up ? t.pos : t.neg, status: r ? 'REVOKED' : 'ACTIVE', stBg: r ? 'transparent' : t.strong, stFg: r ? t.ink : t.onStrong, dim: r ? 0.6 : 1, btn: r ? 'RESTORE PERMISSION' : 'REVOKE NOW', btnBg: on(!r).bg, btnFg: on(!r).fg, revoke: () => this.setState({ revoked: { ...s.revoked, [a.id]: !r } }) }; }),
+      board: people.filter((p) => s.lb === 'all' || p.kind === s.lb).map((p, i) => ({ ...p, rank: String(i + 1).padStart(2, '0'), pnlC: p.up ? t.pos : t.neg, bBg: p.kind === 'AGENT' ? 'transparent' : t.strong, bFg: p.kind === 'AGENT' ? t.ink : t.onStrong, bLine: p.kind === 'AGENT' ? 'dashed' : 'solid' })),
+      lbTabs: [['all', 'COMBINED'], ['HUMAN', 'HUMANS'], ['AGENT', 'AGENTS']].map(([k, label]) => ({ label, on: String(s.lb === k), pick: () => this.setState({ lb: k }), ...on(s.lb === k) })),
+      isDash: s.screen === 'dash', isPos: s.screen === 'pos', isDoors: s.screen === 'doors', isBank: s.screen === 'bank',
+      isMarket: s.screen === 'market', isJackpot: s.screen === 'jackpot', isAgents: s.screen === 'agents', isBoard: s.screen === 'board',
+      agaruzo: s.agaruzo, posFloor: String(s.posFloor).padStart(2, '0'), posLev: LEV[s.posFloor], posLiq: fmt(liqOf(s.posFloor, 'bull')),
+      bullOn: String(s.side === 'bull'), bearOn: String(s.side === 'bear'),
+      bullBg: s.side === 'bull' ? t.bullLine : 'transparent', bullFg: s.side === 'bull' ? t.surf : t.bull,
+      bearBg: s.side === 'bear' ? t.bearLine : 'transparent', bearFg: s.side === 'bear' ? t.surf : t.bear,
+      pickBull: () => this.setState({ side: 'bull' }), pickBear: () => this.setState({ side: 'bear' }),
+      amountStr: fmt(s.amount), chipUnit: s.chip === 'MUSD' ? 'MUSD' : (s.chip === 'Y' ? 'YIELD' : 'PRINCIPAL'),
+      onAmt: (e) => { const v = parseFloat(String(e.target.value).replace(/,/g, '')); this.setState({ amount: isNaN(v) ? 0 : v }); },
+      openPos: () => { this.setState({ posFloor: s.floor, agaruzo: true }); flash(); },
+      climbPos: () => { if (s.posFloor < 10) { this.setState({ posFloor: s.posFloor + 1, agaruzo: true }); flash(); } },
+      dropPos: () => this.setState({ posFloor: Math.max(1, s.posFloor - 1) }),
+      loop: s.loop, toggleLoop: () => this.setState({ loop: !s.loop }),
+      pickedSeries: s.series,
+      depOn: String(isDep), wdOn: String(!isDep), depBg: on(isDep).bg, depFg: on(isDep).fg, wdBg: on(!isDep).bg, wdFg: on(!isDep).fg,
+      pickDep: () => this.setState({ bank: 'dep' }), pickWd: () => this.setState({ bank: 'wd' }),
+      bankVerb: isDep ? 'DEPOSIT' : 'WITHDRAW', bankCta: isDep ? 'DEPOSIT INTO THE BANK' : 'WITHDRAW MY SHARE',
+      bankNote: isDep ? 'Your BTC becomes Bank shares. The Bank borrows MUSD on Mezo at 1% and backs the game with it.' : 'You are always paid out in BTC. The MUSD stays in the Bank so winners can be paid.',
+      earn: [{ k: 'Trading fees', v: 'a cut of every move' }, { k: 'Funding', v: 'when it covers the crowded side' }, { k: 'Collapses', v: '25% of every penalty' }, { k: 'Cost', v: '1% a year on borrowed MUSD' }],
+      winners: [{ when: 'Last week', who: '0x3b…91', amt: '0.431 MUSD' }, { when: '2 weeks ago', who: 'No draw yet', amt: '—' }],
+      feed: [{ t: '14:02', m: 'FLOOR 09 BULLS DOWN · survivors +41.20', c: t.neg }, { t: '14:01', m: 'AGARUZO! 0x8f…c2 reached floor 08', c: t.hi }, { t: '13:58', m: 'kaidan.bot (agent) went bear on 03', c: t.bear }, { t: '13:55', m: 'Floor 10 premium now 1.21×', c: t.ink }, { t: '13:44', m: 'Safety jar +0.75', c: t.muted }]
+    };
+  }
+}
+
+
+const TPL = document.createElement('template');
+TPL.innerHTML = document.getElementById('juu-template').textContent;
+const app = document.getElementById('app');
+const comp = new Component({});
+let queued = false; const t0 = performance.now();
+function schedule() { if (queued) return; queued = true; Promise.resolve().then(() => { queued = false; draw(); }); }
+function draw() {
+  const act = document.activeElement; const aid = act && act.id; let sel = null;
+  try { if (aid && act.selectionStart != null) sel = [act.selectionStart, act.selectionEnd]; } catch (e) {}
+  const frag = document.createDocumentFragment();
+  renderNodes(TPL.content.childNodes, comp.renderVals(), frag, false);
+  app.replaceChildren(frag);
+  if (aid) { const el = document.getElementById(aid); if (el) { el.focus(); if (sel) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) {} } }
+  const secs = (performance.now() - t0) / 1000;
+  document.querySelectorAll('.juu-tick').forEach((x) => { x.style.animationDelay = '-' + (secs % 52).toFixed(2) + 's'; });
+}
+draw();
+
+</script>
+</body>
+</html>
