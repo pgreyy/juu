@@ -1,0 +1,423 @@
+{
+  "info": {
+    "name": "Juu data API",
+    "description": "Read-only Juu endpoints. Set stack to main or demo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Index",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [],
+          "query": []
+        },
+        "description": "All endpoints"
+      }
+    },
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ],
+          "query": []
+        },
+        "description": "Keeper health: late or failing jobs, warnings"
+      }
+    },
+    {
+      "name": "Jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs"
+          ],
+          "query": []
+        },
+        "description": "Every keeper job, recent transactions and warnings"
+      }
+    },
+    {
+      "name": "Series",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/series",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "series"
+          ],
+          "query": []
+        },
+        "description": "veBTC and sMUSD series, Y and P values, P Market prices"
+      }
+    },
+    {
+      "name": "Floors",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/floors",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "floors"
+          ],
+          "query": []
+        },
+        "description": "Floor states and collapse prices"
+      }
+    },
+    {
+      "name": "Sides",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/sides",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "sides"
+          ],
+          "query": []
+        },
+        "description": "Bull vs Bear sizes, gap, room left"
+      }
+    },
+    {
+      "name": "Funding",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/funding",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "funding"
+          ],
+          "query": []
+        },
+        "description": "Funding rate per hour"
+      }
+    },
+    {
+      "name": "Climb Premium",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/climb-premium",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "climb-premium"
+          ],
+          "query": []
+        },
+        "description": "Seat prices on floors 7-10, kill switch status"
+      }
+    },
+    {
+      "name": "Bank",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/bank",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "bank"
+          ],
+          "query": []
+        },
+        "description": "Bank capacity and its Mezo loan"
+      }
+    },
+    {
+      "name": "Price history",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/price/history?minutes=60",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "price",
+            "history"
+          ],
+          "query": [
+            {
+              "key": "minutes",
+              "value": "60"
+            }
+          ]
+        },
+        "description": "BTC price sampled every minute"
+      }
+    },
+    {
+      "name": "Recent collapses",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/collapses/recent?limit=20",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "collapses",
+            "recent"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        },
+        "description": "Recent floor collapses"
+      }
+    },
+    {
+      "name": "Open positions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/positions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "positions"
+          ],
+          "query": []
+        },
+        "description": "All open positions"
+      }
+    },
+    {
+      "name": "Position",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/positions/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "positions",
+            "1"
+          ],
+          "query": []
+        },
+        "description": "One position by id"
+      }
+    },
+    {
+      "name": "Jackpot",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/jackpot",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "jackpot"
+          ],
+          "query": []
+        },
+        "description": "Buffer, target, prize, recent draws"
+      }
+    },
+    {
+      "name": "Leaderboard (all)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/leaderboard?type=all",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "leaderboard"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "all"
+            }
+          ]
+        },
+        "description": "Agents and humans"
+      }
+    },
+    {
+      "name": "Leaderboard (agents)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/leaderboard?type=agents",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "leaderboard"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "agents"
+            }
+          ]
+        },
+        "description": "Agents only"
+      }
+    },
+    {
+      "name": "Leaderboard (humans)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/leaderboard?type=humans",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "leaderboard"
+          ],
+          "query": [
+            {
+              "key": "type",
+              "value": "humans"
+            }
+          ]
+        },
+        "description": "Humans only"
+      }
+    },
+    {
+      "name": "Agent sessions of a user",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/agents/{{user}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "agents",
+            "{{user}}"
+          ],
+          "query": []
+        },
+        "description": "Sessions a user granted"
+      }
+    },
+    {
+      "name": "Agent fee",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/{{stack}}/agent-fee",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "{{stack}}",
+            "agent-fee"
+          ],
+          "query": []
+        },
+        "description": "Agent fee rate and split"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8788"
+    },
+    {
+      "key": "stack",
+      "value": "demo"
+    },
+    {
+      "key": "user",
+      "value": "0x5Ac87a8AeC1EF2Ff28835e6EBbf52495C89Bc5eA"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "chainId": 31611,
+  "mezo": {
+    "musd": "0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503",
+    "btc": "0x7b7C000000000000000000000000000000000000",
+    "mezoToken": "0x7B7c000000000000000000000000000000000001",
+    "priceFeed": "0x86bCF0841622a5dAC14A313a15f96A95421b9366",
+    "borrowerOperations": "0xCdF7028ceAB81fA0C6971208e83fa7872994beE5",
+    "troveManager": "0xE47c80e8c23f6B4A1aE41c34837a0599D5D16bb0",
+    "veBTC": "0x38E35d92E6Bfc6787272A62345856B13eA12130a",
+    "voter": "0x263F1Fd5fB7F866881e1B6cD7d5d6c40Fd985F0D",
+    "router": "0x9a1ff7FE3a0F69959A3fBa1F1e5ee18e1A9CD7E9",
+    "poolFactory": "0x4947243CC818b627A5D06d14C4eCe7398A23Ce1A",
+    "smusd": "0x6f461c68B2c5492C0F5CCEc5a264d692aA7A8e16",
+    "smusdGaugePool": "0x6f461c68B2c5492C0F5CCEc5a264d692aA7A8e16",
+    "musdBtcPool": "0xd16A5Df82120ED8D626a1a15232bFcE2366d6AA9"
+  },
+  "shared": {
+    "splitter": "0xC97F652387E213a92DD2DaBDb41754CdD535ce5e",
+    "pmarket": "0x6748eA3C557B03611Fb360889ea61B4fB72B891c",
+    "savings": "0xF7857dB1d1Aa1Aa60a8576EBc1b2F8236b4A22f4"
+  },
+  "stacks": {
+    "main": {
+      "label": "main",
+      "priceFeed": "0x86bCF0841622a5dAC14A313a15f96A95421b9366",
+      "pricer": "0xe25F6095665626342ffF7FeA7d8BE0c40517Cf34",
+      "bank": "0x42428f3c928c9af20E4d10Ca1D91aBDd565c5959",
+      "buffer": "0xAB61604F82f645110A062b49F2bC204cbb473d39",
+      "game": "0xfD5c96497Ae439f88023EFa78D13Afa6C0ca40E7",
+      "jackpot": "0x508d6449FCb235c92D79f0011Dd09f3833233D62",
+      "loop": "0x33c807030053b821B1efCEcbF40F9A7025edec28",
+      "gateway": "0x29da0243E5604CAf1490d148B7dB5f0835Ab2394",
+      "accountFactory": "0xECEf17Da15D530dB1bb0B906a35A8DCB6545d084",
+      "fromBlock": 16744663,
+      "deployedAt": 1794531190
+    },
+    "demo": {
+      "label": "demo (DEMO ONLY: price can be set by the owner)",
+      "priceFeed": "0x01297A4923330BC49EAA21777284b3e6440498E8",
+      "pricer": "0x009BcfeC38cF0F15215E87B44fF1DF53c868A0D1",
+      "bank": "0x0A2acca04fD2fEbd2BB9e6eE30762b487A51F420",
+      "buffer": "0xaa07cCbd7DC5662321D0E2bc7D4CFa34a9eB62A0",
+      "game": "0x3DC2CfdF76fa127abf5486357e79082A9b2E37Cd",
+      "jackpot": "0xD5109C77e5C5ce383c4aD716281882B00B0F7e6c",
+      "loop": "0x6509684FF00DE88c0E233Ca16c2082b01Ce450a1",
+      "gateway": "0xb57abA53d416832974f3036A2c32Fe05f106DCAb",
+      "accountFactory": null,
+      "fromBlock": 16744685,
+      "deployedAt": 1794531282
+    }
+  }
+}

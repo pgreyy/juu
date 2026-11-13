@@ -1,0 +1,17 @@
+{
+  "name": "juu-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Juu keeper bot, data API for agents, and MCP server",
+  "scripts": {
+    "start": "node src/index.js",
+    "mcp": "node mcp/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "ethers": "^6.17.0",
+    "express": "^4.22.3",
+    "zod": "^3.25.76"
+  }
+}
