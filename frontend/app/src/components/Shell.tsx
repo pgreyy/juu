@@ -193,6 +193,23 @@ function MobileMenu() {
   );
 }
 
+/** Header logo and wordmark: on the app's home (MUSDash) it goes to the landing page; anywhere else, back to MUSDash.
+ *  The sidebar toggle (rail logo) is a separate button. */
+function BrandLink({ children }: { children: React.ReactNode }) {
+  const home = usePathname() === "/";
+  if (home)
+    return (
+      <a href="https://playjuu.xyz" className="brand" aria-label="Back to playjuu.xyz" title="Back to playjuu.xyz">
+        {children}
+      </a>
+    );
+  return (
+    <Link href="/" className="brand" aria-label="Go to MUSDash" title="Go to MUSDash">
+      {children}
+    </Link>
+  );
+}
+
 export function Shell({ children }: { children: React.ReactNode }) {
   const { stack } = useStack();
   const ticker = useTicker();
@@ -206,11 +223,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="page">
       <header className="head juu-head">
-            <Link href="/" className="brand" aria-label="Juu, MUSDash">
+            <BrandLink>
               <StackMark size={40} />
               <Wordmark size={38} />
               <span className="tag">THE MUSDASH TOTE</span>
-            </Link>
+            </BrandLink>
             <div className="head-right">
               {stack === "demo" && <span className="stack-badge" title="Demo stack: the owner can set the price"><span className="lbl-long">DEMO STACK</span><span className="lbl-short">DEMO</span></span>}
               <span className="desk-only"><ThemeToggle /></span>
