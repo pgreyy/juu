@@ -201,7 +201,7 @@ export default function Landing() {
 
         <Footer
           play={[{ label: "MUSDash", href: APP + "/" }, { label: "Jackpot", href: APP + "/jackpot" }, { label: "Leaderboard", href: APP + "/leaderboard" }, { label: "Agents", href: APP + "/agents" }]}
-          earn={[{ label: "Doors", href: APP + "/doors" }, { label: "Positions", href: APP + "/positions" }, { label: "Bank", href: APP + "/bank" }, { label: "Principal Market", href: APP + "/principal-market" }]}
+          earn={[{ label: "Doors", href: APP + "/doors" }, { label: "Portfolio", href: APP + "/portfolio" }, { label: "Bank", href: APP + "/bank" }, { label: "Principal Market", href: APP + "/principal-market" }]}
           build={[
             { label: "Docs", href: DOCS },
             { label: "Data API", href: process.env.NEXT_PUBLIC_DATA_API_URL || null },

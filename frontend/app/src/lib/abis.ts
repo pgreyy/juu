@@ -52,6 +52,7 @@ export const ABI = {
     "function userClose(uint256 id)",
   ],
   factory: ["function create() returns (address)", "function accountOf(address) view returns (address)"],
+  troveManager: ["function getTroveColl(address) view returns (uint256)", "function getTroveDebt(address) view returns (uint256)"],
   account: ["function openTrove(uint256 debtAmount) payable"],
 };
 

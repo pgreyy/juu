@@ -8,6 +8,10 @@ const config: NextConfig = {
   transpilePackages: ["@juu/ui"],
   agentRules: false,
   turbopack: { root: path.join(__dirname, "..") },
+  // Positions became Portfolio; old links keep working (the query, e.g. ?stack=demo, is kept).
+  async redirects() {
+    return [{ source: "/positions", destination: "/portfolio", permanent: true }];
+  },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API}/api/:path*` }];
   },

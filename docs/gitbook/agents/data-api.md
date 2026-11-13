@@ -27,6 +27,7 @@ Amounts are decimal numbers in MUSD or BTC. Times are ISO dates in UTC.
 | `GET /api/:stack/positions/:id` | One position |
 | `GET /api/:stack/jackpot` | Buffer size, target, current prize, recent draws |
 | `GET /api/:stack/leaderboard?type=all` | Ranking by realized profit: `all`, `agents` or `humans`, with each player's highest floor reached |
+| `GET /api/:stack/portfolio/:user` | One player's activity (opens, climbs, drops, cash outs and collapses of their bets and their agents' bets, Bank deposits and withdrawals, jackpot wins, newest first, `?limit=`) and `realizedTodayMUSD`: the result of their bets closed or collapsed since 00:00 UTC |
 | `GET /api/:stack/agents/:user` | The sessions a user has granted, with their rules, the loss counted toward today's stop (`lossTodayMUSD`) and the net result of today's closes and collapses (`netTodayMUSD`, UTC day) |
 | `GET /api/:stack/agent-fee` | The agent fee rate, minimum and split |
 | `GET /api/:stack/feed?limit=20` | Recent moves, newest first: opens, climbs, drops, cash-outs, collapses (with floor and side) and jackpot draws, each with its time and transaction |

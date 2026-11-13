@@ -9,7 +9,7 @@ import { EXPLORER, useWallet } from "@/lib/wallet";
 
 export const TABS = [
   { href: "/", label: "MUSDash", icon: "musdash" },
-  { href: "/positions", label: "Positions", icon: "positions" },
+  { href: "/portfolio", label: "Portfolio", icon: "portfolio" },
   { href: "/doors", label: "Doors", icon: "doors" },
   { href: "/bank", label: "Bank", icon: "bank" },
   { href: "/principal-market", label: "Principal Market", icon: "principal-market" },
@@ -154,7 +154,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <Footer
             LinkAs={NextLink}
             play={[{ label: "MUSDash", href: "/" }, { label: "Jackpot", href: "/jackpot" }, { label: "Leaderboard", href: "/leaderboard" }, { label: "Agents", href: "/agents" }]}
-            earn={[{ label: "Doors", href: "/doors" }, { label: "Positions", href: "/positions" }, { label: "Bank", href: "/bank" }, { label: "Principal Market", href: "/principal-market" }]}
+            earn={[{ label: "Doors", href: "/doors" }, { label: "Portfolio", href: "/portfolio" }, { label: "Bank", href: "/bank" }, { label: "Principal Market", href: "/principal-market" }]}
             build={[
               { label: "Docs", href: docs },
               { label: "Data API", href: process.env.NEXT_PUBLIC_DATA_API_URL || null },

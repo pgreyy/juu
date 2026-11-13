@@ -154,6 +154,7 @@ export function api() {
         "GET /api/:stack/jackpot",
         "GET /api/:stack/leaderboard?type=all|agents|humans",
         "GET /api/:stack/agents/:user",
+        "GET /api/:stack/portfolio/:user",
         "GET /api/:stack/agent-fee",
         "GET /api/:stack/feed?limit=20",
         "GET /api/:stack/tickets/:user",
@@ -482,6 +483,55 @@ export function api() {
     const out = items.slice(-limit).reverse();
     await Promise.all(out.map(async (x) => (x.time = iso(await blockTime(x.block)))));
     return { stack: s.name, scannedToBlock: events(s.name).lastBlock, feed: out };
+  }));
+
+  // One player's Juu activity and today's realized result, for the Portfolio page. Opens, climbs, drops, cash outs and
+  // collapses (their own bets and their agents'), Bank deposits and withdrawals, jackpot wins. Today = UTC day.
+  app.get("/api/:stack/portfolio/:user", wrap(async (req) => {
+    const s = st(req);
+    const user = req.params.user.toLowerCase();
+    const limit = Math.min(Number(req.query.limit || 30), 200);
+    const agents = agentPositions(s.name);
+    const mine = (id, owner) => {
+      const g = agents.get(String(id));
+      return g ? g.user.toLowerCase() === user : owner.toLowerCase() === user;
+    };
+    const byAgent = (id) => agents.get(String(id))?.agent || null;
+    const pos = new Map();
+    const items = [];
+    const results = [];
+    for (const e of events(s.name).list) {
+      const a = e.args;
+      const base = { block: e.block, tx: e.tx };
+      if (e.source === "game") {
+        if (e.event === "Opened") pos.set(String(a.id), { side: SIDE[Number(a.side)], floor: Number(a.floor), chip: CHIP[Number(a.chip)] });
+        if (!["Opened", "Agaruzo", "Dropped", "Closed", "FloorCollapsed", "Result"].includes(e.event) || !mine(a.id, a.owner)) continue;
+        const p = pos.get(String(a.id)) || {};
+        const who = { id: Number(a.id), agent: byAgent(a.id), side: p.side || null };
+        if (e.event === "Opened") items.push({ kind: "open", ...who, floor: Number(a.floor), chip: p.chip, sizeMUSD: fmt(a.size), ...base });
+        else if (e.event === "Agaruzo" || e.event === "Dropped") {
+          p.floor = Number(a.toFloor);
+          items.push({ kind: e.event === "Agaruzo" ? "climb" : "drop", ...who, fromFloor: Number(a.fromFloor), floor: Number(a.toFloor), ...base });
+        } else if (e.event === "Closed") items.push({ kind: "cashout", ...who, floor: p.floor ?? null, musdOut: fmt(a.musdOut), ...base });
+        else if (e.event === "FloorCollapsed") items.push({ kind: "collapse", ...who, floor: p.floor ?? null, ...base });
+        else if (e.event === "Result") results.push({ id: Number(a.id), result: fmt(a.result), block: e.block });
+      } else if (e.source === "bank" && e.event === "Deposited" && a.receiver.toLowerCase() === user) {
+        items.push({ kind: "deposit", btc: fmt(a.btc), shares: fmt(a.shares), ...base });
+      } else if (e.source === "bank" && e.event === "Withdrawn" && a.owner.toLowerCase() === user) {
+        items.push({ kind: "withdraw", btc: fmt(a.btc), musdOut: fmt(a.musdOut), ...base });
+      } else if (e.source === "jackpot" && e.event === "Drawn" && a.winner.toLowerCase() === user) {
+        items.push({ kind: "jackpot", prizeMUSD: fmt(a.prize), ...base });
+      }
+    }
+    // Attach each bet's realized result to its cash out or collapse.
+    const res = new Map(results.map((r) => [r.id, r.result]));
+    for (const it of items) if ((it.kind === "cashout" || it.kind === "collapse") && res.has(it.id)) it.resultMUSD = res.get(it.id);
+    const today = Math.floor((await now()) / 86400);
+    let realizedTodayMUSD = 0;
+    for (const r of results) if (Math.floor((await blockTime(r.block)) / 86400) === today) realizedTodayMUSD += r.result;
+    const out = items.slice(-limit).reverse();
+    await Promise.all(out.map(async (x) => (x.time = iso(await blockTime(x.block)))));
+    return { stack: s.name, user: req.params.user, realizedTodayMUSD, activity: out };
   }));
 
   // Jackpot tickets this epoch for one player. 1 ticket = 1 MUSD of position size held for 1 hour.

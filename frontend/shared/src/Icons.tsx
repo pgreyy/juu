@@ -1,8 +1,9 @@
 import type * as React from "react";
-// The eight page icons and the sidebar icon (docs/design/assets/icons). 24px grid, stroke 1.8, round caps.
+// The page icons and the sidebar icon (docs/design/assets/icons). 24px grid, stroke 1.8, round caps.
 const PATHS: Record<string, React.ReactNode> = {
   musdash: <path d="M6 21V7l6-4 6 4v14M6 11h12M6 15h12M10 21v-3h4v3" />,
   positions: <path d="M12 3l9 5-9 5-9-5 9-5zM3 12.5l9 5 9-5M3 17l9 5 9-5" />,
+  portfolio: <path d="M11 4a8 8 0 1 0 9 9h-9V4zM14 2.5a8 8 0 0 1 7.5 7.5H14V2.5z" />,
   doors: <path d="M6 21V3h10v18M3 21h18M13 12h.01" />,
   bank: <path d="M3 9l9-5 9 5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18" />,
   "principal-market": (

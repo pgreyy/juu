@@ -68,6 +68,8 @@ export const ABI = {
     "event AgentFeePaid(uint256 indexed positionId, address indexed user, address indexed agent, uint256 fee, uint256 toBuffer, uint256 toBank)",
   ],
   bank: [
+    "event Deposited(address indexed sender, address indexed receiver, uint256 btc, uint256 shares)",
+    "event Withdrawn(address indexed owner, address indexed receiver, uint256 shares, uint256 btc, uint256 musdOut)",
     "function capitalMUSD() view returns (uint256)",
     "function maxExposure() view returns (uint256)",
     "function liquidity() view returns (uint256)",
