@@ -2,7 +2,7 @@
 import express from "express";
 import { ethers } from "ethers";
 import { ABI } from "./abis.js";
-import { addresses, STACKS } from "./config.js";
+import { addresses, env, STACKS } from "./config.js";
 import { c, fmt, now, provider, shared, stack } from "./chain.js";
 import { byEvent, events } from "./events.js";
 import { history } from "./history.js";
@@ -77,8 +77,27 @@ function agentPositions(stackName) {
   return m;
 }
 
+// Browsers may read the API from these sites (comma-separated origins, e.g. the two Vercel sites). The API is
+// read only, so this only controls which web pages can fetch it directly.
+const ORIGINS = env("CORS_ORIGINS", "")
+  .split(",")
+  .map((x) => x.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+
 export function api() {
   const app = express();
+  app.disable("x-powered-by");
+  app.use((req, res, next) => {
+    const o = req.get("origin");
+    if (o && ORIGINS.includes(o)) {
+      res.set("Access-Control-Allow-Origin", o);
+      res.set("Vary", "Origin");
+      res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+      res.set("Access-Control-Allow-Headers", "Content-Type");
+    }
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
 
   app.get("/", (req, res) =>
     res.json({

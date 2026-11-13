@@ -32,6 +32,9 @@ Amounts are decimal numbers in MUSD or BTC. Times are ISO dates in UTC.
 | `GET /api/:stack/feed?limit=20` | Recent moves, newest first: opens, climbs, drops, cash-outs, collapses (with floor and side) and jackpot draws, each with its time and transaction |
 | `GET /api/:stack/tickets/:user` | This week's jackpot tickets for one address and for everyone, and the address's odds. One ticket is 1 MUSD of position size held for one hour |
 
+Browsers can read the API directly only from the sites listed in `CORS_ORIGINS` in the `.env` (comma-separated). The
+Juu app and landing page read it through their own `/api` path, so they don't depend on it.
+
 ## Running it
 
 ```

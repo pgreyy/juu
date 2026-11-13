@@ -63,3 +63,15 @@ The user (you) must first, from your own wallet:
 1. grant the agent a session on the Agent Gateway ([how](permissions.md)),
 2. approve the Agent Gateway for the MUSD the agent may use,
 3. send the agent wallet a little BTC for gas.
+
+## Hosted over HTTP
+
+The same server can run over Streamable HTTP instead of stdio, for a server behind HTTPS (see `docs/deploy.md` in the
+repo). Set `MCP_HTTP_PORT`; it then listens on 127.0.0.1 at `/mcp`, with a health check at `/mcp/health`.
+
+* Without `AGENT_PRIVATE_KEY` it is read only and needs no token.
+* With `AGENT_PRIVATE_KEY`, every request must carry `Authorization: Bearer <MCP_AUTH_TOKEN>`, and the server refuses to
+  start without a token of at least 24 characters. Anyone who can reach a hosted server with an agent key could
+  otherwise play with that key.
+
+Running it on your own computer over stdio (above) keeps the agent key off any server.

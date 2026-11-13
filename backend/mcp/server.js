@@ -8,6 +8,8 @@
 //                      Never a user's main wallet key: the agent key can only do what the user's session allows,
 //                      and the user can revoke it any time. Without it, only the read tools work.
 //   MEZO_RPC_URL       default https://rpc.test.mezo.org
+//   MCP_HTTP_PORT      serve over Streamable HTTP on 127.0.0.1:<port>/mcp instead of stdio (for a server behind Caddy)
+//   MCP_AUTH_TOKEN     bearer token clients must send over HTTP; required when AGENT_PRIVATE_KEY is set
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -91,179 +93,219 @@ async function sendTx(fn, args) {
 
 const SIDES = { bull: 0, bear: 1 };
 const CHIPS = { y: 1, p: 2 };
-const server = new McpServer({ name: "juu", version: "0.1.0" });
+/** A fresh server with every tool registered (HTTP mode builds one per request). */
+function buildServer() {
+  const server = new McpServer({ name: "juu", version: "0.1.0" });
 
-// ---------------------------------------------------------------- read tools
+  // ---------------------------------------------------------------- read tools
 
-const reads = [
-  ["juu_floors", "Floor states: leverage, how far the price may move before a floor collapses, open positions and their collapse prices, seat premiums.", "/floors"],
-  ["juu_sides", "Bull vs Bear open size, the gap the Bank carries and how much room is left.", "/sides"],
-  ["juu_funding", "Current funding rate per hour for each side.", "/funding"],
-  ["juu_climb_premium", "Climb Premium on floors 7-10: next seat price and kill switch status.", "/climb-premium"],
-  ["juu_bank", "Bank capacity: capital, max gap, liquidity, its Mezo loan.", "/bank"],
-  ["juu_jackpot", "Jackpot: Buffer size, target, current prize, recent draws.", "/jackpot"],
-  ["juu_positions", "All open positions with live value, equity and collapse price.", "/positions"],
-  ["juu_agent_fee", "The extra fee every agent action pays and how it is split.", "/agent-fee"],
-];
-for (const [name, description, p] of reads) {
-  server.registerTool(name, { description, inputSchema: {} }, async () => {
+  const reads = [
+    ["juu_floors", "Floor states: leverage, how far the price may move before a floor collapses, open positions and their collapse prices, seat premiums.", "/floors"],
+    ["juu_sides", "Bull vs Bear open size, the gap the Bank carries and how much room is left.", "/sides"],
+    ["juu_funding", "Current funding rate per hour for each side.", "/funding"],
+    ["juu_climb_premium", "Climb Premium on floors 7-10: next seat price and kill switch status.", "/climb-premium"],
+    ["juu_bank", "Bank capacity: capital, max gap, liquidity, its Mezo loan.", "/bank"],
+    ["juu_jackpot", "Jackpot: Buffer size, target, current prize, recent draws.", "/jackpot"],
+    ["juu_positions", "All open positions with live value, equity and collapse price.", "/positions"],
+    ["juu_agent_fee", "The extra fee every agent action pays and how it is split.", "/agent-fee"],
+  ];
+  for (const [name, description, p] of reads) {
+    server.registerTool(name, { description, inputSchema: {} }, async () => {
+      try {
+        return text(await get(`/api/${STACK}${p}`));
+      } catch (e) {
+        return fail(e);
+      }
+    });
+  }
+
+  server.registerTool("juu_series", { description: "Series: end dates, phase, Y and P margin values, P Market price and fixed return, sMUSD series.", inputSchema: {} }, async () => {
     try {
-      return text(await get(`/api/${STACK}${p}`));
+      return text(await get("/api/series"));
     } catch (e) {
       return fail(e);
     }
   });
-}
 
-server.registerTool("juu_series", { description: "Series: end dates, phase, Y and P margin values, P Market price and fixed return, sMUSD series.", inputSchema: {} }, async () => {
-  try {
-    return text(await get("/api/series"));
-  } catch (e) {
-    return fail(e);
-  }
-});
-
-server.registerTool(
-  "juu_price_history",
-  { description: "BTC price history sampled every minute.", inputSchema: { minutes: z.number().int().min(1).max(10080).default(60) } },
-  async ({ minutes }) => {
-    try {
-      return text(await get(`/api/${STACK}/price/history?minutes=${minutes}`));
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-server.registerTool(
-  "juu_recent_collapses",
-  { description: "Recent floor collapses.", inputSchema: { limit: z.number().int().min(1).max(200).default(20) } },
-  async ({ limit }) => {
-    try {
-      return text(await get(`/api/${STACK}/collapses/recent?limit=${limit}`));
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-server.registerTool(
-  "juu_leaderboard",
-  { description: "Leaderboard by realized profit: agents, humans or all.", inputSchema: { type: z.enum(["all", "agents", "humans"]).default("all") } },
-  async ({ type }) => {
-    try {
-      return text(await get(`/api/${STACK}/leaderboard?type=${type}`));
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-server.registerTool(
-  "juu_position",
-  { description: "One position by id.", inputSchema: { id: z.number().int().min(1) } },
-  async ({ id }) => {
-    try {
-      return text(await get(`/api/${STACK}/positions/${id}`));
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-server.registerTool(
-  "juu_my_session",
-  { description: "The rules a user gave this agent (max chips, highest floor, daily loss limit, expiry).", inputSchema: { user: z.string() } },
-  async ({ user }) => {
-    try {
-      const all = await get(`/api/${STACK}/agents/${user}`);
-      const mine = agent ? all.sessions.filter((s) => s.agent.toLowerCase() === agent.address.toLowerCase()) : all.sessions;
-      return text({ agent: agent?.address ?? null, user, sessions: mine });
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-// ---------------------------------------------------------------- action tools (agent session key only)
-
-server.registerTool(
-  "juu_open",
-  {
-    description: "Open a position for a user with their MUSD, through the Agent Gateway. Pays MUSDash's trading fee, the seat premium on floors 7-10, and the agent fee. The user's session rules apply.",
-    inputSchema: { user: z.string(), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), margin_musd: z.number().positive() },
-  },
-  async ({ user, side, floor, margin_musd }) => {
-    try {
-      const r = await sendTx("openMUSD", [user, SIDES[side], floor, ethers.parseEther(String(margin_musd))]);
-      const ev = r.logs.map((l) => { try { return gateway.interface.parseLog(l); } catch { return null; } }).find((x) => x?.name === "AgentOpened");
-      return text({ ...r, logs: undefined, positionId: ev ? Number(ev.args.positionId) : null });
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-server.registerTool(
-  "juu_open_with_tokens",
-  {
-    description: "Open a position for a user with their Y or P chips of a series.",
-    inputSchema: { user: z.string(), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), chip: z.enum(["y", "p"]), series_id: z.number().int().min(0), amount: z.number().positive() },
-  },
-  async ({ user, side, floor, chip, series_id, amount }) => {
-    try {
-      const r = await sendTx("openTokens", [user, SIDES[side], floor, CHIPS[chip], series_id, ethers.parseEther(String(amount))]);
-      const ev = r.logs.map((l) => { try { return gateway.interface.parseLog(l); } catch { return null; } }).find((x) => x?.name === "AgentOpened");
-      return text({ ...r, logs: undefined, positionId: ev ? Number(ev.args.positionId) : null });
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-server.registerTool(
-  "juu_close",
-  { description: "Close one of this agent's positions. Everything it returns goes to the user.", inputSchema: { id: z.number().int().min(1) } },
-  async ({ id }) => {
-    try {
-      const r = await sendTx("close", [id]);
-      return text({ ...r, logs: undefined });
-    } catch (e) {
-      return fail(e);
-    }
-  },
-);
-
-for (const [name, verb] of [["juu_climb", "Climb"], ["juu_drop", "Drop"]]) {
   server.registerTool(
-    name,
-    { description: `${verb} one of this agent's positions to another floor (within the user's highest floor).`, inputSchema: { id: z.number().int().min(1), to_floor: z.number().int().min(1).max(10) } },
-    async ({ id, to_floor }) => {
+    "juu_price_history",
+    { description: "BTC price history sampled every minute.", inputSchema: { minutes: z.number().int().min(1).max(10080).default(60) } },
+    async ({ minutes }) => {
       try {
-        const r = await sendTx("moveFloor", [id, to_floor]);
+        return text(await get(`/api/${STACK}/price/history?minutes=${minutes}`));
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "juu_recent_collapses",
+    { description: "Recent floor collapses.", inputSchema: { limit: z.number().int().min(1).max(200).default(20) } },
+    async ({ limit }) => {
+      try {
+        return text(await get(`/api/${STACK}/collapses/recent?limit=${limit}`));
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "juu_leaderboard",
+    { description: "Leaderboard by realized profit: agents, humans or all.", inputSchema: { type: z.enum(["all", "agents", "humans"]).default("all") } },
+    async ({ type }) => {
+      try {
+        return text(await get(`/api/${STACK}/leaderboard?type=${type}`));
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "juu_position",
+    { description: "One position by id.", inputSchema: { id: z.number().int().min(1) } },
+    async ({ id }) => {
+      try {
+        return text(await get(`/api/${STACK}/positions/${id}`));
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "juu_my_session",
+    { description: "The rules a user gave this agent (max chips, highest floor, daily loss limit, expiry).", inputSchema: { user: z.string() } },
+    async ({ user }) => {
+      try {
+        const all = await get(`/api/${STACK}/agents/${user}`);
+        const mine = agent ? all.sessions.filter((s) => s.agent.toLowerCase() === agent.address.toLowerCase()) : all.sessions;
+        return text({ agent: agent?.address ?? null, user, sessions: mine });
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  // ---------------------------------------------------------------- action tools (agent session key only)
+
+  server.registerTool(
+    "juu_open",
+    {
+      description: "Open a position for a user with their MUSD, through the Agent Gateway. Pays MUSDash's trading fee, the seat premium on floors 7-10, and the agent fee. The user's session rules apply.",
+      inputSchema: { user: z.string(), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), margin_musd: z.number().positive() },
+    },
+    async ({ user, side, floor, margin_musd }) => {
+      try {
+        const r = await sendTx("openMUSD", [user, SIDES[side], floor, ethers.parseEther(String(margin_musd))]);
+        const ev = r.logs.map((l) => { try { return gateway.interface.parseLog(l); } catch { return null; } }).find((x) => x?.name === "AgentOpened");
+        return text({ ...r, logs: undefined, positionId: ev ? Number(ev.args.positionId) : null });
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "juu_open_with_tokens",
+    {
+      description: "Open a position for a user with their Y or P chips of a series.",
+      inputSchema: { user: z.string(), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), chip: z.enum(["y", "p"]), series_id: z.number().int().min(0), amount: z.number().positive() },
+    },
+    async ({ user, side, floor, chip, series_id, amount }) => {
+      try {
+        const r = await sendTx("openTokens", [user, SIDES[side], floor, CHIPS[chip], series_id, ethers.parseEther(String(amount))]);
+        const ev = r.logs.map((l) => { try { return gateway.interface.parseLog(l); } catch { return null; } }).find((x) => x?.name === "AgentOpened");
+        return text({ ...r, logs: undefined, positionId: ev ? Number(ev.args.positionId) : null });
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool(
+    "juu_close",
+    { description: "Close one of this agent's positions. Everything it returns goes to the user.", inputSchema: { id: z.number().int().min(1) } },
+    async ({ id }) => {
+      try {
+        const r = await sendTx("close", [id]);
         return text({ ...r, logs: undefined });
       } catch (e) {
         return fail(e);
       }
     },
   );
+
+  for (const [name, verb] of [["juu_climb", "Climb"], ["juu_drop", "Drop"]]) {
+    server.registerTool(
+      name,
+      { description: `${verb} one of this agent's positions to another floor (within the user's highest floor).`, inputSchema: { id: z.number().int().min(1), to_floor: z.number().int().min(1).max(10) } },
+      async ({ id, to_floor }) => {
+        try {
+          const r = await sendTx("moveFloor", [id, to_floor]);
+          return text({ ...r, logs: undefined });
+        } catch (e) {
+          return fail(e);
+        }
+      },
+    );
+  }
+
+  server.registerTool(
+    "juu_set_loop",
+    { description: "Turn the user's Loop on or off (only if the user allowed this agent to).", inputSchema: { user: z.string(), on: z.boolean(), series_id: z.number().int().min(0) } },
+    async ({ user, on, series_id }) => {
+      try {
+        const r = await sendTx("setLoopFor", [user, on, series_id]);
+        return text({ ...r, logs: undefined });
+      } catch (e) {
+        return fail(e);
+      }
+    },
+  );
+
+  server.registerTool("juu_whoami", { description: "This server's stack, API and agent address (never any key).", inputSchema: {} }, async () =>
+    text({ stack: STACK, api: API, gateway: stackAddr.gateway, agent: agent?.address ?? null, canAct: Boolean(agent) }),
+  );
+  return server;
 }
 
-server.registerTool(
-  "juu_set_loop",
-  { description: "Turn the user's Loop on or off (only if the user allowed this agent to).", inputSchema: { user: z.string(), on: z.boolean(), series_id: z.number().int().min(0) } },
-  async ({ user, on, series_id }) => {
+// Transport: stdio by default (for an assistant on your own computer). With MCP_HTTP_PORT set, Streamable HTTP on
+// 127.0.0.1 only, for a reverse proxy (Caddy) in front. Over HTTP a bearer token is required whenever an agent key is
+// loaded, because anyone who reaches the endpoint could otherwise play with that key.
+const HTTP_PORT = process.env.MCP_HTTP_PORT;
+if (!HTTP_PORT) {
+  await buildServer().connect(new StdioServerTransport());
+} else {
+  const TOKEN = process.env.MCP_AUTH_TOKEN || "";
+  if (agent && TOKEN.length < 24) {
+    console.error("MCP over HTTP with AGENT_PRIVATE_KEY needs MCP_AUTH_TOKEN (at least 24 characters). Not starting.");
+    process.exit(1);
+  }
+  const { StreamableHTTPServerTransport } = await import("@modelcontextprotocol/sdk/server/streamableHttp.js");
+  const { default: express } = await import("express");
+  const app = express();
+  app.use(express.json({ limit: "256kb" }));
+  app.get("/mcp/health", (req, res) => res.json({ ok: true, stack: STACK, canAct: Boolean(agent), needsToken: Boolean(TOKEN) }));
+  app.post("/mcp", async (req, res) => {
+    if (TOKEN && req.get("authorization") !== `Bearer ${TOKEN}`) return res.status(401).json({ error: "missing or wrong bearer token" });
     try {
-      const r = await sendTx("setLoopFor", [user, on, series_id]);
-      return text({ ...r, logs: undefined });
+      const server = buildServer();
+      const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+      res.on("close", () => {
+        transport.close();
+        server.close();
+      });
+      await server.connect(transport);
+      await transport.handleRequest(req, res, req.body);
     } catch (e) {
-      return fail(e);
+      if (!res.headersSent) res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "internal error" }, id: null });
     }
-  },
-);
-
-server.registerTool("juu_whoami", { description: "This server's stack, API and agent address (never any key).", inputSchema: {} }, async () =>
-  text({ stack: STACK, api: API, gateway: stackAddr.gateway, agent: agent?.address ?? null, canAct: Boolean(agent) }),
-);
-
-await server.connect(new StdioServerTransport());
+  });
+  const notAllowed = (req, res) => res.status(405).json({ jsonrpc: "2.0", error: { code: -32000, message: "Method not allowed." }, id: null });
+  app.get("/mcp", notAllowed);
+  app.delete("/mcp", notAllowed);
+  app.listen(Number(HTTP_PORT), "127.0.0.1", () => console.error(`Juu MCP over HTTP on http://127.0.0.1:${HTTP_PORT}/mcp (${STACK} stack, ${agent ? "can act" : "read only"})`));
+}

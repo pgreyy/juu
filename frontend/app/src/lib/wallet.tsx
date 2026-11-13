@@ -3,7 +3,7 @@ import { BrowserProvider, Contract, Interface, JsonRpcProvider, type Signer, typ
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ERRORS, ERROR_WORDS } from "./abis";
 
-export const CHAIN_ID = 31611;
+export const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31611);
 export const RPC_URL = process.env.NEXT_PUBLIC_MEZO_RPC || "https://rpc.test.mezo.org";
 export const EXPLORER = "https://explorer.test.mezo.org";
 
