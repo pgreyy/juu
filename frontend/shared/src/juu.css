@@ -138,3 +138,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .juu-head .hbtn.fill { background: var(--onHead); color: var(--head); }
 .juu-head .hbtn:hover { text-decoration: underline; text-underline-offset: 4px; }
 .juu-head .stack-badge { border-color: var(--onHead); color: var(--onHead); }
+
+/* Theme button (icon only) and its Light / Dark / System menu */
+.theme-wrap { position: relative; }
+.theme-btn { width: 46px; padding: 0 !important; display: inline-flex; align-items: center; justify-content: center; }
+.theme-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; min-width: 168px; background: var(--surf); color: var(--ink); border: 1.5px solid var(--rule); padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.theme-opt { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px; background: transparent; color: var(--ink); border: 1.5px solid transparent; font-family: var(--fN); font-size: 13px; text-align: left; }
+.theme-opt[aria-checked="true"] { border-color: var(--rule); }
+.theme-opt:hover, .theme-opt:focus-visible { background: var(--sel); }
