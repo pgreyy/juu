@@ -47,7 +47,7 @@ export default function Landing() {
             <div>
               <div className="label">GAMIFIED MONEY LAYER ON MEZO</div>
               <h1 id="hero-h" className="lp-h1 lp-hero-h1">
-                Ten floors. <span className="hi">How high?</span>
+                <span className="ph">Ten floors.</span> <span className="ph hi">How high?</span>
               </h1>
               <p className="lp-lede">Bring your Bitcoin in, split it into Principal and Yield, then climb the tower, save with it or lock in a fixed return.</p>
               <div className="lp-ctas">
