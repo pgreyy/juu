@@ -8,7 +8,7 @@ connections. The app and the landing page run on Vercel.
 | Piece | Where | Address |
 | --- | --- | --- |
 | Keeper bot + Data API (`juu-backend`) | VPS, pm2 as `juu` | 127.0.0.1:8788, public at `https://api.playjuu.xyz` |
-| MCP server over HTTP (`juu-mcp`) | VPS, pm2 as `juu` | 127.0.0.1:8789 (not public) |
+| MCP server over HTTP (`juu-mcp`) | VPS, pm2 as `juu` | 127.0.0.1:8789, public at `https://mcp.playjuu.xyz` |
 | Cloudflare tunnel "juu" (`juu-tunnel`) | VPS, pm2 as `juu` | outgoing only; metrics on 127.0.0.1:20250 |
 | Landing (`frontend/landing`) | Vercel project `juu-landing` | `https://playjuu.xyz` |
 | App (`frontend/app`) | Vercel project `juu-app` | `https://app.playjuu.xyz` |
@@ -124,7 +124,7 @@ Fill in the **server** section only:
 * `KEEPER_KEY`: the keeper wallet's key (the same as in the laptop's `.env`). Paste it in nano, never in a command line.
 * `TUNNEL_TOKEN`: the token of the Cloudflare tunnel "juu".
 * `CORS_ORIGINS=https://playjuu.xyz,https://app.playjuu.xyz`.
-* Leave `AGENT_PRIVATE_KEY` and `MCP_AUTH_TOKEN` empty: the MCP server is read only.
+* Never set `AGENT_PRIVATE_KEY` on the server: the hosted MCP server holds no key (clients send their own).
 
 Leave every laptop-only key empty. The deployer key never goes on the server.
 
@@ -176,7 +176,8 @@ curl -s 127.0.0.1:20250/ready               # "readyConnections" above 0 = tunne
 ## C1. Route api.playjuu.xyz to the backend (CLOUDFLARE)
 
 Zero Trust, Networks, Tunnels, "juu", Public hostnames, Add: subdomain `api`, domain `playjuu.xyz`, service
-`HTTP` `localhost:8788`. Cloudflare creates the DNS record itself.
+`HTTP` `localhost:8788`. Add a second one: subdomain `mcp`, service `HTTP` `localhost:8789`. Cloudflare creates the DNS
+records itself.
 
 Check from the LAPTOP:
 
@@ -211,9 +212,15 @@ ssh juu-vps 'git -C ~/juu checkout <previous commit> && ~/juu/deploy/deploy-curr
 
 ## The MCP server
 
-`juu-mcp` runs read only on 127.0.0.1:8789 and is not public. To publish it, add a second public hostname to the tunnel
-(for example `mcp.playjuu.xyz` to `localhost:8789`). If an agent key is ever added to the server, clients must send
-`Authorization: Bearer <MCP_AUTH_TOKEN>`, and the server refuses to start without a token of at least 24 characters.
+`juu-mcp` listens on 127.0.0.1:8789 and is public at `https://mcp.playjuu.xyz` through the tunnel's second public
+hostname (`mcp` to `HTTP` `localhost:8789`). It holds no key of its own: read tools are open, and to play each client
+sends its own agent session key as `Authorization: Bearer <key>`. The key is used for that request only, kept in memory
+and never written or logged; a token that isn't a private key gets a 401. Before any play it checks that the user has
+given that agent a live session. It refuses to start if `AGENT_PRIVATE_KEY` is set.
+
+```bash
+curl -s https://mcp.playjuu.xyz/mcp/health
+```
 
 ## Vercel
 

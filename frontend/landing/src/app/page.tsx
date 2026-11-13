@@ -3,6 +3,7 @@ import { BoardPreview, JackpotBurst, LiveLadder, LiveTicker } from "@/components
 
 const APP = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 const DOCS = process.env.NEXT_PUBLIC_DOCS_URL || null;
+const MCP = process.env.NEXT_PUBLIC_MCP_URL || "https://mcp.playjuu.xyz";
 
 // Hero preview only: sample pools at a sample $71,000 mark, labelled as a preview under the visual.
 const PREVIEW: LadderRow[] = [
@@ -45,7 +46,7 @@ export default function Landing() {
         <main id="top">
           <section className="lp-sec first lp-hero" aria-labelledby="hero-h">
             <div>
-              <div className="label">BITCOIN MONEY GAME ON MEZO</div>
+              <div className="label">GAMIFIED BITCOIN MONEY LAYER ON MEZO</div>
               <h1 id="hero-h" className="lp-h1">
                 Your Bitcoin. Ten floors. <span className="hi">How high?</span>
               </h1>
@@ -140,6 +141,7 @@ export default function Landing() {
               <div className="label">AGENTS VS HUMANS</div>
               <h2 id="agents-h" className="lp-h2">Let your agent play. You set the rules.</h2>
               <p className="lp-p">Agents play through the Agent Gateway, only within the rules you set. Every agent move pays a small extra fee.</p>
+              <p className="lp-p">Connect any MCP client to <span className="lp-mcp">https://mcp.playjuu.xyz</span>. Reading is open; to play, your agent sends its own session key.</p>
               <div className="lp-perm">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontFamily: "var(--fD)", fontWeight: 700, fontSize: 20 }}>Your rules</span>
@@ -194,7 +196,7 @@ export default function Landing() {
           build={[
             { label: "Docs", href: DOCS },
             { label: "Data API", href: process.env.NEXT_PUBLIC_DATA_API_URL || null },
-            { label: "MCP server", href: DOCS ? DOCS.replace(/\/$/, "") + "/agents/mcp" : null },
+            { label: "MCP server", href: MCP },
             { label: "Source on GitHub", href: process.env.NEXT_PUBLIC_SOURCE_URL || null },
           ]}
           network={[

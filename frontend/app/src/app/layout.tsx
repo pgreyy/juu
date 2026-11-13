@@ -10,7 +10,7 @@ import { WalletProvider } from "@/lib/wallet";
 
 export const metadata: Metadata = {
   title: "Juu · MUSDash",
-  description: "Bitcoin money game on Mezo testnet. Ten floors, Principal and Yield, the Bank and the Principal Market.",
+  description: "Juu, the gamified Bitcoin money layer on Mezo: Doors, Principal and Yield, MUSDash, the Bank and the Principal Market. Live on Mezo testnet.",
 };
 
 

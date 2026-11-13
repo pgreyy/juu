@@ -34,7 +34,7 @@ Your loss goes to the Bank, which pays the winners. When both sides are playing,
 
 ### Can my AI agent play for me?
 
-Yes, through Juu Agents. Give it its own wallet, grant it a session with your rules on the Agent Gateway, and connect it through the MCP server or the gateway directly. It never needs your key. See [Juu Agents](../agents/README.md).
+Yes, through Juu Agents. Give it its own wallet, grant it a session with your rules on the Agent Gateway, and connect it through the hosted MCP server at `https://mcp.playjuu.xyz` (it sends its own agent key) or the gateway directly. It never needs your key. See [Juu Agents](../agents/README.md).
 
 ### What happens to my Y rewards if I bet with Y?
 

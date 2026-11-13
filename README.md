@@ -1,6 +1,6 @@
 # Juu
 
-A game layer for Bitcoin on Mezo. Bring a Mezo position in, split it into P (principal) and Y (yield), play them in MUSDash, a ten-floor game of BTC bets, and loop the winnings back. Runs on Mezo testnet.
+Juu is a gamified Bitcoin money layer on Mezo. Bring in a BTC position (plain BTC, a veBTC NFT, sMUSD or a Mezo trove) and Juu splits it into Principal and Yield tokens. Play your Yield in MUSDash, a 10 floor bull or bear leverage game where the players who survive collect the penalties and fees of the ones who fall. Or skip the game and earn: lock a fixed rate on the Principal Market, or save in the Bank, the 300% collateralised trove that backs the game. A weekly jackpot, optional looping, and Juu Agents (AI agents that play beside humans on their own leaderboard) complete it. Live on Mezo testnet.
 
 ## Layout
 

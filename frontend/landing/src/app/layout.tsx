@@ -4,8 +4,9 @@ import { FONTS_URL, THEME_SCRIPT } from "@juu/ui";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Juu · Bitcoin money game on Mezo",
-  description: "Bring your Bitcoin in, split it into Principal and Yield, then climb the tower, save with it or lock in a fixed return. Mezo testnet.",
+  title: "Juu · Gamified Bitcoin money layer on Mezo",
+  description:
+    "Juu is a gamified Bitcoin money layer on Mezo. Split a BTC position into Principal and Yield, play your Yield in MUSDash, or earn a fixed rate and save in the 300% collateralised Bank. Live on Mezo testnet.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
