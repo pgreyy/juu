@@ -25,7 +25,7 @@ Checks on every agent call:
 | `openMUSD(user, side, floor, margin)` | agent | Pulls margin + trading fee + seat premium + agent fee from the user; refunds anything MUSDash didn't take. |
 | `openTokens(user, side, floor, chip, seriesId, amount)` | agent | Pulls the Y or P and the agent fee (MUSD). |
 | `moveFloor(id, toFloor)` | agent | Climb or drop. |
-| `close(id)` | agent | Allowed after the daily loss limit, not after revoke or expiry. |
+| `close(id)` | agent | Allowed after the daily realised loss stop is reached, not after revoke or expiry. |
 | `setLoopFor(user, on, seriesId)` | agent | Only if `canSetLoop`. Pays the minimum agent fee. |
 | `userClose(id)` | user | Close your agent's position yourself, no agent fee. |
 | `liquidateAndForward(id)` | anyone | Collapses a due agent position and forwards what's left (rewards) to the user. The keeper uses this. |

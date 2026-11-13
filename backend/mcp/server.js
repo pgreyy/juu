@@ -226,7 +226,7 @@ function buildServer(agent, STACK) {
 
   server.registerTool(
     "juu_my_session",
-    { description: "The rules a user gave this agent (max chips, highest floor, daily loss limit, expiry). Without user: every wallet that gives this agent permission now.", inputSchema: { user: z.string().optional() } },
+    { description: "The rules a user gave this agent (max chips, highest floor, daily realised loss stop, expiry; the loss stop counts losses from closed bets, open bets can lose more until they close). Without user: every wallet that gives this agent permission now.", inputSchema: { user: z.string().optional() } },
     async ({ user }) => {
       try {
         if (!user) {

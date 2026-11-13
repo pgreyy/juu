@@ -56,7 +56,7 @@ Sample figures (like 71,000 BTC price) are fine only inside visuals that are cle
    - Bank: "Back the game, earn from it." Trove at 300%, paid out in BTC.
    - Principal Market: "Buy Bitcoin below full price." Principal bought at 0.9604 BTC in testing, full Bitcoin on the end date.
 
-7. **Agents vs humans:** "Let your agent play. You set the rules." Rules list (max per bet, highest floor, daily loss stop, expiry, revoke any time). A small leaderboard preview with AGENT and HUMAN badges.
+7. **Agents vs humans:** "Let your agent play. You set the rules." Rules list (max per bet, highest floor, daily realised loss stop, expiry, revoke any time). A small leaderboard preview with AGENT and HUMAN badges.
 
 8. **Jackpot:** the big starburst ray chart. "Every week the safety jar's overflow becomes a jackpot. Tickets = position size × time held." First draw paid 0.431 MUSD.
 

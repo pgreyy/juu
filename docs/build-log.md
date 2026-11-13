@@ -1,5 +1,9 @@
 # Juu build log
 
+The history of the build, in order. **Many addresses below are retired.** The current main and demo addresses are in
+[gitbook/technical/contracts-and-addresses.md](gitbook/technical/contracts-and-addresses.md); every tested flow with its
+transaction is in [evidence.md](evidence.md).
+
 ## Series lock design (decided 13 Nov 2026)
 
 Juu sets its own series end dates (Thursdays 00:00 UTC; first two: 31 Dec 2026 and 25 Mar 2027).
@@ -53,7 +57,7 @@ Every other function Juu calls matches the explorer's verified ABI of the live v
 
 ## Deployed on Mezo testnet (deployer 0x5Ac87a8AeC1EF2Ff28835e6EBbf52495C89Bc5eA)
 
-### Current: Splitter v2 (13 Nov 2026)
+### Splitter v2 (13 Nov 2026, current)
 v2 change: a series can be created while its unlock week is still ahead (so a 10 Dec demo series fits), and
 deposits stay open until startUnlock is called.
 
@@ -81,7 +85,7 @@ Checked on chain:
 
 Demo calendar for series 0: harvest + claimY weekly from 19 Nov; mature from Thu 10 Dec 01:00 UTC; then redeemP.
 
-### Bank v3, current (13 Nov 2026)
+### Bank v3 (13 Nov 2026, RETIRED: replaced by v4, then v5)
 JuuBank 0x2F12021337cB016e8b03D922D0981A0D82B37E27, deploy tx 0xb635bae9846c480f517fece9a1ada382cd23923e60b0699b071478566b92ac13.
 Savers deposit BTC for jBANK shares (about 1,000 shares per BTC at the start). One trove at 300% (rebalance between
 270% and 330%). MUSDash will pay winners with payOut and send income as MUSD; exposure cap 20% of capital.
@@ -124,7 +128,7 @@ tx 0x672a209d…e38d into lock #1745). The deployer can mature it and redeem aft
 - scripts/sweep-funders.sh: send the funders' BTC (minus a gas reserve) to the deployer. Run only when the owner says
   they are funded.
 
-## MUSDash (deployed 13 Nov 2026)
+## MUSDash v1 (deployed 13 Nov 2026, RETIRED main and demo v1 sets)
 Funding: scripts/sweep-funders.sh moved 0.04999 + 0.04999 BTC to the deployer (tx 0x93c3919125c9a4d0a2d41e4cec87d217302bcaf509445ec99ddc00728bb8c9be,
 tx 0x97828a04825c1ef87bc064f4adff2efd87743d9aa87df5f608998bdfd25bb0ad). First run failed: the gas reserve was too tight for
 cast's max fee; the reserve is now a flat 0.00001 BTC and failures print their error.
@@ -165,7 +169,7 @@ Price pinned 71,000. Opened #5 A Bull f1 100, #6 B Bull f2 50, #7 D Bear f2 100,
 Background job opens #9 C Bull f3 40 from funder 1 after 90 min and snapshots after 3 h (research/demo-funding-run.log).
 Then: V collapses at -9%, survivors A, B, C share by size x time; check funding against the formula.
 
-## Y and P chips: MUSDash v2 + Bank v4 (13 Nov 2026)
+## Y and P chips: MUSDash v2 + Bank v4 (13 Nov 2026, RETIRED)
 MUSDash v2: chips are MUSD, Y or P of one series. Y/P value read from the Pricer at every check. When a Y/P position owes
 MUSD (fee or loss) the Bank pays it (payOut) and takes chips worth that much (rounded up). Collapse: all chips to the Bank,
 Bank pays survivors' and Buffer's shares. Y rewards earned while posted go to the Bank (sweepYRewards) - flagged to owner.
@@ -185,6 +189,9 @@ Main chip test, all status 1: open Bull f2 0.001 P (tx 0xcea6b7e8…7c76, fee 0.
 tx 0x24fd9a64…5769). Player left with 0.0009937 P, 0.0009956 Y; game holds 0; Bank holds the fee chips.
 
 ## v3 build (13 Nov 2026): Agents, Loop, P Market, Climb Premium, jackpot, sMUSD door, Juu account, keeper
+
+Still current from this build: Buffer v2 and Loop (main and demo), JuuPMarket, JuuSavingsSplitter. MUSDash v3,
+Jackpot, AgentGateway and the account factory below were replaced by the v4 set (RETIRED).
 
 Why new versions: the owner's Y-rewards decision (credit Y rewards to the position), the Climb Premium (charged when a
 seat is taken), jackpot tickets (size x time, only the game can track) and the Loop (catch winnings at payout) all need
@@ -275,7 +282,7 @@ demo v2 Bank (withdraw tx 0x66f520d9…bcfb) and 300 MUSD swapped to 0.00382 BTC
 - play #3 Bull f10 20 (tx 0x6baf3869…99df) and #4 Bear f10 20 (tx 0x556f127f…c23c); a background watcher closes the
   first one to profit after fees (profit -> BTC collateral path).
 
-## Cash reserve rule: Bank v5 + MUSDash v4 (13 Nov 2026, owner's decision)
+## Cash reserve rule: Bank v5 + MUSDash v4 (13 Nov 2026, owner's decision, current)
 Bank v5: reserveShare (20%, setting); reserveTarget = capital x 20%; topUpReserve() borrows the shortfall from the trove
 but never past targetCR (300%), emits ReserveToppedUp / ReserveShort; rebalance never repays below the reserve.
 MUSDash v4: maxWinShare (100% of size, setting) caps a bet's win so its worst case is known; open and climb are refused

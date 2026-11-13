@@ -6,7 +6,7 @@
 | --- | --- |
 | **Max chips per bet** | The most MUSD value the agent may put on one bet. For Y or P chips, their Pricer value counts. |
 | **Highest floor** | The agent can't open on, or climb to, any floor above this. |
-| **Daily loss limit** | Once the agent's realized losses for you reach this today (UTC), it can't open or climb until tomorrow. It can still close positions. |
+| **Daily realised loss stop** | Once the agent's realised losses for you reach this today (UTC), it can't open or climb until tomorrow. It can still close positions. Counts losses from closed bets. Open bets can lose more until they close. |
 | **Expiry** | After this time the agent can do nothing. |
 | **Can set Loop** | Whether the agent may turn your Loop on or off. |
 
@@ -63,7 +63,7 @@ Example: `grant(0xAgent..., 30e18, 5, 5e18, <unix time in 1 day>, true)` lets th
 
 ## Tested on chain
 
-On the demo deployment, a test agent was given a session (max 30 MUSD, highest floor 5, daily loss limit 5 MUSD). It opened a bet, climbed from floor 2 to 4 and closed. Then:
+On the demo deployment, a test agent was given a session (max 30 MUSD, highest floor 5, daily realised loss stop 5 MUSD). It opened a bet, climbed from floor 2 to 4 and closed. Then:
 
 * a 40 MUSD bet was refused with `BetTooBig`,
 * floor 6 was refused with `FloorTooHigh` (open and climb),

@@ -2,7 +2,9 @@
 
 All addresses are on **Mezo testnet** (chain id 31611). Explorer: [explorer.test.mezo.org](https://explorer.test.mezo.org).
 
-## Juu contracts (live)
+## Current: main stack
+
+**These are the addresses in use.** The main stack uses Mezo's own BTC price. JuuSplitter, the series tokens, the P Market pools, JuuSavingsSplitter, JuuPMarket and JuuSwap are shared with the demo stack.
 
 | Contract | Address |
 | --- | --- |
@@ -36,9 +38,9 @@ All addresses are on **Mezo testnet** (chain id 31611). Explorer: [explorer.test
 | 1 | Thu 31 Dec 2026 | `0x93269Ff6A2316F0DAf62030d7A175AD6E5b1d657` | `0x9e8A5E7BCAf3d9ca2C693f203F1EF42823e2FB2C` |
 | 2 | Thu 25 Mar 2027 | `0x6CCb4e6e2a21b22dC2Ab62F2c579721b479F3265` | `0x4d11dbd2654feD34136bAD235ABa012c8DE821C1` |
 
-## Demo deployment (DEMO ONLY)
+## Current: demo stack (DEMO ONLY)
 
-A separate set of contracts for showing MUSDash on demand. Its price feed follows Mezo's BTC price unless the owner sets a demo price. **It is not connected to the main contracts above.**
+**These are the demo addresses in use.** A separate set of contracts for showing MUSDash on demand. Its price feed follows Mezo's BTC price unless the owner sets a demo price. **It is not connected to the main contracts above.**
 
 | Contract | Address |
 | --- | --- |
@@ -51,12 +53,17 @@ A separate set of contracts for showing MUSDash on demand. Its price feed follow
 | JuuLoop (demo) | `0x6509684FF00DE88c0E233Ca16c2082b01Ce450a1` |
 | AgentGateway (demo) | `0x5E2DFd2992CACb5d8ca505069FD79154Bf15e4F5` |
 
-The first demo set (MUSDash `0x756e4aA5a229bEB93591785CaB6dEd40a121E376`, Bank `0x35D4D57507F33805a0b62b3852396a394088a390`, Buffer `0x955eB2cFCE5204a818e3E506F9060300Edbf479C`) ran the MUSD-only tests below.
+Earlier demo sets are listed under Retired below.
 
-## Retired contracts
+## Retired contracts (do not use)
+
+**RETIRED.** None of these is used by the app, the Data API or the keeper. Some tests below ran on them.
 
 | Contract | Address | Why |
 | --- | --- | --- |
+| Demo v1 set: MUSDash `0x756e4aA5a229bEB93591785CaB6dEd40a121E376`, Bank `0x35D4D57507F33805a0b62b3852396a394088a390`, Buffer `0x955eB2cFCE5204a818e3E506F9060300Edbf479C` | | The first demo set (MUSD chips only). The MUSD-only demo tests below ran on it. |
+| Splitter v1: JuuSplitter `0xc79ef730C6CdbD38b1bF63Cb8b8Ec806c10d6180`, JuuPricer `0xE2E8C7D8d52cc27a16F54edc82142D66Eeb3cE18` | | Replaced by Splitter v2 (series created ahead of their unlock week). Still holds 0.002 BTC of test funds in its series 0, redeemable after 31 Dec 2026. |
+| JuuBank v1 `0x56f40Bbb4D9d8a86b7aF0A712ec44fcEEe43fEA0`, v2 `0x214767De1eE65CFf147EAA1c90F719535b594baB` | | Replaced by v3 (gas compensation counted correctly; savers paid in BTC while the loan is open). Both empty. |
 | Main v3 set: MUSDash `0xfD5c96497Ae439f88023EFa78D13Afa6C0ca40E7`, Bank v4 `0x42428f3c928c9af20E4d10Ca1D91aBDd565c5959`, Jackpot `0x508d6449FCb235c92D79f0011Dd09f3833233D62`, Gateway `0x29da0243E5604CAf1490d148B7dB5f0835Ab2394`, account factory `0xECEf17Da15D530dB1bb0B906a35A8DCB6545d084` | | Replaced by v4 with the cash reserve and the Bank cash check. Bank v4's loan closed and its funds moved to Bank v5. |
 | Demo v3 set: MUSDash `0x3DC2CfdF76fa127abf5486357e79082A9b2E37Cd`, Bank v4 `0x0A2acca04fD2fEbd2BB9e6eE30762b487A51F420`, Jackpot `0xD5109C77e5C5ce383c4aD716281882B00B0F7e6c`, Gateway `0xb57abA53d416832974f3036A2c32Fe05f106DCAb` | | Replaced by the demo v4 set. The demo v3 tests below (Agents, Loop, Climb Premium, jackpot) ran on it. |
 | Account factory `0xA7e5a0051496C46a199c2328E8d4bF479E2d6983` | | Its guard closed all bets in one call, which can exceed Mezo's block gas limit; replaced the same day, never used. |
@@ -180,7 +187,7 @@ What the demo shows, in MUSD: #3 was worth 3.00 at the collapse, under its 6.00 
 | Agent climbs through the hosted MCP server | `0xbe326913360d4679725d0ebcadbd9c335a17bc8b91e9f2d94c489aef57ff96a9` |
 | Agent closes through the hosted MCP server | `0xd753682da814d2a8822e18889331b0f75b246aeeb430985809abc788d82ad662` |
 
-Refused as expected (simulated, no transaction): a 40 MUSD bet with a 30 MUSD limit (`BetTooBig`), floor 6 with a floor-5 limit (`FloorTooHigh`), any action after revoke (`NoSession`), any open after the daily loss limit (`StoppedForToday`).
+Refused as expected (simulated, no transaction): a 40 MUSD bet with a 30 MUSD limit (`BetTooBig`), floor 6 with a floor-5 limit (`FloorTooHigh`), any action after revoke (`NoSession`), any open after the daily realised loss stop (`StoppedForToday`).
 
 ### Loop (demo)
 

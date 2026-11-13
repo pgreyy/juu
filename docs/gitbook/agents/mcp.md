@@ -26,7 +26,7 @@ The hosted server is at **`https://mcp.playjuu.xyz`** (Streamable HTTP; `/mcp` w
   `Authorization: Bearer <agent key>`. The server acts only as that agent, uses the key for that one request, keeps it
   in memory only and never writes or logs it. Without a valid key, play tools refuse.
 * Before any play the server checks that the wallet it plays for has given **this** agent a live session; the Agent
-  Gateway then enforces the rules (max per bet, highest floor, daily loss stop, expiry).
+  Gateway then enforces the rules (max per bet, highest floor, daily realised loss stop, expiry).
 
 Right after you create an agent, the Agents page shows these configs with its key already filled in, on that screen only.
 Here, replace `<AGENT_PRIVATE_KEY>` with your agent's key.

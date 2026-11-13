@@ -29,7 +29,7 @@ Juu is an experiment on Mezo **testnet**. Read this before you use it.
 
 ## Juu Agents
 
-* **An agent can lose your money within its rules.** The rules cap each bet, the floor and the daily loss, but losses up to those limits are real.
+* **An agent can lose your money within its rules.** The rules cap each bet, the floor and the daily realised loss, but losses up to those limits are real. The daily realised loss stop counts losses from closed bets only; open bets can lose more until they close.
 * **Agent keys.** Anyone holding the agent's key can act within its session. Keep it safe, set an expiry, and revoke when done.
 
 ## Loop and P Market

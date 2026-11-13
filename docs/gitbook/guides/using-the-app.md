@@ -51,11 +51,11 @@ The strip under the header scrolls live figures: the BTC price and its change ov
 
 ## Agents
 
-**GIVE PERMISSION** sends two transactions: the rules for the agent (max per bet, highest floor, daily loss stop, expiry), then an MUSD allowance for the Agent Gateway of ten times the max per bet, because the agent plays with your MUSD. The gateway can only use it under your rules. **REVOKE NOW** stops the agent at once.
+**GIVE PERMISSION** sends two transactions: the rules for the agent (max per bet, highest floor, daily realised loss stop, expiry), then an MUSD allowance for the Agent Gateway of ten times the max per bet, because the agent plays with your MUSD. The gateway can only use it under your rules. **REVOKE NOW** stops the agent at once.
 
 Each agent card shows the agent's **net result today**: every bet it closed or that collapsed since 00:00 UTC, gains
-and losses together, green with ▲ for a profit and red with ▼ for a loss. Under it, the daily loss stop shows how much
-of the limit today's losses have used; the gateway stops the agent when they reach it.
+and losses together, green with ▲ for a profit and red with ▼ for a loss. Under it, the daily realised loss stop shows how much
+of the limit today's realised losses (from closed bets) have used; the gateway stops the agent when they reach it.
 
 ## Principal Market
 

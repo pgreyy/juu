@@ -7,12 +7,14 @@
 
 # Juu
 
-### Ten floors. How high?
+### A Bitcoin-native financial layer on Mezo.
 
-**A gamified money layer on Mezo.**
+**Split your position. Put it to work. Ten floors. How high?**
 
-[Live app](https://app.playjuu.xyz) · [Website](https://playjuu.xyz) · [Docs](https://playjuu.xyz/docs) · [MCP for agents](https://playjuu.xyz/docs/mcp) · [2 min demo video](#demo-video)
-<!-- demo-video: replace the #demo-video link above and the "Watch the demo" button below with the video URL -->
+<a href="#demo-video"><img src="https://img.shields.io/badge/Watch%20the%202%20minute%20demo-5F6600?style=for-the-badge" alt="Watch the 2 minute demo" height="36"></a>
+<!-- demo-video: replace the #demo-video link above with the video URL -->
+
+[Live app](https://app.playjuu.xyz) · [Website](https://playjuu.xyz) · [Docs](https://playjuu.xyz/docs) · [MCP for agents](https://playjuu.xyz/docs/mcp)
 
 <p>
   <img src="https://img.shields.io/badge/network-Mezo%20testnet-5F6600?style=flat-square" alt="Mezo testnet">
@@ -27,18 +29,47 @@
 
 <p>
   <a href="https://app.playjuu.xyz"><img src="https://img.shields.io/badge/Open%20the%20app-101010?style=for-the-badge" alt="Open the app" height="28"></a>
-  <a href="#demo-video"><img src="https://img.shields.io/badge/Watch%20the%20demo-5F6600?style=for-the-badge" alt="Watch the demo" height="28"></a>
   <a href="https://playjuu.xyz/docs"><img src="https://img.shields.io/badge/Read%20the%20docs-D9DDB5?style=for-the-badge&labelColor=D9DDB5&color=D9DDB5" alt="Read the docs" height="28"></a>
 </p>
 
 </div>
 
-Juu takes a Bitcoin position on Mezo (plain BTC, a veBTC lock, sMUSD or a Mezo trove) and splits it into **Principal**
+Juu is a Bitcoin-native financial layer on Mezo. It takes a Bitcoin position (plain BTC, a veBTC lock, sMUSD or a Mezo
+trove) and splits it into **Principal**
 (your BTC back on a fixed end date) and **Yield** (what it earns until then). You play your Yield or Principal in
 **MUSDash**, a ten floor bull or bear game where survivors collect from the players who fall. Or you skip the game and
 earn: buy Principal below full price for a fixed return, or save in the **Bank**, the 300% collateralised trove that
 backs the game. A weekly jackpot, optional looping and **Juu Agents** (AI agents that play beside humans on their own
 leaderboard, through MCP) complete it. Everything runs on Mezo testnet today.
+
+## How it fits together
+
+```mermaid
+flowchart TB
+  M["Mezo: BTC, veBTC, sMUSD, troves and MUSD, price feed, gauges, pools and Router, MEZO"]
+  D["Doors and Splitter: Principal and Yield, 1:1, per series"]
+  P["MUSDash · Bank · Principal Market"]
+  S["Fees, funding and penalties · Buffer (safety jar) · weekly jackpot"]
+  A["Agent Gateway and MCP: AI agents play under each user's rules"]
+  M --> D --> P --> S
+  A -->|plays MUSDash for users| P
+```
+
+**Money flow.** The Bank backs the game with MUSD from its own Mezo trove; what players pay goes back to the Bank, the
+safety jar and the survivors, and only the jar's surplus becomes the jackpot.
+
+```mermaid
+flowchart LR
+  B["BTC deposits (Bank savers)"] --> T["Bank trove on Mezo, 300%"]
+  T --> U["MUSD"]
+  U -->|pays wins| G["MUSDash"]
+  G -->|fees, funding, penalties| K["Bank: savers' share value"]
+  G -->|fees, penalties| J["Buffer (safety jar)"]
+  G -->|penalties| V["Survivors on the same side"]
+  J -->|surplus above target only| W["Weekly jackpot"]
+```
+
+More detail: [docs/architecture.md](docs/architecture.md).
 
 ## A 2 minute path (for judges)
 
@@ -66,27 +97,6 @@ leaderboard, through MCP) complete it. Everything runs on Mezo testnet today.
 | [![Leaderboard](docs/readme/leaderboard.webp)](docs/readme/leaderboard.webp)<br>**Leaderboard.** Humans and agents ranked by realised profit, same rules, same tower. | |
 
 ## How it works
-
-```
-  BTC  |  veBTC lock  |  sMUSD  |  Mezo trove
-                   |
-                 Doors
-                   |
-        Splitter: mint 1:1
-          /                \
-   Principal (P)          Yield (Y)
-   your BTC back          what it earns
-   on the end date        until then
-     |        \            /       |
-     |      MUSDash (P, Y or MUSD as chips)
-     |                     |
-  Principal Market      fees and collapse penalties
-  (fixed return)           |
-                  +--------+---------+------------------+
-                  |                  |                  |
-             Bank savers       safety jar (Buffer)   protocol
-             (paid in BTC)     -> weekly jackpot
-```
 
 1. **Bring it in.** A Door takes BTC, a veBTC lock, sMUSD or opens a Mezo trove inside your own Juu account.
 2. **It splits.** The Splitter mints Principal and Yield one for one against what you brought, grouped in series with fixed end dates.
@@ -119,7 +129,8 @@ leaderboard, through MCP) complete it. Everything runs on Mezo testnet today.
 | MEZO | On the Swap tab, and Portfolio prices MEZO rewards from Mezo's MEZO/MUSD pool. |
 | Mezo testnet (chain 31611) | Everything runs there; prices come from Mezo's price feed. |
 
-**What we built.** Our contracts on Mezo testnet:
+**What we built.** Our contracts on Mezo testnet. **Current main stack** (Mezo's own price feed; these are the addresses
+in use):
 
 | Contract | Address |
 | --- | --- |
@@ -135,9 +146,21 @@ leaderboard, through MCP) complete it. Everything runs on Mezo testnet today.
 | Juu account factory (Trove Door) | [`0x6Fe844B458829e60CCe1dcd0000eeA94B96C76e4`](https://explorer.test.mezo.org/address/0x6Fe844B458829e60CCe1dcd0000eeA94B96C76e4) |
 | JuuPMarket (Principal Market) | [`0x6748eA3C557B03611Fb360889ea61B4fB72B891c`](https://explorer.test.mezo.org/address/0x6748eA3C557B03611Fb360889ea61B4fB72B891c) |
 | JuuSwap (Swap tab, 0.1% fee) | [`0xd562c670179fF0D5aD14660959d8A5c2ec8E83bF`](https://explorer.test.mezo.org/address/0xd562c670179fF0D5aD14660959d8A5c2ec8E83bF) |
-| MUSDash (demo stack) | [`0x652C3Db601a194f4f7BD4294e7447f1fDbe99525`](https://explorer.test.mezo.org/address/0x652C3Db601a194f4f7BD4294e7447f1fDbe99525) |
 
-The demo stack is a separate deployment, labelled in the app, whose price feed the owner can set, so collapses can be shown on demand. Every address is in [docs/gitbook/technical/contracts-and-addresses.md](docs/gitbook/technical/contracts-and-addresses.md).
+**Current demo stack (DEMO ONLY).** A separate deployment, labelled in the app, whose price feed the owner can set, so
+collapses can be shown on demand. It shares the Splitter, the series and the Principal Market with the main stack.
+
+| Contract | Address |
+| --- | --- |
+| DemoPriceFeed (DEMO ONLY) | [`0x01297A4923330BC49EAA21777284b3e6440498E8`](https://explorer.test.mezo.org/address/0x01297A4923330BC49EAA21777284b3e6440498E8) |
+| MUSDash (demo) | [`0x652C3Db601a194f4f7BD4294e7447f1fDbe99525`](https://explorer.test.mezo.org/address/0x652C3Db601a194f4f7BD4294e7447f1fDbe99525) |
+| JuuBank (demo) | [`0x136fc7b4f5C7A2028C33d27055cf1ab8387Aa4fD`](https://explorer.test.mezo.org/address/0x136fc7b4f5C7A2028C33d27055cf1ab8387Aa4fD) |
+| JuuBuffer (demo) | [`0xaa07cCbd7DC5662321D0E2bc7D4CFa34a9eB62A0`](https://explorer.test.mezo.org/address/0xaa07cCbd7DC5662321D0E2bc7D4CFa34a9eB62A0) |
+| JuuJackpot (demo) | [`0x357B24D3dc36f8F40601aD50E7325c5D076d8296`](https://explorer.test.mezo.org/address/0x357B24D3dc36f8F40601aD50E7325c5D076d8296) |
+| AgentGateway (demo) | [`0x5E2DFd2992CACb5d8ca505069FD79154Bf15e4F5`](https://explorer.test.mezo.org/address/0x5E2DFd2992CACb5d8ca505069FD79154Bf15e4F5) |
+
+**Retired contracts** (earlier versions, not used by the app, the Data API or the keeper) are marked RETIRED in
+[docs/gitbook/technical/contracts-and-addresses.md](docs/gitbook/technical/contracts-and-addresses.md), which also lists every current address.
 
 ## For AI agents
 
@@ -145,7 +168,7 @@ The hosted MCP server is at **`https://mcp.playjuu.xyz`**. Read tools are open; 
 sent by the client as a bearer token on every request.
 
 - **Your MUSD.** The agent bets your MUSD (or your Yield and Principal), taken from your wallet at each bet by the Agent Gateway. Its own wallet holds none.
-- **The gateway's rules.** You set max per bet, highest floor, a daily loss stop and an expiry; the gateway refuses anything outside them.
+- **The gateway's rules.** You set max per bet, highest floor, a daily realised loss stop and an expiry; the gateway refuses anything outside them. The loss stop counts losses from closed bets; open bets can lose more until they close.
 - **Winnings to you.** Everything a closed bet returns goes to your wallet (or your Loop), never to the agent.
 - **Revoke any time.** One click on the Agents page; the agent can do nothing after that.
 
@@ -161,7 +184,7 @@ Setup for each client: [playjuu.xyz/docs/mcp](https://playjuu.xyz/docs/mcp).
 
 ## Evidence
 
-Every flow below ran on Mezo testnet through the live app or the hosted MCP server. Each link opens the transaction.
+Every flow below ran on Mezo testnet through the live app or the hosted MCP server, or by direct contract calls where marked. Each link opens the transaction.
 
 | Flow | Transactions |
 | --- | --- |
@@ -175,6 +198,7 @@ Every flow below ran on Mezo testnet through the live app or the hosted MCP serv
 | MUSDash with Principal chips | [open](https://explorer.test.mezo.org/tx/0xe7f3195eb86931bdb648d301e478b39e555f6186ddc73978d9cb816ea59f6dea), [cash out](https://explorer.test.mezo.org/tx/0x4accba4292c963a047bed157c2ecd4525c3f78ce9d204af5bf541f37148ef38b) |
 | Agent created in the browser | [permission](https://explorer.test.mezo.org/tx/0xcdf38ff2290d039386113dd26d8cf2c74038f94a5d1fffdaa8a6c2ef03b4d44f) |
 | Agent plays through the hosted MCP server | [open](https://explorer.test.mezo.org/tx/0x6ce83f1bf752053c446f6c17b446dab433ad5741e1edd45330ece92f9af292c6), [close](https://explorer.test.mezo.org/tx/0xd753682da814d2a8822e18889331b0f75b246aeeb430985809abc788d82ad662), [open without passing the user](https://explorer.test.mezo.org/tx/0x9f1f25c83e327407042cf1ad6eaf4c80913742f715ca969132fdfcf43df046b5) |
+| Trove Door: Juu account (direct contract calls) | [open trove](https://explorer.test.mezo.org/tx/0xf8cd33356868ae56a8fd70386c946a6bc3c8561326ceaf12fdbf63223867d6db), [guard closes a bet](https://explorer.test.mezo.org/tx/0xef6b712f9ac4aab24daa89d8c26e1622a18c8e464f95530878752baf08eebe45), [profit to collateral](https://explorer.test.mezo.org/tx/0xd91df3100e8567170124aedd171430856d8c0c147791ff2ccdcc2e465fdd986c), [close trove](https://explorer.test.mezo.org/tx/0x7930fbf60b63e1a93332b1a264d5dca333fb92848a23fc6ae00de8095ec3fcc1) |
 | Swaps with the 0.1% fee (half to the safety jar, half to the Bank) | [BTC to MUSD](https://explorer.test.mezo.org/tx/0x008529dd96cd2a74955258c9fd763df928d438843529a29a7f9427dc62fc477f), [MUSD to BTC](https://explorer.test.mezo.org/tx/0x57c4b5f946df571f5b4c52371d9ea8c67355b508900c6e2c415dcc2a206c0268) |
 
 Real figures:
@@ -184,14 +208,18 @@ Real figures:
 - **Data API speed:** 3 to 9 ms for a cached answer on the server, 0.13 to 0.17 s through Cloudflare; an uncached `/floors` takes 0.32 s (it took 4.0 s before the chain reads ran in parallel).
 - **Keeper:** runs 24/7 on the server; its first transaction there was a [veBTC harvest](https://explorer.test.mezo.org/tx/0xf2749c0e28627e5e152e2847a26f3c6dc50866aa1645eab5385f10c5de9f0d3e).
 
-Every deployment and test transaction is in [docs/build-log.md](docs/build-log.md).
+The full table, one row per tested flow, is in [docs/evidence.md](docs/evidence.md); the history is in [docs/build-log.md](docs/build-log.md).
 
 ## Honest limits
 
 - **Testnet only.** Testnet BTC and MUSD have no value. Mainnet comes only after a security review.
 - **Small pools.** The Principal Market pools hold about 0.0065 BTC each and the MEZO/MUSD pool about 72 MUSD, so orders above roughly 0.00005 BTC move prices more than 1%. Orders that would move a pool more than 5% are refused.
-- **Not tested end to end yet:** the Trove Door's full opening (Mezo's smallest loan needs at least about 0.032 BTC of collateral), series maturity and Principal redemption (first end date 10 Dec 2026), Yield rewards paid to Yield chips, and the weekly jackpot on the main stack.
-- **The Climb Premium pays earlier climbers from later entries.** On floors 7 to 10 each new seat pays the positions already there. It has no maximum price: each seat costs 10% more within an epoch and it resets every epoch, and the kill switch ends it for good once new top-floor seats fall below half of the epoch before.
+- **No security review yet.** The contracts have not been reviewed; one owner key controls the settings (no multisig, no timelock). See [docs/security-and-risks.md](docs/security-and-risks.md).
+- **Trove Door: what is tested.** By direct contract calls on testnet: creating a Juu account, opening a trove and borrowing, withdrawing MUSD, playing with MUSD borrowed from the trove, settling bets (returned chips repay the debt down to Mezo's 2,000 MUSD minimum), a winning bet's profit added as BTC collateral, the keeper's guard closing bets, and closing the trove ([evidence](docs/evidence.md#trove-door-juu-account)). Not yet run: the app's Trove Door page with a real wallet (Mezo's smallest loan needs about 0.032 BTC of collateral) and the owner's manual add collateral, borrow, repay and withdraw collateral calls.
+- **Not tested yet:** series maturity and Principal redemption (first end date 10 Dec 2026), Yield rewards paid to Yield chips, and the weekly jackpot on the main stack.
+- **Jackpot reveal timing.** The keeper commits before the epoch and reveals after the tickets are sealed. Once the block after the seal exists, the keeper can work out the winner before revealing and could choose not to reveal; after 256 blocks that epoch is not drawn (the prize stays in the safety jar). A keeper that is offline that long also skips the draw.
+- **The Climb Premium is uncapped.** On floors 7 to 10 each new seat pays the positions already there: 1 MUSD for the first seat in an epoch, then 10% more for each next seat, with no maximum within an epoch. It pays earlier climbers from later entries; it resets every epoch, and the kill switch ends it for good once new top floor seats fall below half of the epoch before.
+- **The daily realised loss stop counts closed bets only.** Open agent bets can lose more until they close.
 - **The demo stack's price is set by hand.** It exists to show collapses; the main stack uses Mezo's price feed.
 
 ## Run it yourself
@@ -224,7 +252,10 @@ Running the hosted setup (server, Cloudflare tunnel, Vercel) is in [docs/deploy.
 
 - Docs: [playjuu.xyz/docs](https://playjuu.xyz/docs) (source in [docs/gitbook](docs/gitbook))
 - Deploy guide: [docs/deploy.md](docs/deploy.md)
-- Build log with every transaction: [docs/build-log.md](docs/build-log.md)
+- Architecture: [docs/architecture.md](docs/architecture.md)
+- Evidence, one row per tested flow: [docs/evidence.md](docs/evidence.md)
+- Security and risks: [docs/security-and-risks.md](docs/security-and-risks.md)
+- Build log (history): [docs/build-log.md](docs/build-log.md)
 - Design system: [docs/design/juu-design-system.md](docs/design/juu-design-system.md)
 
 ## Licence

@@ -9,7 +9,7 @@ Juu Agents lets your own AI or trading agent play MUSDash for you, under rules y
 ## How it works, in plain words
 
 1. Your agent has its own wallet address, separate from yours. Think of it as a **session key**: a key that can only do what you allow.
-2. You give that address permission in the **Agent Gateway**, with rules: how big a bet can be, the highest floor, a daily loss limit, and an expiry date.
+2. You give that address permission in the **Agent Gateway**, with rules: how big a bet can be, the highest floor, a daily realised loss stop, and an expiry date. The loss stop counts losses from closed bets; open bets can lose more until they close.
 3. The agent plays through the gateway. The gateway checks your rules on every action and refuses anything outside them.
 4. Everything a position returns (chips, winnings, rewards) goes straight to **your** wallet, never to the agent.
 5. You can cancel the permission any time. From that moment the agent can do nothing.

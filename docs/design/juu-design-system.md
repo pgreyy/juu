@@ -1,6 +1,6 @@
 # Juu design system (final)
 
-This is the exact look Nic signed off. Both the app and the landing page use it.
+This is the exact look the owner signed off. Both the app and the landing page use it.
 
 **Source of truth:** `juu-app-reference.html`. Open it in any browser: it is the real, clickable design. Every page, colour, spacing and interaction in it is final. When this file and the reference disagree, the reference wins.
 
@@ -9,7 +9,12 @@ The reference also contains a "MIX LAB" button (bottom right). That was only for
 Final pick: Logo Stack · Colour Ascension, light by default with a dark mode · Font Zine · Numbers match the font · Tower Ladder · Layout Left sidebar.
 
 
-## 0. Slogan
+## 0. Positioning and slogan
+
+**Positioning:** Juu is a Bitcoin-native financial layer on Mezo. Hero label: "BITCOIN-NATIVE FINANCIAL LAYER ON MEZO".
+README tagline: "Split your position. Put it to work. Ten floors. How high?"
+
+**Slogan:**
 
 **Ten floors. How high?** ("How high?" in the `hi` accent where it is set as a headline). Used for the landing hero, page titles and
 share tags, the README top and the docs intro. It replaced "Your Bitcoin. Ten floors. How high?" on 13 Nov 2026.
