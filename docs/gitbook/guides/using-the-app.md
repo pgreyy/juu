@@ -28,7 +28,7 @@ The icons on the left open each page. Click the Juu logo at the top of the sideb
 | Page | What you do there |
 | --- | --- |
 | MUSDash | Play: pick Bull or Bear, chips, an amount and a floor, then open. Climb, drop or cash out your position. |
-| Portfolio | Two tabs. **Overview**: everything your wallet holds in Juu with its value in BTC and USD, today's profit or loss, your open bets (yours and your agents') and your recent activity; each wallet row (BTC, MUSD, MEZO) has a Swap button. **Swap**: swap BTC, MUSD and MEZO on Mezo's own pools through Mezo's Router, with the rate, price impact, minimum received and slippage (0.5% by default) under Details. The old `/positions` and `/swap` addresses lead here. |
+| Portfolio | Two tabs. **Overview**: everything your wallet holds in Juu with its value in BTC and USD, today's profit or loss, your open bets (yours and your agents') and your recent activity; each wallet row (BTC, MUSD, MEZO) has a Swap button. **Swap**: swap BTC, MUSD and MEZO on Mezo's own pools through Mezo's Router, in one transaction through Juu's JuuSwap contract, which keeps a 0.1% Juu fee (half to the safety jar, half to the Bank's savers). The rate, "You receive" and the minimum received already include the fee; Details shows the fee, price impact, minimum received and slippage (0.5% by default). The old `/positions` and `/swap` addresses lead here. |
 | Doors | Bring BTC, a veBTC lock, sMUSD or a new trove into Juu. |
 | Bank | Deposit BTC to back the game, or withdraw your share (paid in BTC). |
 | Principal Market | Buy Principal below full price for a fixed return, or sell the Principal you hold for BTC now. |

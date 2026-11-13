@@ -5,7 +5,7 @@ import { useState } from "react";
 import { BTC_GAS_RESERVE, PctButtons } from "@/components/PctButtons";
 import { ABI } from "@/lib/abis";
 import { useRead } from "@/lib/data";
-import { POOL_ABI, ROUTER_ABI, SWAP, SYMS, route, type Sym } from "@/lib/swap";
+import { JUUSWAP_ABI, POOL_ABI, ROUTER_ABI, SWAP, SYMS, route, type Sym } from "@/lib/swap";
 import { EXPLORER, call, read, reader, useWallet } from "@/lib/wallet";
 
 const n18 = (x: bigint) => Number(formatUnits(x, 18));
@@ -58,12 +58,27 @@ export function SwapCard({ initialFrom, initialTo }: { initialFrom?: Sym; initia
     await Promise.all(SYMS.map(async (s) => (out[s] = s === "BTC" ? n18(await reader.getBalance(w.address!)) : n18(await read(SWAP.tokens[s]!, ABI.erc20).balanceOf(w.address)))));
     return out;
   }, 15000, w.bump);
-  const allowance = useRead(w.address ? `swapallow-${from}-${w.address}` : null, async () => n18(await read(SWAP.tokens[from]!, ABI.erc20).allowance(w.address, SWAP.router)), 15000, w.bump);
+  // Swaps go through JuuSwap (Juu fee, then Mezo's Router) where it exists, else straight through Mezo's Router.
+  const spender = SWAP.juuSwap ?? SWAP.router;
+  const allowance = useRead(w.address ? `swapallow-${from}-${spender}-${w.address}` : null, async () => n18(await read(SWAP.tokens[from]!, ABI.erc20).allowance(w.address, spender)), 15000, w.bump);
+  const juuFee = useRead(SWAP.juuSwap ? "juu-fee" : null, async () => {
+    const c = read(SWAP.juuSwap!, JUUSWAP_ABI);
+    const [rate, on] = await Promise.all([c.feeRate(), c.feeOn()]);
+    return on ? n18(rate) : 0;
+  }, 300000);
 
-  // Router quote, plus the pools' current prices for the price impact.
+  // Quote after the Juu fee (JuuSwap.quote), plus the pools' current prices for the price impact of the swapped part.
   const quote = useRead(hops && n > 0 ? `swapq-${from}-${to}-${n}` : null, async () => {
-    const outs: bigint[] = await read(SWAP.router, ROUTER_ABI).getAmountsOut(parseUnits(String(n), 18), routes);
-    let spot = n;
+    let fee = 0, out: number;
+    if (SWAP.juuSwap) {
+      const q = await read(SWAP.juuSwap, JUUSWAP_ABI).quote(parseUnits(String(n), 18), routes);
+      fee = n18(q.fee);
+      out = n18(q.amountOut);
+    } else {
+      const outs: bigint[] = await read(SWAP.router, ROUTER_ABI).getAmountsOut(parseUnits(String(n), 18), routes);
+      out = n18(outs[outs.length - 1]);
+    }
+    let spot = n - fee;
     for (const h of hops!) {
       const p = read(h.pool, POOL_ABI);
       const [t0, r] = await Promise.all([p.token0(), p.getReserves()]);
@@ -71,7 +86,7 @@ export function SwapCard({ initialFrom, initialTo }: { initialFrom?: Sym; initia
       const [rin, rout] = inIs0 ? [n18(r[0]), n18(r[1])] : [n18(r[1]), n18(r[0])];
       spot = rin > 0 ? (spot * rout) / rin : 0;
     }
-    return { out: n18(outs[outs.length - 1]), spot };
+    return { out, spot, fee };
   }, 15000);
   // The rate for 1 unit, shown before an amount is typed.
   const unitRate = useRead(hops ? `swaprate-${from}-${to}` : null, async () => {
@@ -87,7 +102,7 @@ export function SwapCard({ initialFrom, initialTo }: { initialFrom?: Sym; initia
   const tooBig = impact > 0.05;
   const badSlip = !(slipPct > 0 && slipPct <= 20);
   const needsApprove = allowance != null && n > 0 && allowance < n;
-  const rate = quote && n > 0 ? quote.out / n : unitRate;
+  const rate = quote && n > 0 ? quote.out / n : unitRate != null ? unitRate * (1 - (juuFee ?? 0)) : null;
 
   const pick = (side: "from" | "to", s: Sym) => {
     setDone(null);
@@ -114,14 +129,18 @@ export function SwapCard({ initialFrom, initialTo }: { initialFrom?: Sym; initia
     const min = parseUnits(minOut.toFixed(12), 18);
     const before = bals?.[to] ?? 0;
     const tokenIn = SWAP.tokens[from]!;
+    const deadline = Math.floor(Date.now() / 1000) + 600;
     const ok = await w.run(
       "swap",
       [
         async (s: Signer) => {
           const t = new Contract(tokenIn, ABI.erc20, s);
-          return (await t.allowance(await s.getAddress(), SWAP.router)) >= v ? null : call(t, "approve", [SWAP.router, v]);
+          return (await t.allowance(await s.getAddress(), spender)) >= v ? null : call(t, "approve", [spender, v]);
         },
-        async (s: Signer) => call(new Contract(SWAP.router, ROUTER_ABI, s), "swapExactTokensForTokens", [v, min, routes, await s.getAddress(), Math.floor(Date.now() / 1000) + 600]),
+        async (s: Signer) =>
+          SWAP.juuSwap
+            ? call(new Contract(SWAP.juuSwap, JUUSWAP_ABI, s), "swap", [v, min, routes, await s.getAddress(), deadline])
+            : call(new Contract(SWAP.router, ROUTER_ABI, s), "swapExactTokensForTokens", [v, min, routes, await s.getAddress(), deadline]),
       ],
       "Swapped.",
     );
@@ -183,6 +202,11 @@ export function SwapCard({ initialFrom, initialTo }: { initialFrom?: Sym; initia
           </button>
         </summary>
         <dl>
+          {SWAP.juuSwap && (
+            <>
+              <dt>Juu fee {fmt((juuFee ?? 0.001) * 100, 1)}%</dt><dd>{show(from, quote?.fee ?? 0)} {from}</dd>
+            </>
+          )}
           <dt>Price impact</dt><dd className={tooBig ? "c-bear" : undefined}>{fmt(impact * 100, 2)}%</dd>
           <dt>Minimum received</dt><dd>{show(to, minOut)} {to}</dd>
           <dt>Slippage</dt><dd>{slipPct}%</dd>
@@ -198,7 +222,7 @@ export function SwapCard({ initialFrom, initialTo }: { initialFrom?: Sym; initia
         )}
       </details>
       <button type="button" className="sc-go" onClick={go} disabled={off}>{label}</button>
-      {needsApprove && !off && !busyNow && <p className="sc-note">One approval for Mezo&apos;s Router, then the swap, in two wallet steps.</p>}
+      {needsApprove && !off && !busyNow && <p className="sc-note">One approval{SWAP.juuSwap ? "" : " for Mezo's Router"}, then the swap, in two wallet steps.</p>}
       {tooBig && <p className="sc-note c-bear">This would move the pool&apos;s price by more than 5%. Try a smaller amount.</p>}
       {w.tx?.key === "swap" && w.tx.state === "error" && <p className="sc-note c-bear" role="alert">{w.tx.msg}</p>}
       {done && (

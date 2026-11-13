@@ -6,6 +6,9 @@ import { CHAIN_ID } from "./wallet";
 export type Sym = "BTC" | "MUSD" | "MEZO";
 type SwapConfig = {
   router: string;
+  /** Juu's JuuSwap: takes the Juu fee (0.1%) and swaps the rest through `router`, in one transaction. Null = swap
+   *  straight through Mezo's Router with no fee. */
+  juuSwap: string | null;
   factory: string;
   tokens: Record<Sym, string | null>;
   /** Pools that exist (volatile basic pools), keyed "A/B" in alphabetical order. */
@@ -16,6 +19,7 @@ const CONFIGS: Record<number, SwapConfig> = {
   // Mezo testnet
   31611: {
     router: "0x9a1ff7FE3a0F69959A3fBa1F1e5ee18e1A9CD7E9",
+    juuSwap: "0xd562c670179fF0D5aD14660959d8A5c2ec8E83bF",
     factory: "0x4947243CC818b627A5D06d14C4eCe7398A23Ce1A",
     tokens: {
       BTC: "0x7b7C000000000000000000000000000000000000",
@@ -31,6 +35,7 @@ const CONFIGS: Record<number, SwapConfig> = {
   // Mezo mainnet (for later): router, factory and MUSD/BTC pool from Mezo's docs. MEZO's address and pool to be added.
   31612: {
     router: "0x16A76d3cd3C1e3CE843C6680d6B37E9116b5C706",
+    juuSwap: null, // deploy JuuSwap on mainnet, then set it here
     factory: "0x83FE469C636C4081b87bA5b3Ae9991c6Ed104248",
     tokens: { BTC: "0x7b7C000000000000000000000000000000000000", MUSD: null, MEZO: null },
     pools: { "BTC/MUSD": "0x52e604c44417233b6CcEDDDc0d640A405Caacefb" },
@@ -53,5 +58,11 @@ export function route(from: Sym, to: Sym): { from: Sym; to: Sym; pool: string }[
 export const ROUTER_ABI = [
   "function getAmountsOut(uint256 amountIn, (address from, address to, bool stable, address factory)[] routes) view returns (uint256[])",
   "function swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, (address from, address to, bool stable, address factory)[] routes, address to, uint256 deadline) returns (uint256[])",
+];
+export const JUUSWAP_ABI = [
+  "function feeRate() view returns (uint256)",
+  "function feeOn() view returns (bool)",
+  "function quote(uint256 amountIn, (address from, address to, bool stable, address factory)[] routes) view returns (uint256 fee, uint256 amountOut)",
+  "function swap(uint256 amountIn, uint256 amountOutMin, (address from, address to, bool stable, address factory)[] routes, address to, uint256 deadline) returns (uint256)",
 ];
 export const POOL_ABI = ["function token0() view returns (address)", "function getReserves() view returns (uint256, uint256, uint256)"];

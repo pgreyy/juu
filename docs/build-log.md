@@ -401,3 +401,17 @@ MCP without `user` on demo (test agent 0x5028…429a, one owner): juu_whoami sho
 0x9f1f25c83e327407042cf1ad6eaf4c80913742f715ca969132fdfcf43df046b5, closed tx 0x800f906abae361aee8db849485a35a92926a96512a7ff26150b403aa37f611b8.
 Agents Remove on demo: revoke tx 0xd3143cbf5ce7e9dfcf0e9746574d9fcc35c6426125a546dfdd6f195bdaffdbdb, then a signed hide (no
 transaction); the Data API refused a live agent (409) and another wallet's signature (403).
+
+## JuuSwap: the Swap tab's 0.1% fee (13 Nov 2026)
+
+JuuSwap 0xd562c670179fF0D5aD14660959d8A5c2ec8E83bF (deploy tx 0xba78f0f36a26d2358efe8de62ea225a1b6c175e26f5eb7cae14796a75681d869),
+source contracts/src/JuuSwap.sol. It takes 0.1% of the input (owner-settable, hard cap 0.5%, can be turned off), turns
+the fee into MUSD on Mezo's pool, sends half to the main safety jar (Buffer 0xAB61604F82f645110A062b49F2bC204cbb473d39)
+and half to the main Bank (0x55726A86c321347db688f2C6A331445465eeE9BE), and swaps the rest through Mezo's Router, in one
+transaction. A fee that can't be swapped goes to the Bank as is.
+* 0.0001 BTC -> 7.8182 MUSD through the app: approve tx 0x79648ca20d8e9e075174c6523d7cc6d776694518f67c484351037f805a4957ef, swap tx
+  0x008529dd96cd2a74955258c9fd763df928d438843529a29a7f9427dc62fc477f. Fee 0.0000001 BTC -> 0.007826 MUSD: 0.003913 to the
+  safety jar, 0.003913 to the Bank (FeePaid event and MUSD transfers).
+* 2 MUSD -> 0.0000255 BTC: approve tx 0x0804b23c256e3248fb0299a1d26b16c9508c1f6c8e5bde9c6c6e59f85579e957, swap tx
+  0x57c4b5f946df571f5b4c52371d9ea8c67355b508900c6e2c415dcc2a206c0268. Fee 0.002 MUSD: 0.001 to the safety jar and 0.001 to
+  the Bank (balances rose by exactly that).

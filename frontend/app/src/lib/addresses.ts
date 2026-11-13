@@ -19,7 +19,8 @@ export const ADDR = {
   "shared": {
     "splitter": "0xC97F652387E213a92DD2DaBDb41754CdD535ce5e",
     "pmarket": "0x6748eA3C557B03611Fb360889ea61B4fB72B891c",
-    "savings": "0xF7857dB1d1Aa1Aa60a8576EBc1b2F8236b4A22f4"
+    "savings": "0xF7857dB1d1Aa1Aa60a8576EBc1b2F8236b4A22f4",
+    "juuSwap": "0xd562c670179fF0D5aD14660959d8A5c2ec8E83bF"
   },
   "stacks": {
     "main": {

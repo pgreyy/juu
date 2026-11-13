@@ -17,6 +17,7 @@ All addresses are on **Mezo testnet** (chain id 31611). Explorer: [explorer.test
 | JuuAccountFactory (Door 3) | `0x6Fe844B458829e60CCe1dcd0000eeA94B96C76e4` |
 | JuuPMarket | `0x6748eA3C557B03611Fb360889ea61B4fB72B891c` |
 | JuuSavingsSplitter (Door 2, sMUSD) | `0xF7857dB1d1Aa1Aa60a8576EBc1b2F8236b4A22f4` |
+| JuuSwap (Swap tab: 0.1% Juu fee, then Mezo's Router) | `0xd562c670179fF0D5aD14660959d8A5c2ec8E83bF` |
 | Keeper bot wallet | `0x01cd4ca24A84ce336798bFedC6276a0c7D28F547` |
 
 ### P Market pools (Mezo DEX)
