@@ -46,8 +46,8 @@ export default function Landing() {
           <section className="lp-sec first lp-hero s-sand1" aria-labelledby="hero-h">
             <div>
               <div className="label">GAMIFIED BITCOIN MONEY LAYER ON MEZO</div>
-              <h1 id="hero-h" className="lp-h1">
-                Your Bitcoin. Ten floors. <span className="hi">How high?</span>
+              <h1 id="hero-h" className="lp-h1 lp-hero-h1">
+                Ten floors. <span className="hi">How high?</span>
               </h1>
               <p className="lp-lede">Bring your Bitcoin in, split it into Principal and Yield, then climb the tower, save with it or lock in a fixed return.</p>
               <div className="lp-ctas">
@@ -147,7 +147,7 @@ export default function Landing() {
               <div className="lp-bigstat">0.431 <span className="u">MUSD</span></div>
               <div className="label" style={{ marginTop: 8 }}>THE FIRST DRAW PAID</div>
               <div className="lp-sec-cta">
-                <a className="btn line small" href={APP + "/jackpot"}>See this week&apos;s jackpot</a>
+                <a className="btn line small" href={APP + "/leaderboard?tab=jackpot"}>See this week&apos;s jackpot</a>
               </div>
             </div>
           </section>
@@ -199,7 +199,7 @@ export default function Landing() {
         </main>
 
         <Footer
-          play={[{ label: "MUSDash", href: APP + "/" }, { label: "Jackpot", href: APP + "/jackpot" }, { label: "Leaderboard", href: APP + "/leaderboard" }, { label: "Agents", href: APP + "/agents" }]}
+          play={[{ label: "MUSDash", href: APP + "/" }, { label: "Jackpot", href: APP + "/leaderboard?tab=jackpot" }, { label: "Leaderboard", href: APP + "/leaderboard" }, { label: "Agents", href: APP + "/agents" }]}
           earn={[{ label: "Doors", href: APP + "/doors" }, { label: "Portfolio", href: APP + "/portfolio" }, { label: "Bank", href: APP + "/bank" }, { label: "Principal Market", href: APP + "/principal-market" }]}
           build={[
             { label: "Docs", href: "/docs" },

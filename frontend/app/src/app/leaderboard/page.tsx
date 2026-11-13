@@ -1,13 +1,17 @@
 "use client";
-import { shortAddr, signed } from "@juu/ui";
-import { useState } from "react";
+import { amt, shortAddr, signed } from "@juu/ui";
+import { useEffect, useState } from "react";
+import { JackpotView } from "@/components/JackpotView";
 import { usePoll, useStack } from "@/lib/data";
+import { until, weekday } from "@/lib/format";
+import { useMarket } from "@/lib/market";
 import type { LeaderRes } from "@/lib/types";
 import { useWallet } from "@/lib/wallet";
 
-const TABS = [["all", "COMBINED"], ["humans", "HUMANS"], ["agents", "AGENTS"]] as const;
+const FILTERS = [["all", "COMBINED"], ["humans", "HUMANS"], ["agents", "AGENTS"]] as const;
+type Tab = "rankings" | "jackpot";
 
-export default function Leaderboard() {
+function Rankings() {
   const { stack } = useStack();
   const w = useWallet();
   const [type, setType] = useState<"all" | "humans" | "agents">("all");
@@ -15,10 +19,9 @@ export default function Leaderboard() {
   const rows = lb.data?.ranking || [];
   return (
     <>
-      <h1 className="h1">LEADERBOARD</h1>
       <p className="lede" style={{ marginBottom: 16 }}>Humans vs agents. Same rules, same tower.</p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-        {TABS.map(([k, label]) => (
+        {FILTERS.map(([k, label]) => (
           <button key={k} type="button" className="btn-line" style={{ padding: "0 16px", letterSpacing: "0.08em" }} aria-pressed={type === k} onClick={() => setType(k)}>{label}</button>
         ))}
       </div>
@@ -48,6 +51,48 @@ export default function Leaderboard() {
         </table>
       </div>
       <p className="note">Realised profit in MUSD from closed and collapsed bets, after fees. Agents include the agent fee.</p>
+    </>
+  );
+}
+
+export default function Leaderboard() {
+  const m = useMarket();
+  const jp = m.jackpot;
+  // The tab lives in the address (?tab=jackpot), so links elsewhere open the right one.
+  const [tab, setTab] = useState<Tab>("rankings");
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("tab") === "jackpot") setTab("jackpot");
+  }, []);
+  // The countdown text refreshes every minute.
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => tick((x) => x + 1), 60000);
+    return () => clearInterval(t);
+  }, []);
+  const open = (t: Tab) => {
+    setTab(t);
+    const q = new URLSearchParams(window.location.search);
+    if (t === "jackpot") q.set("tab", "jackpot");
+    else q.delete("tab");
+    const qs = q.toString();
+    window.history.replaceState(null, "", window.location.pathname + (qs ? "?" + qs : ""));
+  };
+  return (
+    <>
+      <h1 className="h1">LEADERBOARD</h1>
+      <button type="button" className="jp-strip" onClick={() => open("jackpot")} aria-label="Open the Jackpot tab">
+        <span className="k">JACKPOT</span>
+        <span className="c-hi v">{amt(jp?.jackpotNowMUSD ?? 0)}</span>
+        <span className="u">MUSD</span>
+        <span className="sep">·</span>
+        <span>draws {jp ? weekday(jp.epochEnds).charAt(0) + weekday(jp.epochEnds).slice(1).toLowerCase() : "Thu"} in <span className="v">{jp ? until(jp.epochEnds) : "0m"}</span></span>
+        <span className="go" aria-hidden="true">→</span>
+      </button>
+      <div className="pf-tabs" role="tablist" aria-label="Leaderboard">
+        <button type="button" role="tab" className="btn-line" aria-selected={tab === "rankings"} aria-pressed={tab === "rankings"} onClick={() => open("rankings")}>RANKINGS</button>
+        <button type="button" role="tab" className="btn-line" aria-selected={tab === "jackpot"} aria-pressed={tab === "jackpot"} onClick={() => open("jackpot")}>JACKPOT</button>
+      </div>
+      {tab === "jackpot" ? <JackpotView /> : <Rankings />}
     </>
   );
 }

@@ -77,6 +77,9 @@ html[data-theme="dark"] .s-band { border-top-color: var(--oliveX); }
 .lp-hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 56px; align-items: center; }
 .lp-h1 { margin: 14px 0 0; font-family: var(--fD); font-weight: 800; font-size: clamp(48px, 7vw, 108px); line-height: 0.95; letter-spacing: -0.02em; }
 .lp-h1 .hi { color: var(--hi); }
+/* The hero line is short ("Ten floors. How high?"), so it runs larger, one phrase per line. */
+.lp-hero-h1 { font-size: clamp(56px, 8.2vw, 124px); line-height: 0.92; letter-spacing: -0.03em; }
+.lp-hero-h1 .hi { display: block; }
 .lp-lede { margin: 24px 0 0; font-size: 19px; line-height: 1.55; max-width: 44ch; }
 .lp-ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
 .lp-facts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 28px; font-family: var(--fN); font-size: 12px; letter-spacing: 0.08em; color: var(--muted); }

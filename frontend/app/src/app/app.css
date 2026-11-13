@@ -266,3 +266,15 @@ main.main p, .lede, .note { max-width: 72ch; }
 .pf-tabs button { min-height: 52px; font-family: var(--fN); font-size: 14px; letter-spacing: 0.12em; }
 .pf-swap { margin-left: 8px; min-height: 30px; padding: 0 8px; font-family: var(--fN); font-size: 10px; letter-spacing: 0.08em; background: transparent; color: var(--ink); border: 1px solid var(--rule); vertical-align: middle; }
 .getmusd { display: inline-block; margin-top: 8px; font-family: var(--fN); font-size: 12px; color: var(--bear); }
+
+/* Leaderboard: the slim live jackpot strip above the tabs */
+.jp-strip { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; width: 100%; margin: 10px 0 14px; padding: 10px 14px; min-height: 44px; border: 1.5px solid var(--rule); background: var(--panel); color: var(--onPanel); font-family: var(--fN); font-size: 13px; text-align: left; cursor: pointer; }
+.jp-strip .k { font-size: 11px; letter-spacing: 0.12em; }
+.jp-strip .v { font-size: 15px; font-weight: 600; }
+.jp-strip .u, .jp-strip .sep { opacity: 0.75; }
+.jp-strip .go { margin-left: auto; }
+.jp-strip:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* The 440px ticket chamber scales down on phones instead of widening the page. */
+.jp-burstwrap { overflow: hidden; }
+.jp-burstwrap .juu-burst { flex: 0 0 auto; max-width: none !important; }
+@media (max-width: 600px) { .jp-burstwrap { height: 300px; align-items: center; } .jp-burstwrap .juu-burst { transform: scale(0.62); } }

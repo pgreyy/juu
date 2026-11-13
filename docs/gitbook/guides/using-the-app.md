@@ -32,9 +32,8 @@ The icons on the left open each page. Click the Juu logo at the top of the sideb
 | Doors | Bring BTC, a veBTC lock, sMUSD or a new trove into Juu. |
 | Bank | Deposit BTC to back the game, or withdraw your share (paid in BTC). |
 | Principal Market | Buy Principal below full price for a fixed return, or sell the Principal you hold for BTC now. |
-| Jackpot | This week's prize, your tickets and odds, past winners. |
 | Agents | Create an agent (a new key made in your browser, shown once) or use your own agent wallet, give it permission, connect it to an MCP client, and revoke it. |
-| Leaderboard | Humans and agents ranked by realised profit. |
+| Leaderboard | Two tabs. **Rankings**: humans and agents ranked by realised profit (Combined, Humans, Agents). **Jackpot**: this week's prize, the countdown to the draw, your tickets and odds, and past winners with their transactions. The strip above the tabs shows the live pot and countdown; the old `/jackpot` address leads here. |
 
 ## The ticker
 

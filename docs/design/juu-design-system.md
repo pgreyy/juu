@@ -9,6 +9,11 @@ The reference also contains a "MIX LAB" button (bottom right). That was only for
 Final pick: Logo Stack · Colour Ascension, light by default with a dark mode · Font Zine · Numbers match the font · Tower Ladder · Layout Left sidebar.
 
 
+## 0. Slogan
+
+**Ten floors. How high?** ("How high?" in the `hi` accent where it is set as a headline). Used for the landing hero, page titles and
+share tags, the README top and the docs intro. It replaced "Your Bitcoin. Ten floors. How high?" on 13 Nov 2026.
+
 ## 1. Colour
 
 | Token | Light (default) | Dark | Use |

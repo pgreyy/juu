@@ -9,8 +9,16 @@ import { WalletProvider } from "@/lib/wallet";
 
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://app.playjuu.xyz"),
   title: "Juu · MUSDash",
-  description: "Juu, the gamified Bitcoin money layer on Mezo: Doors, Principal and Yield, MUSDash, the Bank and the Principal Market. Live on Mezo testnet.",
+  description: "Ten floors. How high? Juu, the gamified Bitcoin money layer on Mezo: Doors, Principal and Yield, MUSDash, the Bank and the Principal Market. Live on Mezo testnet.",
+  openGraph: {
+    title: "Juu · Ten floors. How high?",
+    description: "Play MUSDash, swap, save in the Bank or buy Principal on Mezo testnet.",
+    url: "https://app.playjuu.xyz",
+    siteName: "Juu",
+    type: "website",
+  },
 };
 
 

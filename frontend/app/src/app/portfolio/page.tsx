@@ -187,7 +187,7 @@ export default function Portfolio() {
               <div className={"v " + (today > 0.005 ? "c-bull" : today < -0.005 ? "c-bear" : "")}>{signed(today)} MUSD</div>
             </div>
             <div className="stat">
-              <div className="k">JACKPOT TICKETS</div>
+              <div className="k"><a href="/leaderboard?tab=jackpot" style={{ color: "inherit" }}>JACKPOT TICKETS →</a></div>
               <div className="v">{fmt(tickets.data?.yourTickets ?? 0)} <span className="c-muted" style={{ fontSize: 14 }}>· {fmt((tickets.data?.yourOdds ?? 0) * 100, 1)}% odds</span></div>
             </div>
           </div>

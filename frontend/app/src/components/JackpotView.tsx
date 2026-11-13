@@ -7,7 +7,8 @@ import { EXPLORER, useWallet } from "@/lib/wallet";
 
 type Tickets = { yourTickets: number; allTickets: number; yourOdds: number; drawAfter: string; unit: string };
 
-export default function Jackpot() {
+/** The jackpot: pot, countdown, the wallet's tickets and odds, past draws. Shown in Leaderboard's Jackpot tab. */
+export function JackpotView() {
   const { stack } = useStack();
   const w = useWallet();
   const m = useMarket();
@@ -40,7 +41,7 @@ export default function Jackpot() {
             Tickets = position size × time held this week. One ticket is 1 MUSD held for one hour.{!w.address && " Connect a wallet to see your tickets."}
           </p>
         </div>
-        <div style={{ flex: "1 1 420px", minWidth: 0, display: "flex", justifyContent: "center" }}>
+        <div className="jp-burstwrap" style={{ flex: "1 1 420px", minWidth: 0, display: "flex", justifyContent: "center" }}>
           <Starburst big bullShare={bull + bear > 0 ? bull / (bull + bear) : null} label="Ticket chamber. Green rays are the bull share of open positions, red the bear share.">
             <span className="juu-burst-core" style={{ width: 124, height: 124, margin: "-62px 0 0 -62px" }}>
               <span style={{ fontSize: 24 }}>{jp ? weekday(jp.epochEnds) : "THU"}</span>

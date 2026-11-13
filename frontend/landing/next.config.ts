@@ -7,6 +7,8 @@ const API = process.env.JUU_API_URL || "http://127.0.0.1:8788";
 const config: NextConfig = {
   transpilePackages: ["@juu/ui"],
   agentRules: false,
+  // Never show the Next.js dev badge (it only exists on local preview servers anyway).
+  devIndicators: false,
   turbopack: { root: path.join(__dirname, "..") },
   // The docs are built from docs/gitbook; the MCP guide has the short address /docs/mcp.
   async redirects() {

@@ -38,7 +38,7 @@ Sample figures (like 71,000 BTC price) are fine only inside visuals that are cle
 
 2. **Hero:**
    - Eyebrow (DM Mono, uppercase): "BITCOIN MONEY GAME ON MEZO".
-   - Headline (Bricolage 800, huge): **"Your Bitcoin. Ten floors. How high?"**
+   - Headline (Bricolage 800, huge): **"Ten floors. How high?"** (changed from "Your Bitcoin. Ten floors. How high?" on 13 Nov 2026)
    - One line: "Bring your Bitcoin in, split it into Principal and Yield, then climb the tower, save with it or lock in a fixed return."
    - Buttons: "Enter MUSDash" (strong) and "How it works" (outline).
    - Visual: a live-looking slice of the Ladder (floors 10 to 1, MARK bar, depth shading), animated gently: depth bars breathe, one floor flashes AGARUZO!. This is the centrepiece, not an illustration.
