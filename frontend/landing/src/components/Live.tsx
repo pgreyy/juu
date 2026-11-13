@@ -2,6 +2,7 @@
 // Live parts of the landing page: they read the Juu data API (main stack) and show a dash while loading.
 import { Ladder, Starburst, Ticker, collapsePrice, fmt, lev, pad2, shortAddr, signed, tickerItems, usd, utcLongDate, utcWeekday, type LadderRow } from "@juu/ui";
 import { useEffect, useState } from "react";
+import { HeroLadder } from "./HeroLadder";
 
 function useJson<T>(path: string, ms = 30000) {
   const [data, setData] = useState<T | null>(null);
@@ -145,4 +146,14 @@ export function NextSeriesFact() {
   if (!next) return null;
   const label = next.startsWith(DEMO_SERIES_END) ? "FIRST DEMO SERIES ENDS" : "NEXT SERIES ENDS";
   return <span>{label} {utcLongDate(next)}</span>;
+}
+
+/** Hero ladder preview: sample pools, marked at the live BTC price (Mezo's price feed, main stack) with its 24 h change. */
+export function LiveHeroLadder({ rows, selected }: { rows: LadderRow[]; selected?: number }) {
+  const floors = useJson<Floors>("/api/main/floors");
+  const hist = useJson<{ samples: { price: number }[] }>("/api/main/price/history?minutes=1440", 60000);
+  const mark = floors?.price ?? null;
+  const first = hist?.samples?.[0]?.price;
+  const change = mark != null && first ? mark / first - 1 : null;
+  return <HeroLadder mark={mark} change={change} rows={rows} selected={selected} />;
 }

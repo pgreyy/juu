@@ -193,6 +193,7 @@ html[data-theme="dark"] .lp-hero { --hlBox: var(--sand2); --hlRule: var(--bandRu
 .lp-perm { background: var(--panel); border: 1.5px solid var(--rule); padding: 22px; margin-top: 28px; }
 .lp-sec-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 .lp-perm .st { font-family: var(--fN); font-size: 11px; letter-spacing: 0.08em; padding: 4px 10px; background: var(--strong); color: var(--onStrong); }
+.lp-perm-note { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--rule2); font-size: 13px; line-height: 1.5; color: var(--muted); }
 .lp-board { width: 100%; border-collapse: collapse; font-family: var(--fN); font-size: 14px; }
 .lp-board th { text-align: right; padding: 10px 0; font-weight: 400; font-size: 11px; letter-spacing: 0.12em; color: var(--muted); border-bottom: 1.5px solid var(--rule); }
 .lp-board th:first-child, .lp-board th:nth-child(2) { text-align: left; }
@@ -284,3 +285,16 @@ html[data-theme="dark"] .lp-hero { --hlBox: var(--sand2); --hlRule: var(--bandRu
   .doc-fold summary { min-height: 44px; display: flex; align-items: center; font-family: var(--fN); font-size: 13px; letter-spacing: 0.06em; cursor: pointer; }
   .doc-fold nav { padding: 6px 0 12px; }
 }
+
+/* Built on Mezo: one compact cell per Mezo piece. */
+.lp-mezo { list-style: none; margin: 32px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.lp-mezo li { display: flex; flex-direction: column; gap: 8px; padding: 18px; background: var(--surf); border: 1.5px solid var(--rule); }
+html[data-theme="dark"] .lp-mezo li { background: var(--sand1); }
+.lp-mezo .k { font-family: var(--fN); font-size: 13px; font-weight: 600; letter-spacing: 0.06em; }
+.lp-mezo .t { font-size: 14px; line-height: 1.5; }
+.hl-mark .d { font-family: var(--fN); font-size: 12px; }
+.hl-mark .d.up { color: var(--bullBar); }
+.hl-mark .d.down { color: var(--bearBar); }
+@media (max-width: 1000px) { .lp-mezo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .lp-mezo { grid-template-columns: minmax(0, 1fr); gap: 8px; } .lp-mezo li { padding: 14px; gap: 6px; } }
+html[data-theme="dark"] .hl-mark .d { color: var(--onStrong); opacity: 0.75; }

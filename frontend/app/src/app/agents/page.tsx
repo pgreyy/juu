@@ -177,7 +177,7 @@ export default function Agents() {
               <dl className="readout" style={{ marginTop: 14 }}>
                 <dt>Max per bet</dt><dd>{fmt(a.maxChipsMUSD)} MUSD</dd>
                 <dt>Highest floor</dt><dd>Up to {a.maxFloor}</dd>
-                <dt>Daily loss stop</dt><dd>{fmt(a.lossTodayMUSD, 2)} of {fmt(a.dailyLossLimitMUSD)} MUSD used</dd>
+                <dt>Daily realised loss stop</dt><dd>{fmt(a.lossTodayMUSD, 2)} of {fmt(a.dailyLossLimitMUSD)} MUSD used</dd>
                 <dt>Expires</dt><dd>{expiresText(a.expires)}</dd>
               </dl>
               {on ? (
@@ -263,8 +263,9 @@ export default function Agents() {
               </select>
             </div>
             <div>
-              <label htmlFor="agLoss" style={{ fontSize: 11, letterSpacing: "0.12em" }}>DAILY LOSS STOP (MUSD)</label>
-              <input id="agLoss" className="line" style={{ fontSize: 15 }} value={loss} onChange={(e) => setLoss(e.target.value)} inputMode="decimal" />
+              <label htmlFor="agLoss" style={{ fontSize: 11, letterSpacing: "0.12em" }}>DAILY REALISED LOSS STOP (MUSD)</label>
+              <input id="agLoss" className="line" style={{ fontSize: 15 }} value={loss} onChange={(e) => setLoss(e.target.value)} inputMode="decimal" aria-describedby="agLossNote" />
+              <div id="agLossNote" className="c-muted" style={{ fontSize: 12, lineHeight: 1.4, marginTop: 6 }}>Counts losses from closed bets. Open bets can lose more until they close.</div>
             </div>
             <div>
               <label htmlFor="agExp" style={{ fontSize: 11, letterSpacing: "0.12em" }}>EXPIRES IN (DAYS)</label>

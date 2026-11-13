@@ -111,6 +111,7 @@ main.main p, .lede, .note { max-width: 72ch; }
 .pick { min-height: 44px; padding: 0; border: 1.5px solid var(--rule); background: transparent; color: var(--ink); font-family: var(--fN); font-weight: 600; font-size: 14px; }
 .pick[aria-pressed="true"] { background: var(--strong); color: var(--onStrong); }
 .open-btn { margin-top: 18px; height: 56px; font-size: 17px; letter-spacing: 0.08em; }
+.open-risk { margin: 8px 0 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
 .yours { display: flex; gap: 16px; align-items: stretch; border-top: 1.5px solid var(--rule); padding-top: 18px; }
 .yours .info { flex: 1; min-width: 0; }
 .yours .l1 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }

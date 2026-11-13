@@ -203,6 +203,7 @@ export default function MUSDash() {
           <button type="button" className="btn-strong open-btn" onClick={open} disabled={busy(w.tx, "open") || n <= 0 || short}>
             {busy(w.tx, "open") ? "OPENING…" : n <= 0 ? "ENTER AN AMOUNT" : short ? `NOT ENOUGH ${chip === "MUSD" ? "MUSD" : unit}` : `OPEN ON FLOOR ${floor}`}
           </button>
+          <p className="open-risk">Your chips can be lost if this floor collapses. Fees and funding apply.</p>
           <TxNote k="open" />
         </section>
 

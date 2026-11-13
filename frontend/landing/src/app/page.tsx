@@ -1,11 +1,10 @@
 import { Agaruzo, Footer, Icon, StackMark, ThemeToggle, Wordmark, type LadderRow } from "@juu/ui";
-import { BoardPreview, JackpotBurst, LiveLadder, LiveTicker, NextSeriesFact } from "@/components/Live";
-import { HeroLadder } from "@/components/HeroLadder";
+import { BoardPreview, JackpotBurst, LiveHeroLadder, LiveLadder, LiveTicker, NextSeriesFact } from "@/components/Live";
 
 const APP = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 const DOCS = "/docs";
 
-// Hero preview only: sample pools at a sample $71,000 mark, labelled as a preview under the visual.
+// Hero preview only: sample pools, marked at the live BTC price, labelled as a preview under the visual.
 const PREVIEW: LadderRow[] = [
   [10, 620, 180], [9, 0, 410], [8, 980, 540], [7, 1240, 900], [6, 1610, 1320],
   [5, 2050, 1780], [4, 2380, 2010], [3, 1960, 2240], [2, 1420, 1180], [1, 980, 1050],
@@ -47,7 +46,7 @@ export default function Landing() {
           <section className="lp-sec first lp-hero s-sand1" aria-labelledby="hero-h">
             <div className="hero-grid">
               <div className="hero-text">
-                <div className="hero-label">GAMIFIED MONEY LAYER ON MEZO</div>
+                <div className="hero-label">BITCOIN-NATIVE FINANCIAL LAYER ON MEZO</div>
                 <h1 id="hero-h" className="hero-h1">
                   <span className="ph">Ten floors.</span> <span className="ph hi">How high?</span>
                 </h1>
@@ -67,8 +66,8 @@ export default function Landing() {
                   <span>MUSDASH · THE LADDER</span>
                   <span>GAME PREVIEW</span>
                 </div>
-                <HeroLadder mark={71000} rows={PREVIEW} selected={5} />
-                <div className="hl-caption">SAMPLE POOLS AT A $71,000 MARK</div>
+                <LiveHeroLadder rows={PREVIEW} selected={5} />
+                <div className="hl-caption">SAMPLE POOLS AT THE LIVE BTC PRICE</div>
               </div>
             </div>
           </section>
@@ -168,10 +167,11 @@ export default function Landing() {
                 <dl className="lp-readout">
                   <dt>Max per bet</dt><dd>your limit</dd>
                   <dt>Highest floor</dt><dd>1 to 10</dd>
-                  <dt>Daily loss stop</dt><dd>your limit</dd>
+                  <dt>Daily realised loss stop</dt><dd>your limit</dd>
                   <dt>Expiry</dt><dd>a date you pick</dd>
                   <dt>Revoke</dt><dd>any time</dd>
                 </dl>
+                <p className="lp-perm-note">Counts losses from closed bets. Open bets can lose more until they close.</p>
               </div>
               <div className="lp-sec-cta">
                 <a className="btn sand small" href={APP + "/agents"}>Give your agent permission</a>
@@ -183,6 +183,21 @@ export default function Landing() {
               </div>
               <BoardPreview appUrl={APP} />
             </div>
+          </section>
+          <section id="mezo" className="lp-sec s-olive1" aria-labelledby="mezo-h">
+            <div className="label">BUILT ON MEZO</div>
+            <h2 id="mezo-h" className="lp-h2">Mezo&apos;s pieces, put to work.</h2>
+            <p className="lp-p">Juu uses Mezo&apos;s own parts and builds its products on top: the Doors and the Splitter, MUSDash, the Bank, the Principal Market, the jackpot and the Agent Gateway.</p>
+            <ul className="lp-mezo">
+                <li><span className="k">MUSD</span><span className="t">The money of the game: chips, fees, payouts and the Bank&apos;s loan are all MUSD.</span></li>
+                <li><span className="k">Troves</span><span className="t">The Bank borrows MUSD from its own trove at 300%. The Trove Door opens a trove inside your own Juu account.</span></li>
+                <li><span className="k">veBTC</span><span className="t">BTC you bring in is locked as veBTC in a series lock; its rewards go to Yield holders.</span></li>
+                <li><span className="k">sMUSD</span><span className="t">The sMUSD Door splits sMUSD into Principal (your MUSD back) and Yield (the savings yield).</span></li>
+                <li><span className="k">Price feed</span><span className="t">Mezo&apos;s BTC price marks every MUSDash floor and decides when a floor collapses.</span></li>
+                <li><span className="k">Gauges</span><span className="t">Juu&apos;s series locks vote for a Mezo gauge, and the rewards they earn flow to Yield.</span></li>
+                <li><span className="k">Swap pools</span><span className="t">Principal Market pools and the Swap tab run on Mezo&apos;s own pools and Router.</span></li>
+                <li><span className="k">MEZO</span><span className="t">Swap to and from MEZO on Mezo&apos;s MEZO/MUSD pool; Portfolio prices MEZO from it.</span></li>
+            </ul>
           </section>
         </main>
 
