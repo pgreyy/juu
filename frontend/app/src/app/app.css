@@ -6,8 +6,11 @@
 
 /* Rail */
 .rail { flex: 0 0 64px; width: 64px; background: var(--bg); border-right: 1.5px solid var(--rule2); padding: 12px 8px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; align-self: flex-start; height: 100vh; }
-.rail.open { width: 220px; padding: 16px 12px; }
-.rail.open { flex-basis: 220px; }
+/* Expanded: 240px, wide enough for "Principal Market" on one line. */
+.rail.open { flex: 0 0 240px; width: 240px; padding: 12px 12px; }
+/* Expanded: the toggle sits top left, its icon in line with the nav icons (item padding 12 + dot 6 + gap 8, centred on the icons), and the
+   gap under it matches the gap between items. */
+.rail.open .rail-logo { width: auto; height: 52px; margin: 0; padding: 0 0 0 25px; justify-content: flex-start; }
 /* Collapsed: icons centred in the 64px rail; the active dot sits just left of its icon. */
 .rail:not(.open) .rail-item { position: relative; padding: 0; }
 .rail:not(.open) .rail-item .dot { position: absolute; left: 1px; top: 50%; margin-top: -3px; }
