@@ -13,12 +13,51 @@ const CHIP = ["MUSD", "Y", "P"];
 const PHASE = ["None", "Open", "Unlocking", "Matured"];
 const iso = (t) => new Date(Number(t) * 1000).toISOString();
 
-function wrap(fn) {
+// Shared answer cache for the /api/* reads. Every visitor polls the same few URLs, and each answer takes several chain
+// reads, so one answer is shared by everyone for a few seconds:
+//   fresh (under API_CACHE_MS, default 3 s): served as is;
+//   stale (under API_STALE_MS, default 60 s): served at once while one refresh runs in the background;
+//   older or missing: computed, and everyone asking at the same moment waits for that one computation.
+// Errors are never cached.
+const CACHE_MS = Number(env("API_CACHE_MS", "") || 3000);
+const STALE_MS = Number(env("API_STALE_MS", "") || 60000);
+const cache = new Map(); // url -> { at, body, inflight }
+const MAX_CACHE = 500;
+
+function refresh(key, fn, req, res) {
+  const entry = cache.get(key) || {};
+  if (!entry.inflight) {
+    entry.inflight = Promise.resolve()
+      .then(() => fn(req, res))
+      .then((body) => {
+        cache.set(key, { at: Date.now(), body, inflight: null });
+        if (cache.size > MAX_CACHE) cache.delete(cache.keys().next().value);
+        return body;
+      })
+      .finally(() => {
+        const e = cache.get(key);
+        if (e) e.inflight = null;
+      });
+    cache.set(key, entry);
+  }
+  return entry.inflight;
+}
+
+function wrap(fn, { cached = true } = {}) {
   return async (req, res) => {
     try {
-      res.json(await fn(req, res));
+      if (!cached) return res.json(await fn(req, res));
+      const key = req.originalUrl;
+      const hit = cache.get(key);
+      const age = hit?.body !== undefined ? Date.now() - hit.at : Infinity;
+      if (age < CACHE_MS) return res.set("X-Cache", "fresh").json(hit.body);
+      if (age < STALE_MS) {
+        refresh(key, fn, req, res).catch(() => {});
+        return res.set("X-Cache", "stale").json(hit.body);
+      }
+      res.set("X-Cache", "miss").json(await refresh(key, fn, req, res));
     } catch (e) {
-      res.status(e.status || 500).json({ error: (e.shortMessage || e.message || String(e)).slice(0, 300) });
+      if (!res.headersSent) res.status(e.status || 500).json({ error: (e.shortMessage || e.message || String(e)).slice(0, 300) });
     }
   };
 }
@@ -34,12 +73,8 @@ function st(req) {
 }
 
 async function positionRow(s, id) {
-  const p = await s.game.getPosition(id);
-  let live = null;
-  try {
-    live = await s.game.positionValue(id);
-  } catch {}
-  const agent = p.owner.toLowerCase() === s.addr.gateway.toLowerCase() ? await s.gateway.positions(id) : null;
+  const [p, live, gw] = await Promise.all([s.game.getPosition(id), s.game.positionValue(id).catch(() => null), s.gateway.positions(id).catch(() => null)]);
+  const agent = p.owner.toLowerCase() === s.addr.gateway.toLowerCase() ? gw : null;
   return {
     id: Number(id),
     owner: p.owner,
@@ -139,74 +174,84 @@ export function api() {
       jobsFailing: js.filter((j) => j.lastError).map((j) => ({ name: j.name, error: j.lastError })),
       warningsLastHour: recent.slice(-20),
     };
-  }));
+  }, { cached: false }));
 
-  app.get("/jobs", wrap(async () => ({ jobs: jobStatus(), recentActions: recentActions(), warnings: warnings.slice(-50).reverse() })));
+  app.get("/jobs", wrap(async () => ({ jobs: jobStatus(), recentActions: recentActions(), warnings: warnings.slice(-50).reverse() }), { cached: false }));
 
   app.get("/api/series", wrap(async () => {
     const t = await now();
     const sp = shared.splitter;
     const main = stack("main");
-    const out = [];
-    const n = Number(await sp.seriesCount());
-    for (let id = 0; id < n; id++) {
-      const s = await sp.getSeries(id);
-      const one = 10n ** 18n;
-      const [yVal, pVal, weeks, poolPrice, implied] = await Promise.all([
-        main.pricer.yValue(id, one).catch(() => 0n),
-        main.pricer.pValue(id, one).catch(() => 0n),
-        main.pricer.yieldWeeksLeft(id).catch(() => 0n),
-        shared.pmarket.priceOfP(id).catch(() => 0n),
-        shared.pmarket.impliedReturn(id).catch(() => [0n, 0n]),
-      ]);
-      out.push({
-        kind: "veBTC",
-        id,
-        endDate: iso(s.end),
-        phase: PHASE[Number(s.phase)],
-        unlockFrom: iso(Number(s.end) - 30 * 86400),
-        lockEnd: s.lockEnd > 0n ? iso(s.lockEnd) : null,
-        btcLocked: fmt(await sp.lockedBTC(id)),
-        pToken: s.p,
-        yToken: s.y,
-        yMarginValuePerY: fmt(yVal),
-        yieldWeeksLeft: fmt(weeks),
-        pMarginValuePerP: fmt(pVal),
-        pMarket: { pool: await shared.pmarket.poolOf(id), btcPerP: fmt(poolPrice), fixedReturnToEnd: fmt(implied[0]) },
-        btcStaysInJuuUntil: iso(s.end),
-      });
-    }
+    const [n, m] = (await Promise.all([sp.seriesCount(), shared.savings.seriesCount()])).map(Number);
+    const one = 10n ** 18n;
+    const ve = await Promise.all(
+      Array.from({ length: n }, async (_, id) => {
+        const [s, yVal, pVal, weeks, poolPrice, implied, locked, pool] = await Promise.all([
+          sp.getSeries(id),
+          main.pricer.yValue(id, one).catch(() => 0n),
+          main.pricer.pValue(id, one).catch(() => 0n),
+          main.pricer.yieldWeeksLeft(id).catch(() => 0n),
+          shared.pmarket.priceOfP(id).catch(() => 0n),
+          shared.pmarket.impliedReturn(id).catch(() => [0n, 0n]),
+          sp.lockedBTC(id),
+          shared.pmarket.poolOf(id),
+        ]);
+        return {
+          kind: "veBTC",
+          id,
+          endDate: iso(s.end),
+          phase: PHASE[Number(s.phase)],
+          unlockFrom: iso(Number(s.end) - 30 * 86400),
+          lockEnd: s.lockEnd > 0n ? iso(s.lockEnd) : null,
+          btcLocked: fmt(locked),
+          pToken: s.p,
+          yToken: s.y,
+          yMarginValuePerY: fmt(yVal),
+          yieldWeeksLeft: fmt(weeks),
+          pMarginValuePerP: fmt(pVal),
+          pMarket: { pool, btcPerP: fmt(poolPrice), fixedReturnToEnd: fmt(implied[0]) },
+          btcStaysInJuuUntil: iso(s.end),
+        };
+      }),
+    );
     const sv = shared.savings;
-    const m = Number(await sv.seriesCount());
-    for (let id = 0; id < m; id++) {
-      const s = await sv.getSeries(id);
-      out.push({ kind: "sMUSD", id, endDate: iso(s.end), matured: s.matured, principalMUSD: fmt(s.principal), pToken: s.p, yToken: s.y, musdStaysInJuuUntil: iso(s.end) });
-    }
+    const sm = await Promise.all(Array.from({ length: m }, (_, id) => sv.getSeries(id)));
+    const out = [
+      ...ve,
+      ...sm.map((s, id) => ({ kind: "sMUSD", id, endDate: iso(s.end), matured: s.matured, principalMUSD: fmt(s.principal), pToken: s.p, yToken: s.y, musdStaysInJuuUntil: iso(s.end) })),
+    ];
     return { now: iso(t), series: out };
   }));
 
   app.get("/api/:stack/floors", wrap(async (req) => {
     const s = st(req);
-    const mm = fmt(await s.game.maintenanceMargin());
-    const price = fmt(await s.priceFeed.fetchPrice());
-    const ids = await s.game.openPositionIds();
+    // Every chain read at once (ethers sends them to Mezo as one batch).
+    const F = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const [mmRaw, priceRaw, ids, levs, sizes, premiums] = await Promise.all([
+      s.game.maintenanceMargin(),
+      s.priceFeed.fetchPrice(),
+      s.game.openPositionIds(),
+      Promise.all(F.map((f) => s.game.leverage(f - 1))),
+      Promise.all(F.map((f) => s.game.floorSize(f))),
+      Promise.all(F.map((f) => (f >= 7 ? s.game.seatPremium(f) : 0n))),
+    ]);
+    const mm = fmt(mmRaw);
+    const price = fmt(priceRaw);
     const rows = await Promise.all(ids.map((id) => positionRow(s, id)));
-    const floors = [];
-    for (let f = 1; f <= 10; f++) {
-      const lev = fmt(await s.game.leverage(f - 1));
+    const floors = F.map((f, i) => {
+      const lev = fmt(levs[i]);
       const move = 1 / lev - mm;
-      const onFloor = rows.filter((r) => r.floor === f);
-      floors.push({
+      return {
         floor: f,
         leverage: lev,
         collapseMove: move,
         collapsePriceForNewBull: price * (1 - move),
         collapsePriceForNewBear: price * (1 + move),
-        openSize: fmt(await s.game.floorSize(f)),
-        seatPremium: f >= 7 ? fmt(await s.game.seatPremium(f)) : 0,
-        positions: onFloor.map((r) => ({ id: r.id, side: r.side, size: r.size, collapsePrice: r.collapsePrice, isAgent: r.isAgent })),
-      });
-    }
+        openSize: fmt(sizes[i]),
+        seatPremium: f >= 7 ? fmt(premiums[i]) : 0,
+        positions: rows.filter((r) => r.floor === f).map((r) => ({ id: r.id, side: r.side, size: r.size, collapsePrice: r.collapsePrice, isAgent: r.isAgent })),
+      };
+    });
     return { stack: s.name, price, maintenanceMargin: mm, floors };
   }));
 
@@ -224,23 +269,31 @@ export function api() {
 
   app.get("/api/:stack/climb-premium", wrap(async (req) => {
     const s = st(req);
-    const e = Number(await s.game.currentEpoch());
-    const len = Number(await s.game.epochLength());
-    const floors = [];
-    for (let f = 7; f <= 10; f++) floors.push({ floor: f, seatsThisEpoch: Number(await s.game.seatsTaken(e, f)), nextSeatPremium: fmt(await s.game.seatPremium(f)) });
+    const [eRaw, lenRaw, on, base, growth, kill] = await Promise.all([
+      s.game.currentEpoch(), s.game.epochLength(), s.game.premiumOn(), s.game.premiumBase(), s.game.premiumGrowth(), s.game.killLevel(),
+    ]);
+    const e = Number(eRaw);
+    const len = Number(lenRaw);
+    const TOP = [7, 8, 9, 10];
+    const [seats, prems, topNow, topLast] = await Promise.all([
+      Promise.all(TOP.map((f) => s.game.seatsTaken(e, f))),
+      Promise.all(TOP.map((f) => s.game.seatPremium(f))),
+      s.game.topSeats(e),
+      e > 0 ? s.game.topSeats(e - 1) : 0n,
+    ]);
     return {
       stack: s.name,
-      premiumOn: await s.game.premiumOn(),
-      killSwitch: (await s.game.premiumOn()) ? "armed (premium on)" : "tripped (premium off for good)",
-      base: fmt(await s.game.premiumBase()),
-      growthPerSeat: fmt(await s.game.premiumGrowth()),
-      killLevel: fmt(await s.game.killLevel()),
+      premiumOn: on,
+      killSwitch: on ? "armed (premium on)" : "tripped (premium off for good)",
+      base: fmt(base),
+      growthPerSeat: fmt(growth),
+      killLevel: fmt(kill),
       epoch: e,
       epochEnds: iso((e + 1) * len),
       epochLengthSeconds: len,
-      topSeatsThisEpoch: Number(await s.game.topSeats(e)),
-      topSeatsLastEpoch: e > 0 ? Number(await s.game.topSeats(e - 1)) : 0,
-      floors,
+      topSeatsThisEpoch: Number(topNow),
+      topSeatsLastEpoch: Number(topLast),
+      floors: TOP.map((f, i) => ({ floor: f, seatsThisEpoch: Number(seats[i]), nextSeatPremium: fmt(prems[i]) })),
     };
   }));
 
@@ -303,16 +356,19 @@ export function api() {
 
   app.get("/api/:stack/jackpot", wrap(async (req) => {
     const s = st(req);
-    const e = Number(await s.game.currentEpoch());
-    const len = Number(await s.game.epochLength());
+    const [eRaw, lenRaw, buffer, target, surplus] = await Promise.all([
+      s.game.currentEpoch(), s.game.epochLength(), s.buffer.balance(), s.jackpot.getFunction("target")(), s.jackpot.surplus(),
+    ]);
+    const e = Number(eRaw);
+    const len = Number(lenRaw);
     const draws = byEvent(s.name, "jackpot", "Drawn").slice(-10).reverse();
     return {
       stack: s.name,
       epoch: e,
       epochEnds: iso((e + 1) * len),
-      bufferMUSD: fmt(await s.buffer.balance()),
-      targetMUSD: fmt(await s.jackpot.getFunction("target")()),
-      jackpotNowMUSD: fmt(await s.jackpot.surplus()),
+      bufferMUSD: fmt(buffer),
+      targetMUSD: fmt(target),
+      jackpotNowMUSD: fmt(surplus),
       committed: (await s.jackpot.commitOf(e)) !== ethers.ZeroHash,
       recentDraws: draws.map((d) => ({ epoch: Number(d.args.epoch), winner: d.args.winner, positionId: Number(d.args.positionId), prize: fmt(d.args.prize), totalTickets: d.args.totalTickets, tx: d.tx })),
     };

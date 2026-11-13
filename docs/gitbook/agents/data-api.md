@@ -44,3 +44,11 @@ npm start
 ```
 
 The backend reads contract addresses from `backend/config/addresses.json` and the keeper's key from the project's `.env` file. To serve the API without sending any transactions, start it with `KEEPER_DRY_RUN=1 npm start`.
+
+## Freshness
+
+Answers under `/api/` are shared between everyone asking for a few seconds: an answer is fresh for 3 seconds; after that
+the API still answers at once with the last one while it fetches a new one in the background (up to a minute old, only
+when nobody asked for a while). The `X-Cache` header says which: `fresh`, `stale` or `miss`. `/health` and `/jobs` are
+never cached.
+
