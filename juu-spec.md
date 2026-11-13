@@ -1,6 +1,6 @@
 # Juu: product spec (v0.2)
 
-A gamified money layer on Mezo. Bring your Mezo positions in, split them, play them, and loop the winnings back.
+A Bitcoin-native financial layer on Mezo. Bring your Mezo positions in, split them, play them, and loop the winnings back.
 
 The game inside is called **MUSDash**. The cheer when you climb a floor is **Agaruzo!** (Japanese, "it's going up!").
 
