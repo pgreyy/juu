@@ -1,4 +1,4 @@
-import { Agaruzo, Footer, Icon, LEV, Ladder, StackMark, ThemeToggle, Wordmark, pad2, type LadderRow } from "@juu/ui";
+import { Agaruzo, Footer, Icon, Ladder, StackMark, ThemeToggle, Wordmark, type LadderRow } from "@juu/ui";
 import { BoardPreview, JackpotBurst, LiveLadder, LiveTicker } from "@/components/Live";
 
 const APP = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -150,21 +150,6 @@ export default function Landing() {
               </div>
             </div>
           </section>
-
-          <section className="lp-sec lp-final s-olive2" aria-labelledby="final-h">
-            <div className="label">MUSDASH</div>
-            <h2 id="final-h" className="lp-h1">Ten floors are waiting.</h2>
-            <div className="lp-ctas"><EnterButton /></div>
-            <div className="lp-floors" aria-label="The ten floors and their leverage">
-              {LEV.map((l, i) => (
-                <div key={i} className={"floor-badge" + (i + 1 >= 7 ? " hi" : "")}>
-                  <span className="k">{l}×</span>
-                  <span className="n">{pad2(i + 1)}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
           <section id="agents" className="lp-sec lp-split s-band" aria-labelledby="agents-h">
             <div>
               <div className="label">AGENTS VS HUMANS</div>

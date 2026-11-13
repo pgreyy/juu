@@ -54,7 +54,7 @@ Two families so each landing section has its own shade. Bull and bear keep their
 | sand2 | #E9E3D3 | #1A1914 | "Bring it in", Jackpot, the Bank card |
 | sand3 | #DCD4BF | #23211B | page frame and footer |
 | olive1 | #EEF0DC | #1B1D12 | MUSDash section |
-| olive2 | #D9DDB5 | #262A15 | Principal Market card, "Ten floors are waiting." |
+| olive2 | #D9DDB5 | #262A15 | Principal Market card (and the top bar, as `head`) |
 | oliveX | #5F6600 | #B8C24A | secondary button fill (text: sand1 light, #12110E dark) |
 | band | #101010 | #0A0A08 | the Agents ink band; text #F4F0E6 / #E9E3D3, muted #9A9384 |
 

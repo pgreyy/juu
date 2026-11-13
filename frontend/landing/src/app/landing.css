@@ -152,13 +152,6 @@ html[data-theme="dark"] .s-band { border-top-color: var(--oliveX); }
 .lp-bigstat { font-family: var(--fN); font-size: clamp(56px, 7vw, 96px); line-height: 1; color: var(--hi); margin-top: 28px; }
 .lp-bigstat .u { font-size: 18px; color: var(--muted); }
 
-/* Final call */
-.lp-final { text-align: left; }
-.lp-final .lp-h1 { font-size: clamp(44px, 6.4vw, 96px); max-width: 14ch; }
-.lp-floors { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; margin-top: 40px; }
-.lp-floors .floor-badge { padding: 12px 0; min-width: 0; }
-.lp-floors .floor-badge .n { font-size: clamp(20px, 2.4vw, 32px); }
-.lp-floors .floor-badge.hi .n { color: var(--hi); }
 
 @media (min-width: 1440px) {
   .lp-p { font-size: 18px; }
@@ -177,7 +170,6 @@ html[data-theme="dark"] .s-band { border-top-color: var(--oliveX); }
   .lp-sec.first { padding-top: 32px; }
   .lp-earn { grid-template-columns: minmax(0, 1fr); }
   .lp-block { padding: 20px; }
-  .lp-floors { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .lp-page .juu-footer { padding-top: 36px; padding-bottom: 24px; }
 }
 @media (max-width: 560px) {
