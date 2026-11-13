@@ -46,6 +46,7 @@ export function explain(e: unknown): string {
   }
   const m = x?.shortMessage || x?.reason || x?.message || String(e);
   if (/insufficient funds/i.test(m)) return "Not enough BTC in your wallet for this and its gas.";
+  if (/missing revert data/i.test(m)) return "Mezo refused this without giving a reason. Check the amount and your balance, then try again.";
   return m.length > 160 ? m.slice(0, 160) + "…" : m;
 }
 
@@ -55,7 +56,16 @@ export function explain(e: unknown): string {
  */
 export async function call(c: Contract, fn: string, args: unknown[], overrides: Record<string, unknown> = {}): Promise<TransactionResponse> {
   const f = c.getFunction(fn);
-  await f.staticCall(...args, overrides);
+  try {
+    await f.staticCall(...args, overrides);
+  } catch (e) {
+    // Mezo testnet's RPC now and then fails a call with no reason at all; a real refusal comes back with its reason.
+    // Try once more before giving up.
+    const err = e as { code?: string; data?: string | null };
+    if (err.code !== "CALL_EXCEPTION" || err.data) throw e;
+    await new Promise((res) => setTimeout(res, 1500));
+    await f.staticCall(...args, overrides);
+  }
   let gasLimit: bigint;
   try {
     gasLimit = ((await f.estimateGas(...args, overrides)) * 3n) / 2n;

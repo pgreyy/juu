@@ -22,8 +22,8 @@ Final pick: Logo Stack · Colour Ascension, light by default with a dark mode ·
 | strong | #101010 | #E6F05A | primary buttons, selected states |
 | onStrong | #F6F2E8 | #101010 | text on strong |
 | panel | #ECE6D8 | #1C1C1C | blocks like the floor badge, "you get" boxes |
-| bull | #12804A | #3DDC84 | bull text, gains |
-| bear | #C8361B | #F04427 | bear text, losses, collapse prices, danger |
+| bull | #0F7543 | #3DDC84 | bull text, gains |
+| bear | #BA3118 | #F24A2C | bear text, losses, collapse prices, danger |
 | bullBar | #1FAF66 | #3DDC84 | bull bars and depth shading |
 | bearBar | #E2452A | #F04427 | bear bars and depth shading |
 | hi | #6B7300 | #E6F05A | floors 7 to 10, jackpot, Agaruzo |
@@ -31,7 +31,9 @@ Final pick: Logo Stack · Colour Ascension, light by default with a dark mode ·
 
 - Bull is always green. Bear is always red. Gains use bull, losses and danger use bear.
 - Always pair colour with ▲ / ▼ or the word, never colour alone.
-- All text pairs above pass 4.5:1.
+- All text pairs above pass 4.5:1. The text colours bull and bear were darkened (light) and lightened (dark bear) from
+  the reference's #12804A, #C8361B and #F04427, which fell short of 4.5:1 on surf and sel: light bull on sel is now
+  4.63, light bear on sel 4.77, dark bear on sel 4.6. Bars, lines and rays keep the reference colours.
 
 
 ## 2. Type

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { stackAddr, usePoll, useRead, useStack } from "@/lib/data";
+import { useBtcBalance } from "@/lib/balances";
 import { btc } from "@/lib/format";
 import type { BankRes } from "@/lib/types";
 import { call, read, useWallet } from "@/lib/wallet";
@@ -36,6 +37,9 @@ export default function Bank() {
   const shareBTC = chain && chain.supply > 0n ? Number(formatUnits((chain.mine * chain.assetsRaw) / chain.supply, 18)) : 0;
   const isDep = mode === "dep";
   const n = Number(amount.replace(/,/g, "")) || 0;
+  const myBtc = useBtcBalance(w.address, w.bump);
+  const short = isDep && myBtc != null && n > 0 && n > myBtc - 0.00001;
+  const overShare = !isDep && Boolean(w.address) && chain != null && n > shareBTC + 1e-9;
   const cr = bank.data?.trove.collateralRatio ?? null;
 
   const go = () => {
@@ -80,9 +84,11 @@ export default function Bank() {
               ? `Your BTC becomes Bank shares. The Bank borrows MUSD on Mezo at 1% and backs the game with it. Its trove aims for ${bank.data ? fmt(bank.data.trove.target * 100) : "300"}%.`
               : "You are always paid out in BTC. The MUSD stays in the Bank so winners can be paid."}
           </p>
-          <button type="button" className="btn-strong" style={{ height: 54, fontSize: 15, marginTop: 14 }} onClick={go} disabled={busy(w.tx, "bank") || n <= 0 || (!isDep && shareBTC <= 0 && Boolean(w.address))}>
+          <button type="button" className="btn-strong" style={{ height: 54, fontSize: 15, marginTop: 14 }} onClick={go} disabled={busy(w.tx, "bank") || n <= 0 || short || (!isDep && shareBTC <= 0 && Boolean(w.address))}>
             {busy(w.tx, "bank") ? "WAITING…" : isDep ? "DEPOSIT INTO THE BANK" : "WITHDRAW MY SHARE"}
           </button>
+          {short && <p className="txnote error">You have {btc(myBtc!)} BTC in this wallet.</p>}
+          {overShare && shareBTC > 0 && <p className="txnote">Your share is {btc(shareBTC)} BTC; you&apos;ll get all of it.</p>}
           <TxNote k="bank" />
         </section>
         <section style={{ flex: "1 1 340px", minWidth: 0 }}>

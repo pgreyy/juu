@@ -1,8 +1,8 @@
 /* Juu landing. Theme: our own tokens, not a catalog theme.
    Colour (Ascension, light default): bg #E6E1D5 · surf #F6F2E8 · ink #101010 · muted #55524B · rule #101010 · rule2 #D6CFBF ·
-     strong #101010 · onStrong #F6F2E8 · panel #ECE6D8 · bull #12804A · bear #C8361B · bullBar #1FAF66 · bearBar #E2452A · hi #6B7300.
+     strong #101010 · onStrong #F6F2E8 · panel #ECE6D8 · bull #0F7543 · bear #BA3118 · bullBar #1FAF66 · bearBar #E2452A · hi #6B7300.
    Dark: bg #0A0A0A · surf #101010 · ink #F0E9D8 · muted #929292 · rule #3A3A3A · rule2 #222222 · strong #E6F05A · onStrong #101010 ·
-     panel #1C1C1C · bull #3DDC84 · bear #F04427 · hi #E6F05A. (Defined once in @juu/ui/juu.css; this file only uses var(--token).)
+     panel #1C1C1C · bull #3DDC84 · bear #F24A2C · hi #E6F05A. (Defined once in @juu/ui/juu.css; this file only uses var(--token).)
    Type: Bricolage Grotesque 500/700/800 for headlines and body; DM Mono 400/500 for numbers, labels and buttons.
    Shape: radius 0 everywhere, borders 1.5px, dividers 1px, touch targets at least 44px.
    Assets: Stack logo and favicon from docs/design/assets; page icons from docs/design/assets/icons.

@@ -4,7 +4,7 @@ import { ABI } from "./abis";
 import { ADDR } from "./addresses";
 import { useRead } from "./data";
 import type { Series } from "./types";
-import { read } from "./wallet";
+import { read, reader } from "./wallet";
 
 export type SeriesBal = { s: Series; p: number; y: number; earned: { sym: string; v: number }[] };
 const REWARD_SYMBOL: Record<string, string> = {
@@ -39,4 +39,9 @@ export function useSeriesBalances(address: string | null, series: Series[] | nul
     30000,
     bump,
   );
+}
+
+/** The wallet's own BTC (native coin on Mezo), for "you have" checks before a payment. */
+export function useBtcBalance(address: string | null, bump = 0) {
+  return useRead<number>(address ? `btc-${address}` : null, async () => n(await reader.getBalance(address!)), 20000, bump);
 }

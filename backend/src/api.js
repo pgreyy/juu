@@ -366,10 +366,22 @@ export function api() {
     const s = st(req);
     const user = req.params.user.toLowerCase();
     const agents = new Set(byEvent(s.name, "gateway", "SessionGranted").filter((e) => e.args.user.toLowerCase() === user).map((e) => e.args.agent));
+    // Net result today (UTC day, the same day the gateway's loss stop uses): every close and collapse settled today,
+    // gains and losses together.
+    const today = Math.floor((await now()) / 86400);
+    const settled = [...byEvent(s.name, "gateway", "AgentClosed"), ...byEvent(s.name, "gateway", "AgentLiquidated")].filter((e) => e.args.user.toLowerCase() === user);
+    const net = new Map();
+    for (const e of settled) {
+      if (Math.floor((await blockTime(e.block)) / 86400) !== today) continue;
+      const k = e.args.agent.toLowerCase();
+      net.set(k, (net.get(k) || 0) + fmt(e.args.result));
+    }
     const out = [];
     for (const agent of agents) {
       const x = await s.gateway.session(req.params.user, agent);
-      out.push({ agent, active: x.active, expires: iso(x.expiry), maxChipsMUSD: fmt(x.maxChips), maxFloor: Number(x.maxFloor), dailyLossLimitMUSD: fmt(x.dailyLossLimit), lossTodayMUSD: fmt(x.lossToday), canSetLoop: x.canSetLoop });
+      // The gateway resets lossToday lazily, on the agent's next move; a value from an earlier day is 0 today.
+      const lossToday = Number(x.day) === today ? fmt(x.lossToday) : 0;
+      out.push({ agent, active: x.active, expires: iso(x.expiry), maxChipsMUSD: fmt(x.maxChips), maxFloor: Number(x.maxFloor), dailyLossLimitMUSD: fmt(x.dailyLossLimit), lossTodayMUSD: lossToday, netTodayMUSD: net.get(agent.toLowerCase()) || 0, canSetLoop: x.canSetLoop });
     }
     return { stack: s.name, user: req.params.user, sessions: out };
   }));

@@ -7,6 +7,7 @@ import { ABI } from "@/lib/abis";
 import { ADDR } from "@/lib/addresses";
 import { stackAddr, useRead, useStack } from "@/lib/data";
 import { btc, seriesName } from "@/lib/format";
+import { useBtcBalance } from "@/lib/balances";
 import { useMarket } from "@/lib/market";
 import { call, read, useWallet } from "@/lib/wallet";
 
@@ -28,6 +29,7 @@ export default function Doors() {
   const [debt, setDebt] = useState("1800");
   const [pickId, setPickId] = useState<number | null>(null);
   const d = DOORS.find((x) => x.k === door)!;
+  const myBtc = useBtcBalance(w.address, w.bump);
 
   const kind = door === "smusd" ? "sMUSD" : "veBTC";
   const options = (m.series || [])
@@ -79,7 +81,18 @@ export default function Doors() {
     w.run("door", steps, door === "trove" ? "Your Juu account has its trove." : `In. You hold Principal and Yield of ${name}.`);
   };
 
-  const disabled = busy(w.tx, "door") || (door === "trove" ? !A.accountFactory || n <= 0 : !picked || (door === "ve" ? !tokenId : n <= 0));
+  // Trove door: Mezo's minimum loan is 2,000 MUSD (1,800 to you + its 200 MUSD gas deposit) and it refuses a trove
+  // below 110% collateral. Juu's guard starts closing bets at 130%, so below 150% the page warns.
+  const debtN = Number(debt.replace(/,/g, "")) || 0;
+  const price = m.floors?.price ?? 0;
+  const ratio = door === "trove" && price > 0 && debtN > 0 ? (n * price) / ((debtN + 200) * 1.005) : null;
+  const needBTC = (r: number) => (price > 0 ? ((debtN + 200) * 1.005 * r) / price : 0);
+  const troveBlock = door !== "trove" ? null : debtN < 1800 ? "Mezo's smallest loan is 1,800 MUSD to you." : ratio != null && ratio < 1.1 ? `Mezo needs at least 110% collateral: about ${btc(needBTC(1.1))} BTC for this loan.` : null;
+  const troveWarn = door === "trove" && !troveBlock && ratio != null && ratio < 1.5 ? `That is ${fmt(ratio * 100, 0)}% collateral. Juu's guard closes bets at 130%; about ${btc(needBTC(1.5))} BTC gives room.` : null;
+
+  // Leave a little BTC for gas.
+  const shortBtc = (door === "btc" || door === "trove") && myBtc != null && n > 0 && n > myBtc - 0.00001 ? `You have ${btc(myBtc)} BTC in this wallet.` : null;
+  const disabled = busy(w.tx, "door") || Boolean(shortBtc) || (door === "trove" ? !A.accountFactory || n <= 0 || price <= 0 || Boolean(troveBlock) : !picked || (door === "ve" ? !tokenId : n <= 0));
 
   return (
     <>
@@ -119,6 +132,8 @@ export default function Doors() {
                 <span className="unit">MUSD</span>
               </div>
               {!A.accountFactory && <p className="txnote error">Juu accounts run on the main stack only.</p>}
+              {A.accountFactory && troveBlock && n > 0 && <p className="txnote error">{troveBlock}</p>}
+              {A.accountFactory && troveWarn && <p className="txnote">{troveWarn}</p>}
             </>
           ) : (
             <>
@@ -156,6 +171,7 @@ export default function Doors() {
             <button type="button" className="btn-strong" style={{ height: 54, fontSize: 15 }} onClick={enter} disabled={disabled}>
               {busy(w.tx, "door") ? "ENTERING…" : "ENTER THROUGH THIS DOOR"}
             </button>
+            {shortBtc && <p className="txnote error">{shortBtc}</p>}
             <TxNote k="door" />
           </div>
         </div>

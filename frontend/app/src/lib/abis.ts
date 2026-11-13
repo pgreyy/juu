@@ -42,7 +42,9 @@ export const ABI = {
   pmarket: [
     "function quoteBuy(uint256 seriesId, uint256 btcIn) view returns (uint256)",
     "function buyP(uint256 seriesId, uint256 minPOut) payable returns (uint256)",
+    "function sellP(uint256 seriesId, uint256 amount, uint256 minBtcOut) returns (uint256)",
   ],
+  router: ["function getAmountsOut(uint256 amountIn, (address from, address to, bool stable, address factory)[] routes) view returns (uint256[])"],
   loop: ["function isOn(address) view returns (bool)", "function setLoop(bool on, uint256 seriesId)", "function eligible(address, uint256) view returns (bool)"],
   gateway: [
     "function grant(address agent, uint256 maxChips, uint8 maxFloor, uint256 dailyLossLimit, uint64 expiry, bool canSetLoop)",

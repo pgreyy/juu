@@ -326,3 +326,41 @@ docs/gitbook/ (GitBook, SUMMARY.md). Standing task: update them with every contr
 cd contracts && set -a && source ../.env && set +a
 FOUNDRY_EVM_VERSION=osaka forge script script/DeploySplitter.s.sol --rpc-url $MEZO_RPC_URL --broadcast --slow --gas-estimate-multiplier 150
 ```
+
+## App end to end on testnet, all remaining flows (13 Nov 2026)
+
+Driven through the app in a headless browser with the deployer as the wallet; every transaction status 1.
+
+* Door 01 BTC, demo page: zap 0.003 BTC into series 1 (31 Dec 26) tx 0x1a8f6f5bc32f2acf09a8ff77f05ae31f7301fc750f4281854ca39440b30ed836.
+* Door 02 veBTC: lock #1751 of 0.002 BTC made on Mezo first (tx 0xf462f2b5f595065d592077495fad20c947203ab01f161ca4ccdb8ca2d6fce3e8);
+  approve tx 0x569940f88a16c5b8265dfa36e4995158fb48d15f5523739b187b21680ce46db3, deposit into series 1
+  tx 0xcd4bc3978bd1dce641246c1dc2d2ec3df0b850dc2732a5df042f6b7a287f2644.
+* Door 03 sMUSD: 60 MUSD to sMUSD on Mezo first (tx 0xe5f8813efd862142871b8de070dd9fd130b6b95767fb951f538ff28c03323449); approve
+  tx 0x8582369b6508e0249c37e67ad310845c21fd0c1e61ab191a4ecb66294392ee69, deposit 50 into sMUSD series 0
+  tx 0xeed0f64f12164fb6c1a7df33ac02a88cd7ebc5dfae6ccb5852c90a4dc6dcab64.
+* Door 04 trove (main): not run. The wallet held 0.0146 BTC; Mezo's smallest loan needs about 0.032 BTC at 110%. The page
+  now refuses it before signing ("You have 0.0146 BTC in this wallet." / "Mezo needs at least 110% collateral").
+* Bank (demo): deposit 0.002 BTC tx 0x0d54b95065398ccda41e318f10b1ca1695a94077632148f8488d7e83b1feadc1, withdraw 0.0019 BTC
+  tx 0xddc83fc90db36e2b632063b13715033818c7dd1aacd202d638d3a78f2f4e2760 (an earlier deposit, tx 0x3f6a831d…8fa4, also stands).
+* Principal Market (series 1): buy 0.000005 BTC tx 0x240863e0757a6fc5a736f9c80e968b7f737a60d4cb40b246b8ba5962f2e3f8a3; sell
+  0.000005 P: approve tx 0xe850141b05163a68a1802f783ea01f76205d3f46de3038e5d150e7442b5fd5fd, sell
+  tx 0xdcb75e24086bd64f5c81cfef097be6eaf6b6938f5d6857aa6a82b50444636791.
+  Found on the first run: the page's default amount (0.0098 BTC) replaced the typed one and bought 0.000476 P for 0.009818 BTC
+  from a pool holding 0.0005 BTC (tx 0x40a62200…7227); a test sell then got 0.00305 BTC for 0.00001 P (tx 0xf28d1ec3…f903).
+  Pool repaired by selling 0.000468 P back (txs 0x9064d32a…ce5b, 0xe42bfb51…c659): price 0.975 BTC per P. Fixed: price impact
+  shown, orders above 5% refused (a 0.005 BTC order showed 1,022.92% and the button stayed off), typed amounts kept.
+* MUSDash with Yield chips (demo): open Bull floor 2 with 0.0015 Y-veBTC1: approve tx 0xd10734501d59621daf6f5740ed1b8d2c3d3ae2692ac9354c8b46ce6b5940dc13,
+  open tx 0xe985c2b1fa5f98dd2188d4ac8260812d11fbe96551a615107ff58e0a72c1ba64, cash out tx
+  0xfee64f5049cb7242e333720ac4757d4d70ad0c32364a8daafe5aeb5712922b20 (0.00149337 Y back). Agaruzo! shown.
+* MUSDash with Principal chips (demo): 0.0003 P-veBTC1: approve tx 0x75cf8a22382ecee28e03aff94d28dd59e72ca2d282a6056a87feb92d55bb43d9,
+  open tx 0xe7f3195eb86931bdb648d301e478b39e555f6186ddc73978d9cb816ea59f6dea, cash out tx
+  0x4accba4292c963a047bed157c2ecd4525c3f78ce9d204af5bf541f37148ef38b (0.00029878 P back). Agaruzo! shown.
+* Agent (demo): give permission to the test agent (max 20, floor 4, loss stop 50, 7 days) tx
+  0x7d45fed0ca21d4d67b4f2373a2cc97f355d803bb550edef37fd247ed3aadcb5b, MUSD allowance tx
+  0x15c72dd718a7e5a40ab80ee1c511db9e80a51a76fbe01a6cd3e083f7d13ca533. The agent then played 15 MUSD through the gateway: open
+  #7 tx 0xfc356b25f9a28070ad13fa1c6da875e2bd1720baac4de8550d9cfab650206863, close tx
+  0x07ba93f9e9a2abd8b7f8686eee9f3b8710cb67951294d0e3ea09499807a24510 (result -0.1597). The card showed "−0.16 ▼ LOSS TODAY".
+  The first permission attempt failed with Mezo's reasonless "missing revert data"; the app now retries such a call once.
+
+Keeper moved to the server (13 Nov 2026, 09:33 UTC): laptop keeper stopped first, state copied (jackpot secrets checksum
+matched), server keeper's first transactions: veBTC harvest series 0 tx 0xf2749c0e28627e5e152e2847a26f3c6dc50866aa1645eab5385f10c5de9f0d3e.

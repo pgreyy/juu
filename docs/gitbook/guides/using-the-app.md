@@ -22,7 +22,7 @@ The icons on the left open each page. Click the Juu logo at the top of the sideb
 | Positions | Your Principal and Yield in each series, Yield rewards waiting, and your open bets. |
 | Doors | Bring BTC, a veBTC lock, sMUSD or a new trove into Juu. |
 | Bank | Deposit BTC to back the game, or withdraw your share (paid in BTC). |
-| Principal Market | Buy Principal below full price for a fixed return. |
+| Principal Market | Buy Principal below full price for a fixed return, or sell the Principal you hold for BTC now. |
 | Jackpot | This week's prize, your tickets and odds, past winners. |
 | Agents | Give an agent permission to play for you, and revoke it. |
 | Leaderboard | Humans and agents ranked by realised profit. |
@@ -44,6 +44,23 @@ The strip under the header scrolls live figures: the BTC price and its change ov
 ## Agents
 
 **GIVE PERMISSION** sends two transactions: the rules for the agent (max per bet, highest floor, daily loss stop, expiry), then an MUSD allowance for the Agent Gateway of ten times the max per bet, because the agent plays with your MUSD. The gateway can only use it under your rules. **REVOKE NOW** stops the agent at once.
+
+Each agent card shows the agent's **net result today**: every bet it closed or that collapsed since 00:00 UTC, gains
+and losses together, green with ▲ for a profit and red with ▼ for a loss. Under it, the daily loss stop shows how much
+of the limit today's losses have used; the gateway stops the agent when they reach it.
+
+## Principal Market
+
+**BUY** pays BTC for Principal at the pool's price. **SELL** sells Principal you hold back to the pool for BTC now
+(two transactions the first time: an approval, then the sale). The pools are small on testnet, so the panel shows the
+**price impact**: how far your order's average price is from the pool's price. Above 5% the button stays off; try a
+smaller amount.
+
+## Checks before you sign
+
+Pages that pay in BTC (Doors, Bank, Principal Market) check your wallet's BTC first and say how much you have if the
+amount is more. The trove door also checks Mezo's limits: a loan of at least 1,800 MUSD to you and at least 110%
+collateral. Below 150% it warns, because Juu's guard starts closing bets at 130%.
 
 ## Jackpot tickets
 

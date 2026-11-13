@@ -8,14 +8,14 @@ import { ADDR } from "@/lib/addresses";
 import { stackAddr, usePoll, useStack } from "@/lib/data";
 import { call, useWallet } from "@/lib/wallet";
 
-type Session = { agent: string; active: boolean; expires: string; maxChipsMUSD: number; maxFloor: number; dailyLossLimitMUSD: number; lossTodayMUSD: number; canSetLoop: boolean };
+type Session = { agent: string; active: boolean; expires: string; maxChipsMUSD: number; maxFloor: number; dailyLossLimitMUSD: number; lossTodayMUSD: number; netTodayMUSD: number; canSetLoop: boolean };
 type Fee = { rateOfSize: number; minimumMUSD: number; toBuffer: number; toBank: number };
 
 function expiresText(iso: string) {
   const ms = new Date(iso).getTime() - Date.now();
   if (ms <= 0) return "Expired";
-  const d = Math.floor(ms / 86400000), h = Math.floor((ms % 86400000) / 3600000);
-  return d > 0 ? `In ${d} day${d === 1 ? "" : "s"}` : `In ${h} hour${h === 1 ? "" : "s"}`;
+  const h = Math.round(ms / 3600000), d = Math.round(ms / 86400000);
+  return h >= 36 ? `In ${d} days` : h >= 1 ? `In ${h} hour${h === 1 ? "" : "s"}` : "In under an hour";
 }
 
 export default function Agents() {
@@ -80,14 +80,14 @@ export default function Agents() {
                 <span style={{ fontFamily: "var(--fD)", fontWeight: 700, fontSize: 22 }} title={a.agent}>{shortAddr(a.agent)}</span>
                 <span className={"st" + (on ? " on" : "")}>{on ? "ACTIVE" : expired && a.active ? "EXPIRED" : "REVOKED"}</span>
               </div>
-              <div className={"mono " + (a.lossTodayMUSD > 0 ? "c-bear" : "c-ink")} style={{ fontSize: 30, marginTop: 10 }}>
-                {a.lossTodayMUSD > 0 ? "−" + fmt(a.lossTodayMUSD, 2) : "0.00"}
+              <div className={"mono " + (a.netTodayMUSD > 0.005 ? "c-bull" : a.netTodayMUSD < -0.005 ? "c-bear" : "c-ink")} style={{ fontSize: 30, marginTop: 10 }}>
+                {a.netTodayMUSD > 0.005 ? "+" + fmt(a.netTodayMUSD, 2) : a.netTodayMUSD < -0.005 ? "−" + fmt(-a.netTodayMUSD, 2) : "0.00"}
               </div>
-              <div className="label">LOSS TODAY</div>
+              <div className="label">{a.netTodayMUSD > 0.005 ? "▲ PROFIT TODAY" : a.netTodayMUSD < -0.005 ? "▼ LOSS TODAY" : "NET TODAY"} · MUSD</div>
               <dl className="readout" style={{ marginTop: 14 }}>
                 <dt>Max per bet</dt><dd>{fmt(a.maxChipsMUSD)} MUSD</dd>
                 <dt>Highest floor</dt><dd>Up to {a.maxFloor}</dd>
-                <dt>Daily loss stop</dt><dd>{fmt(a.dailyLossLimitMUSD)} MUSD</dd>
+                <dt>Daily loss stop</dt><dd>{fmt(a.lossTodayMUSD, 2)} of {fmt(a.dailyLossLimitMUSD)} MUSD used</dd>
                 <dt>Expires</dt><dd>{expiresText(a.expires)}</dd>
               </dl>
               <button
