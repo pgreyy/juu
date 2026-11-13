@@ -1,8 +1,8 @@
 "use client";
-import { Footer, Icon, StackMark, Wordmark, ThemeToggle, Ticker, shortAddr, tickerItems, type TickItem } from "@juu/ui";
+import { Footer, Icon, StackMark, THEME_LABEL, ThemeIcon, ThemeToggle, Ticker, Wordmark, shortAddr, tickerItems, useTheme, type ThemeChoice, type TickItem } from "@juu/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { stackAddr, useStack } from "@/lib/data";
 import { useMarket } from "@/lib/market";
 import { EXPLORER, useWallet } from "@/lib/wallet";
@@ -78,7 +78,8 @@ function WalletButton() {
         aria-expanded={open || undefined}
         title={w.address ? `${w.walletName ?? "Wallet"} · ${w.address}` : "Connect a wallet on Mezo testnet (chain 31611)"}
       >
-        {text}
+        <span className="lbl-long">{text}</span>
+        <span className="lbl-short">{w.connecting ? "…" : !w.address ? "CONNECT" : !w.chainOk ? "SWITCH" : shortAddr(w.address)}</span>
       </button>
       {open && (
         <div className="wallet-menu" role="menu" aria-label="Choose a wallet">
@@ -118,6 +119,80 @@ function useTicker(): TickItem[] {
   });
 }
 
+// Phones (under 768px): a bottom tab bar instead of the sidebar, and a menu for the rest.
+const MOBILE_TABS = [
+  { href: "/", label: "MUSDash", icon: "musdash" },
+  { href: "/doors", label: "Doors", icon: "doors" },
+  { href: "/bank", label: "Bank", icon: "bank" },
+  { href: "/leaderboard", label: "Leaders", icon: "leaderboard" },
+  { href: "/portfolio", label: "Portfolio", icon: "portfolio" },
+];
+
+function MobileTabs() {
+  const path = usePathname();
+  return (
+    <nav className="mtabs" aria-label="Main">
+      {MOBILE_TABS.map((t) => {
+        const cur = t.href === "/" ? path === "/" : path.startsWith(t.href);
+        return (
+          <Link key={t.href} href={t.href} className="mtab" aria-current={cur ? "page" : undefined}>
+            <span className="ic" aria-hidden="true"><Icon name={t.icon} size={22} /></span>
+            <span className="nm">{t.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+function MobileMenu() {
+  const [open, setOpen] = useState(false);
+  const [theme, pickTheme] = useTheme();
+  const wrap = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onDown = (e: Event) => !wrap.current?.contains(e.target as Node) && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("touchstart", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("touchstart", onDown);
+    };
+  }, [open]);
+  const close = () => setOpen(false);
+  return (
+    <div className="mmenu-wrap" ref={wrap}>
+      <button type="button" className="hbtn mmenu-btn" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen(!open)}>
+        <span aria-hidden="true">{open ? "✕" : "☰"}</span>
+      </button>
+      {open && (
+        <div className="mmenu" role="menu" aria-label="More">
+          <Link href="/principal-market" role="menuitem" className="mmenu-item" onClick={close}>
+            <Icon name="principal-market" size={20} /> <span>Principal Market</span>
+          </Link>
+          <Link href="/agents" role="menuitem" className="mmenu-item" onClick={close}>
+            <Icon name="agents" size={20} /> <span>Agents</span>
+          </Link>
+          <a href="https://playjuu.xyz/docs" role="menuitem" className="mmenu-item" onClick={close}>
+            <span className="mmenu-doc" aria-hidden="true">?</span> <span>Docs</span>
+          </a>
+          <div className="mmenu-label">THEME</div>
+          <div className="mmenu-theme" role="group" aria-label="Theme">
+            {(["light", "dark", "system"] as ThemeChoice[]).map((c) => (
+              <button key={c} type="button" role="menuitemradio" aria-checked={theme === c} onClick={() => { pickTheme(c); close(); }}>
+                <ThemeIcon c={c} /> <span>{THEME_LABEL[c]}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Shell({ children }: { children: React.ReactNode }) {
   const { stack } = useStack();
   const ticker = useTicker();
@@ -137,9 +212,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <span className="tag">THE MUSDASH TOTE</span>
             </Link>
             <div className="head-right">
-              {stack === "demo" && <span className="stack-badge" title="Demo stack: the owner can set the price">DEMO STACK</span>}
-              <ThemeToggle />
+              {stack === "demo" && <span className="stack-badge" title="Demo stack: the owner can set the price"><span className="lbl-long">DEMO STACK</span><span className="lbl-short">DEMO</span></span>}
+              <span className="desk-only"><ThemeToggle /></span>
               <WalletButton />
+              <MobileMenu />
             </div>
       </header>
       <Ticker items={ticker} />
@@ -165,6 +241,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           />
         </div>
       </div>
+      <MobileTabs />
     </div>
   );
 }

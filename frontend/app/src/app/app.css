@@ -279,3 +279,39 @@ main.main p, .lede, .note { max-width: 72ch; }
 .jp-burstwrap { overflow: hidden; }
 .jp-burstwrap .juu-burst { flex: 0 0 auto; max-width: none !important; }
 @media (max-width: 600px) { .jp-burstwrap { height: 300px; align-items: center; } .jp-burstwrap .juu-burst { transform: scale(0.62); } }
+
+/* ---------------------------------------------------------------- Phones (under 768px): bottom tab bar + menu */
+.lbl-short, .mmenu-wrap, .mtabs { display: none; }
+.desk-only { display: contents; }
+@media (max-width: 767px) {
+  .rail { display: none; }
+  .desk-only { display: none; }
+  .lbl-long { display: none; }
+  .lbl-short { display: inline; }
+  .head { flex-wrap: nowrap; gap: 8px; padding: 10px 12px; }
+  .brand { gap: 8px; min-width: 0; }
+  .brand .tag { display: none; }
+  .head-right { flex-wrap: nowrap; gap: 6px; }
+  .head .hbtn, .head .stack-badge { height: 44px; padding: 0 10px; }
+  .head .stack-badge { font-size: 10px; letter-spacing: 0.08em; }
+  .mmenu-wrap { display: block; position: relative; }
+  .mmenu-btn { width: 44px; padding: 0 !important; font-size: 20px; line-height: 1; }
+  .mmenu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 80; min-width: 230px; background: var(--surf); color: var(--ink); border: 1.5px solid var(--rule); padding: 6px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); }
+  .mmenu-item { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 10px; color: var(--ink); text-decoration: none; font-family: var(--fB); font-size: 15px; }
+  .mmenu-item:active, .mmenu-item:hover { background: var(--sel); }
+  .mmenu-doc { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid currentColor; border-radius: 50%; font-family: var(--fN); font-size: 12px; }
+  .mmenu-label { margin: 8px 10px 4px; font-family: var(--fN); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); }
+  .mmenu-theme { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 0 4px 4px; }
+  .mmenu-theme button { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 56px; background: transparent; color: var(--ink); border: 1.5px solid var(--rule2); font-family: var(--fN); font-size: 11px; }
+  .mmenu-theme button[aria-checked="true"] { border-color: var(--rule); background: var(--sel); }
+  /* The bottom tab bar: fixed, never hides; pages scroll under it. */
+  .mtabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
+    padding-bottom: env(safe-area-inset-bottom, 0px); border-top: 1.5px solid var(--rule);
+    background: color-mix(in srgb, var(--surf) 92%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .mtab { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 58px; color: var(--muted); text-decoration: none; font-family: var(--fN); font-size: 10px; letter-spacing: 0.04em; }
+  .mtab .ic { display: flex; }
+  .mtab[aria-current="page"] { color: var(--ink); font-weight: 600; }
+  .mtab[aria-current="page"]::before { content: ""; position: absolute; top: 6px; left: calc(50% - 20px); width: 6px; height: 6px; border-radius: 50%; background: var(--bull); }
+  /* Every page's last content (and the footer) scrolls fully above the bar. */
+  .page { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+}

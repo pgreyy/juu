@@ -41,18 +41,10 @@ function saved(): Choice {
   return "system";
 }
 
-/**
- * Theme button: icon only, opens Light / Dark / System. System (the default for new visitors) follows the device
- * setting, live. The choice is remembered in this browser; the head script applies it before the first paint.
- */
-export function ThemeToggle({ className = "hbtn quiet" }: { className?: string }) {
+/** The theme choice (Light / Dark / System), remembered in this browser; System follows the device, live. */
+export function useTheme(): [Choice, (c: Choice) => void] {
   const [choice, setChoice] = useState<Choice>("system");
-  const [open, setOpen] = useState(false);
-  const wrap = useRef<HTMLDivElement>(null);
-
   useEffect(() => setChoice(saved()), []);
-
-  // While on System, follow the device when it switches between light and dark.
   useEffect(() => {
     if (choice !== "system") return;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -60,6 +52,28 @@ export function ThemeToggle({ className = "hbtn quiet" }: { className?: string }
     mq.addEventListener("change", on);
     return () => mq.removeEventListener("change", on);
   }, [choice]);
+  const pick = (c: Choice) => {
+    setChoice(c);
+    try {
+      if (c === "system") localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, c);
+    } catch {}
+    apply(c);
+  };
+  return [choice, pick];
+}
+
+export { ThemeIcon, LABEL as THEME_LABEL };
+export type { Choice as ThemeChoice };
+
+/**
+ * Theme button: icon only, opens Light / Dark / System. System (the default for new visitors) follows the device
+ * setting, live. The choice is remembered in this browser; the head script applies it before the first paint.
+ */
+export function ThemeToggle({ className = "hbtn quiet" }: { className?: string }) {
+  const [choice, pickTheme] = useTheme();
+  const [open, setOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -74,13 +88,8 @@ export function ThemeToggle({ className = "hbtn quiet" }: { className?: string }
   }, [open]);
 
   const pick = (c: Choice) => {
-    setChoice(c);
     setOpen(false);
-    try {
-      if (c === "system") localStorage.removeItem(KEY);
-      else localStorage.setItem(KEY, c);
-    } catch {}
-    apply(c);
+    pickTheme(c);
   };
 
   return (

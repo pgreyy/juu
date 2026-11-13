@@ -1,12 +1,15 @@
 import "@juu/ui/juu.css";
 import "./app.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { FONTS_URL, THEME_SCRIPT } from "@juu/ui";
 import { Shell } from "@/components/Shell";
 import { StackProvider } from "@/lib/data";
 import { MarketProvider } from "@/lib/market";
 import { WalletProvider } from "@/lib/wallet";
 
+
+// viewport-fit=cover lets the bottom tab bar use the phone's safe area (env(safe-area-inset-bottom)).
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://app.playjuu.xyz"),
