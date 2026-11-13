@@ -1,8 +1,8 @@
 "use client";
-import { Footer, Icon, StackMark, Ticker, amt, fmt, pad2, shortAddr, signed, type TickItem } from "@juu/ui";
+import { Footer, Icon, StackMark, ThemeToggle, Ticker, shortAddr, tickerItems, type TickItem } from "@juu/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { stackAddr, useStack } from "@/lib/data";
 import { useMarket } from "@/lib/market";
 import { EXPLORER, useWallet } from "@/lib/wallet";
@@ -44,24 +44,6 @@ function Rail() {
   );
 }
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(false);
-  useEffect(() => setDark(document.documentElement.dataset.theme === "dark"), []);
-  const flip = () => {
-    const next = !dark;
-    document.documentElement.dataset.theme = next ? "dark" : "light";
-    try {
-      localStorage.setItem("juu-theme", next ? "dark" : "light");
-    } catch {}
-    setDark(next);
-  };
-  return (
-    <button type="button" className="hbtn quiet" onClick={flip} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
-      {dark ? "LIGHT" : "DARK"}
-    </button>
-  );
-}
-
 function WalletButton() {
   const w = useWallet();
   const text = w.connecting ? "CONNECTING…" : !w.address ? "CONNECT WALLET" : !w.chainOk ? "SWITCH TO MEZO TESTNET" : shortAddr(w.address);
@@ -74,39 +56,18 @@ function WalletButton() {
 
 function useTicker(): TickItem[] {
   const m = useMarket();
-  const t: TickItem[] = [];
-  const price = m.floors?.price;
-  t.push({
-    label: "BTC / USD",
-    value: price ? "$" + fmt(price, 2) : "—",
-    sub: m.change == null ? undefined : (m.change >= 0 ? "▲ " : "▼ ") + fmt(Math.abs(m.change) * 100, 2) + "%",
-    subTone: m.change == null ? "muted" : m.change >= 0 ? "bull" : "bear",
+  return tickerItems({
+    price: m.floors?.price,
+    change: m.change,
+    sides: m.sides,
+    funding: m.funding,
+    jackpot: m.jackpot,
+    lastCollapse: m.feed?.find((f) => f.kind === "collapse") || null,
+    feedLoaded: Boolean(m.feed),
+    climb: m.climb,
+    topAgent: m.agents?.ranking?.[0] || null,
+    agentsLoaded: Boolean(m.agents),
   });
-  const bull = m.sides?.bull ?? 0, bear = m.sides?.bear ?? 0, oi = bull + bear;
-  t.push({
-    label: "OPEN INTEREST",
-    value: m.sides ? amt(oi) : "—",
-    sub: oi > 0 ? `${Math.round((bull / oi) * 100)}% bull · ${Math.round((bear / oi) * 100)}% bear` : "nothing open yet",
-    burst: { bullShare: oi > 0 ? bull / oi : null },
-  });
-  t.push({ label: "BULL OPEN", value: m.sides ? amt(bull) : "—", tone: "bull" });
-  t.push({ label: "BEAR OPEN", value: m.sides ? amt(bear) : "—", tone: "bear" });
-  const fb = m.funding?.bullPaysPerHour ?? 0, fr = m.funding?.bearPaysPerHour ?? 0;
-  t.push({
-    label: "FUNDING",
-    value: m.funding ? fmt(Math.max(fb, fr, 0) * 100, 4) + "%/h" : "—",
-    sub: !m.funding ? undefined : fb > 0 ? "bulls pay" : fr > 0 ? "bears pay" : "balanced",
-  });
-  t.push({ label: "SAFETY JAR", value: m.jackpot ? amt(m.jackpot.bufferMUSD) : "—", sub: "MUSD" });
-  t.push({ label: "JACKPOT", value: m.jackpot ? amt(m.jackpot.jackpotNowMUSD) : "—", tone: "hi", sub: "draws Thu" });
-  const col = m.feed?.find((f) => f.kind === "collapse");
-  if (col) t.push({ label: col.floor ? "FLOOR " + pad2(col.floor) : "COLLAPSE", value: col.side === "Bear" ? "BEARS DOWN" : "BULLS DOWN", tone: "bear" });
-  else t.push({ label: "COLLAPSES", value: "none yet", tone: "muted" });
-  const f10 = m.climb?.floors.find((f) => f.floor === 10);
-  t.push({ label: "FLOOR 10 PREMIUM", value: !m.climb ? "—" : m.climb.premiumOn ? fmt(f10?.nextSeatPremium ?? 0, 2) + " MUSD" : "off", tone: "hi" });
-  const top = m.agents?.ranking?.[0];
-  t.push({ label: "TOP AGENT", value: top ? `${shortAddr(top.player)} ${signed(top.profitMUSD)}` : "none yet", tone: top ? (top.profitMUSD >= 0 ? "bull" : "bear") : "muted" });
-  return t;
 }
 
 export function Shell({ children }: { children: React.ReactNode }) {

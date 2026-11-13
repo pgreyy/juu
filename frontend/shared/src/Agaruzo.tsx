@@ -1,9 +1,9 @@
 import { pad2 } from "./lib";
 
 /** The climb cheer. Show for 1.8 s beside the page title; it never blocks play. */
-export function Agaruzo({ floor }: { floor: number }) {
+export function Agaruzo({ floor, decorative = false }: { floor: number; decorative?: boolean }) {
   return (
-    <div role="status" className="agaruzo">
+    <div role={decorative ? undefined : "status"} aria-hidden={decorative || undefined} className="agaruzo">
       <span className="big">AGARUZO!</span>
       <span className="small">FLOOR {pad2(floor)}</span>
     </div>

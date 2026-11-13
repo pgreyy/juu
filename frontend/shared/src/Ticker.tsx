@@ -23,7 +23,7 @@ function Item({ k, dup }: { k: TickItem; dup: boolean }) {
 /** Market ticker: scrolls left in a seamless loop (content twice, 52 s per loop), pauses on hover. */
 export function Ticker({ items }: { items: TickItem[] }) {
   return (
-    <div className="juu-tickwrap" role="region" aria-label="Market ticker">
+    <div className="juu-tickwrap" role="region" aria-label="Market ticker (focus or tap to pause)" tabIndex={0}>
       <div className="juu-tick">
         {items.map((k, i) => <Item key={"a" + i} k={k} dup={false} />)}
         {items.map((k, i) => <Item key={"b" + i} k={k} dup={true} />)}

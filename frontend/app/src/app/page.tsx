@@ -9,7 +9,7 @@ import { stackAddr, usePoll, useRead, useStack } from "@/lib/data";
 import { hhmm, seriesShort } from "@/lib/format";
 import { useMarket } from "@/lib/market";
 import type { BankRes, FeedItem, Pos } from "@/lib/types";
-import { EXPLORER, call, read, useWallet } from "@/lib/wallet";
+import { call, read, useWallet } from "@/lib/wallet";
 
 type Chip = "MUSD" | "Y" | "P";
 const SIDE_NUM = { Bull: 0, Bear: 1 } as const;
@@ -151,7 +151,7 @@ export default function MUSDash() {
             return (
               <div className="live-row" key={e.tx + e.kind + (e.id ?? "")}>
                 <span className="t">{hhmm(e.time)}</span>
-                <a className={l.c} href={`${EXPLORER}/tx/${e.tx}`} target="_blank" rel="noreferrer">{l.m}</a>
+                <span className={l.c}>{l.m}</span>
               </div>
             );
           })}

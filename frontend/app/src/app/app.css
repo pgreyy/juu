@@ -23,7 +23,7 @@
 
 /* Header */
 .head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 32px 14px; }
-.brand { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; text-decoration: none; color: inherit; }
+.brand { display: flex; align-items: center; min-height: 44px; gap: 14px; flex-wrap: wrap; text-decoration: none; color: inherit; }
 .brand .word { font-family: var(--fD); font-weight: 700; font-size: 38px; letter-spacing: 0.04em; line-height: 1; }
 .brand .tag { font-family: var(--fN); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
 .head-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -57,7 +57,7 @@ main.main { flex: 1; min-width: 0; padding: 24px 32px 32px; }
 .check input { width: 18px; height: 18px; accent-color: var(--ink); margin: 0; }
 
 /* Tables */
-.tbl-wrap { overflow-x: auto; }
+.tbl-wrap { overflow-x: auto; position: relative; }
 .tbl { width: 100%; border-collapse: collapse; font-family: var(--fN); font-size: 14px; }
 .tbl th { text-align: right; padding: 10px 0; font-weight: 400; font-size: 11px; letter-spacing: 0.12em; color: var(--muted); border-bottom: 1.5px solid var(--rule); }
 .tbl th:first-child { text-align: left; }

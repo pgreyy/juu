@@ -1,4 +1,4 @@
-import { FLOORS, amt, collapsePrice, fmt, pad2, usd } from "./lib";
+import { FLOORS, amt, collapsePrice, fmt, lev, pad2, usd } from "./lib";
 
 export type LadderRow = { floor: number; bullPool: number; bearPool: number };
 
@@ -45,7 +45,7 @@ export function Ladder({
         return (
           <Tag
             key={n}
-            {...(onPick ? { type: "button" as const, onClick: () => onPick(n), "aria-pressed": selected === n, "aria-label": `Pick floor ${n}` } : {})}
+            {...(onPick ? { type: "button" as const, onClick: () => onPick(n), "aria-pressed": selected === n, "aria-label": `Pick floor ${n}, ${lev(n)}×` + (mark == null ? "" : `, bull falls at ${usd(collapsePrice(mark, n, "Bull"))}, bear falls at ${usd(collapsePrice(mark, n, "Bear"))}`) } : {})}
             className={"ladder-row ladder-grid" + (flash === n ? " flash" : "")}
             style={!onPick && selected === n ? { background: "var(--sel)" } : undefined}
           >

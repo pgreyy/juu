@@ -6,3 +6,5 @@ export * from "./Ticker";
 export * from "./Ladder";
 export * from "./Agaruzo";
 export * from "./Footer";
+export * from "./tickerData";
+export * from "./ThemeToggle";
