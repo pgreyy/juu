@@ -36,7 +36,7 @@ export default function Positions() {
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 12 }}>
         <div>
           <div className="label">TOTAL IN JUU</div>
-          <div className="big-num">{w.address ? (bals ? btc(total) : "…") : "—"} <span className="u">BTC</span></div>
+          <div className="big-num">{w.address && !bals ? "…" : btc(w.address ? total : 0)} <span className="u">BTC</span></div>
         </div>
         {w.address && (
           <label className="check" style={{ fontSize: 14 }}>

@@ -58,15 +58,15 @@ export default function Bank() {
   return (
     <>
       <div className="label">YOUR SHARE OF THE BANK</div>
-      <div className="big-num">{w.address ? (chain ? btc(shareBTC) : "…") : "—"} <span className="u">BTC</span></div>
+      <div className="big-num">{w.address && !chain ? "…" : btc(w.address ? shareBTC : 0)} <span className="u">BTC</span></div>
       <div className="stats">
-        <div className="stat"><div className="k">BANK HOLDS</div><div className="v">{chain ? btc(chain.assets) + " BTC" : "—"}</div></div>
+        <div className="stat"><div className="k">BANK HOLDS</div><div className="v">{btc(chain?.assets ?? 0) + " BTC"}</div></div>
         <div className="stat">
           <div className="k">TROVE SAFETY</div>
-          <div className={"v " + (cr == null ? "" : cr >= 1.5 ? "c-bull" : "c-bear")}>{cr == null ? "—" : fmt(cr * 100) + "%"}</div>
+          <div className={"v " + (cr == null ? "" : cr >= 1.5 ? "c-bull" : "c-bear")}>{fmt((cr ?? 0) * 100) + "%"}</div>
         </div>
-        <div className="stat"><div className="k">MUSD TO PAY WINNERS</div><div className="v">{bank.data ? amt(bank.data.liquidityMUSD) : "—"}</div></div>
-        <div className="stat"><div className="k">CASH RESERVE RULE</div><div className="v c-hi">{bank.data ? fmt(bank.data.cashReserve.share * 100) + "% MUSD" : "—"}</div></div>
+        <div className="stat"><div className="k">MUSD TO PAY WINNERS</div><div className="v">{amt(bank.data?.liquidityMUSD ?? 0)}</div></div>
+        <div className="stat"><div className="k">CASH RESERVE RULE</div><div className="v c-hi">{fmt((bank.data?.cashReserve.share ?? 0) * 100) + "% MUSD"}</div></div>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 32, marginTop: 24 }}>
         <section style={{ flex: "1 1 340px", minWidth: 0 }}>

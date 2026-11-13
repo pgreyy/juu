@@ -13,7 +13,7 @@ const PREVIEW: LadderRow[] = [
 
 function EnterButton({ small = false }: { small?: boolean }) {
   return (
-    <a className={"btn strong" + (small ? " small" : "")} href={APP + "/"}>
+    <a className={"btn primary" + (small ? " small" : "")} href={APP + "/"}>
       Enter MUSDash
     </a>
   );
@@ -23,7 +23,7 @@ export default function Landing() {
   return (
     <div className="lp-page">
       <div className="lp-card">
-        <header className="lp-head">
+        <header className="lp-head juu-head">
           <a href="#top" className="lp-brand" aria-label="Juu">
             <StackMark size={40} />
             <span className="word">JUU</span>
@@ -44,7 +44,7 @@ export default function Landing() {
         <LiveTicker />
 
         <main id="top">
-          <section className="lp-sec first lp-hero" aria-labelledby="hero-h">
+          <section className="lp-sec first lp-hero s-sand1" aria-labelledby="hero-h">
             <div>
               <div className="label">GAMIFIED BITCOIN MONEY LAYER ON MEZO</div>
               <h1 id="hero-h" className="lp-h1">
@@ -71,7 +71,7 @@ export default function Landing() {
             </div>
           </section>
 
-          <section id="how" className="lp-sec" aria-labelledby="how-h">
+          <section id="how" className="lp-sec s-sand2" aria-labelledby="how-h">
             <div className="label">HOW IT WORKS</div>
             <h2 id="how-h" className="lp-h2">Bring it in. Split it. Use it.</h2>
             <div className="lp-steps">
@@ -90,9 +90,12 @@ export default function Landing() {
                 </div>
               ))}
             </div>
+            <div className="lp-sec-cta">
+              <a className="btn olive small" href={APP + "/doors"}>Open the Doors</a>
+            </div>
           </section>
 
-          <section id="musdash" className="lp-sec lp-split" aria-labelledby="dash-h">
+          <section id="musdash" className="lp-sec lp-split s-olive1" aria-labelledby="dash-h">
             <div>
               <div className="lp-titlerow" style={{ justifyContent: "flex-start", marginBottom: 0 }}>
                 <span className="label">MUSDASH</span>
@@ -113,7 +116,7 @@ export default function Landing() {
             <LiveLadder />
           </section>
 
-          <section id="earn" className="lp-sec" aria-labelledby="earn-h">
+          <section id="earn" className="lp-sec s-sand1" aria-labelledby="earn-h">
             <div className="label">EARN</div>
             <h2 id="earn-h" className="lp-h2">Don&apos;t want to play?</h2>
             <div className="lp-earn">
@@ -123,20 +126,48 @@ export default function Landing() {
                 <h3>Back the game, earn from it.</h3>
                 <div><div className="stat">300%</div><div className="label" style={{ marginTop: 6 }}>THE BANK&apos;S TROVE COLLATERAL RATIO</div></div>
                 <p>Deposit BTC and the Bank backs the game with MUSD from its own Mezo trove, which runs at 300%. You are paid out in BTC.</p>
-                <a className="btn line small go" href={APP + "/bank"}>Open the Bank</a>
+                <a className="btn olive small go" href={APP + "/bank"}>Open the Bank</a>
               </div>
-              <div className="lp-block panel">
+              <div className="lp-block olive">
                 <span className="lp-icon" aria-hidden="true"><Icon name="principal-market" size={24} /></span>
-                <div className="label" style={{ color: "var(--onPanel)" }}>PRINCIPAL MARKET</div>
+                <div className="label">PRINCIPAL MARKET</div>
                 <h3>Buy Bitcoin below full price.</h3>
-                <div><div className="stat">0.9604 <span style={{ fontSize: 18 }}>BTC</span></div><div className="label" style={{ marginTop: 6, color: "var(--onPanel)" }}>PAID FOR ONE PRINCIPAL IN TESTING</div></div>
+                <div><div className="stat">0.9604 <span style={{ fontSize: 18 }}>BTC</span></div><div className="label" style={{ marginTop: 6 }}>PAID FOR ONE PRINCIPAL IN TESTING</div></div>
                 <p>About 4% below full value. Each Principal is redeemed for one full Bitcoin after its end date.</p>
-                <a className="btn line small go" href={APP + "/principal-market"}>Open the Principal Market</a>
+                <a className="btn primary small go" href={APP + "/principal-market"}>Open the Principal Market</a>
               </div>
             </div>
           </section>
 
-          <section id="agents" className="lp-sec lp-split" aria-labelledby="agents-h">
+          <section className="lp-sec lp-jack s-sand2" aria-labelledby="jack-h">
+            <div className="lp-burstwrap"><JackpotBurst /></div>
+            <div>
+              <div className="label">JACKPOT</div>
+              <h2 id="jack-h" className="lp-h2">The safety jar spills over every week.</h2>
+              <p className="lp-p">Every week the safety jar&apos;s overflow becomes a jackpot. Tickets = position size × time held.</p>
+              <div className="lp-bigstat">0.431 <span className="u">MUSD</span></div>
+              <div className="label" style={{ marginTop: 8 }}>THE FIRST DRAW PAID</div>
+              <div className="lp-sec-cta">
+                <a className="btn line small" href={APP + "/jackpot"}>See this week&apos;s jackpot</a>
+              </div>
+            </div>
+          </section>
+
+          <section className="lp-sec lp-final s-olive2" aria-labelledby="final-h">
+            <div className="label">MUSDASH</div>
+            <h2 id="final-h" className="lp-h1">Ten floors are waiting.</h2>
+            <div className="lp-ctas"><EnterButton /></div>
+            <div className="lp-floors" aria-label="The ten floors and their leverage">
+              {LEV.map((l, i) => (
+                <div key={i} className={"floor-badge" + (i + 1 >= 7 ? " hi" : "")}>
+                  <span className="k">{l}×</span>
+                  <span className="n">{pad2(i + 1)}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section id="agents" className="lp-sec lp-split s-band" aria-labelledby="agents-h">
             <div>
               <div className="label">AGENTS VS HUMANS</div>
               <h2 id="agents-h" className="lp-h2">Let your agent play. You set the rules.</h2>
@@ -155,37 +186,15 @@ export default function Landing() {
                   <dt>Revoke</dt><dd>any time</dd>
                 </dl>
               </div>
+              <div className="lp-sec-cta">
+                <a className="btn sand small" href={APP + "/agents"}>Give your agent permission</a>
+              </div>
             </div>
             <div>
               <div className="lp-titlerow" style={{ marginBottom: 0 }}>
                 <span className="label">LEADERBOARD · SAME RULES, SAME TOWER</span>
               </div>
               <BoardPreview appUrl={APP} />
-            </div>
-          </section>
-
-          <section className="lp-sec lp-jack" aria-labelledby="jack-h">
-            <div className="lp-burstwrap"><JackpotBurst /></div>
-            <div>
-              <div className="label">JACKPOT</div>
-              <h2 id="jack-h" className="lp-h2">The safety jar spills over every week.</h2>
-              <p className="lp-p">Every week the safety jar&apos;s overflow becomes a jackpot. Tickets = position size × time held.</p>
-              <div className="lp-bigstat">0.431 <span className="u">MUSD</span></div>
-              <div className="label" style={{ marginTop: 8 }}>THE FIRST DRAW PAID</div>
-            </div>
-          </section>
-
-          <section className="lp-sec lp-final" aria-labelledby="final-h">
-            <div className="label">MUSDASH</div>
-            <h2 id="final-h" className="lp-h1">Ten floors are waiting.</h2>
-            <div className="lp-ctas"><EnterButton /></div>
-            <div className="lp-floors" aria-label="The ten floors and their leverage">
-              {LEV.map((l, i) => (
-                <div key={i} className={"floor-badge" + (i + 1 >= 7 ? " hi" : "")}>
-                  <span className="k">{l}×</span>
-                  <span className="n">{pad2(i + 1)}</span>
-                </div>
-              ))}
             </div>
           </section>
         </main>

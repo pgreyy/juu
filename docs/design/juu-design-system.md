@@ -26,7 +26,10 @@ Final pick: Logo Stack · Colour Ascension, light by default with a dark mode ·
 | bear | #BA3118 | #F24A2C | bear text, losses, collapse prices, danger |
 | bullBar | #1FAF66 | #3DDC84 | bull bars and depth shading |
 | bearBar | #E2452A | #F04427 | bear bars and depth shading |
-| hi | #6B7300 | #E6F05A | floors 7 to 10, jackpot, Agaruzo |
+| hi | #5A6100 | #E6F05A | floors 7 to 10, jackpot, Agaruzo |
+| head | #D9DDB5 | #262A15 | top bar with the logo (app and landing) |
+| onHead | #101010 | #B8C24A | logo, wordmark, buttons on the top bar |
+| headMuted | #55524B | #A3AA6A | tagline on the top bar |
 | sel | #ECE6D8 | #1E1E1E | selected row |
 
 - Bull is always green. Bear is always red. Gains use bull, losses and danger use bear.
@@ -35,6 +38,34 @@ Final pick: Logo Stack · Colour Ascension, light by default with a dark mode ·
   the reference's #12804A, #C8361B and #F04427, which fell short of 4.5:1 on surf and sel: light bull on sel is now
   4.63, light bear on sel 4.77, dark bear on sel 4.6. Bars, lines and rays keep the reference colours.
 
+
+### Landing shades (13 Nov 2026)
+
+Two families so each landing section has its own shade. Bull and bear keep their meaning (gain and loss) only.
+
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| sand1 | #F4F0E6 | #12110E | hero, Earn section, cards in "Bring it in", ticker |
+| sand2 | #E9E3D3 | #1A1914 | "Bring it in", Jackpot, the Bank card |
+| sand3 | #DCD4BF | #23211B | page frame and footer |
+| olive1 | #EEF0DC | #1B1D12 | MUSDash section |
+| olive2 | #D9DDB5 | #262A15 | Principal Market card, "Ten floors are waiting." |
+| oliveX | #5F6600 | #B8C24A | secondary button fill (text: sand1 light, #12110E dark) |
+| band | #101010 | #0A0A08 | the Agents ink band; text #F4F0E6 / #E9E3D3, muted #9A9384 |
+
+Buttons: primary = ink fill (#101010 with sand text; dark: #F0E9D8 with #12110E text), secondary = olive fill,
+tertiary = outline, sand fill on the ink band. Each section uses the style that fits its background.
+
+Contrast (4.5:1 or more, checked by computation and on the rendered pages at 12 widths in both themes):
+* `hi` moved from #6B7300 to **#5A6100** in light: the old shade fell to 3.49 on sand3 and 3.67 on olive2.
+* bull, bear, hi and the olive accent are never used as text on sand3, olive2 or the top bar (they fall below 4.5 there);
+  those surfaces carry ink and muted text only.
+* The selected ▲ BULL / BEAR ▼ buttons fill with bull / bear (#0F7543, #BA3118) instead of bullLine / bearLine
+  (#12804A gave 4.46 with sand text).
+* On the ink band, bull and bear use their dark-theme shades (#3DDC84, #F24A2C).
+
+Width: the landing stops at 1280px and the app at 1440px, centred, so big monitors don't stretch them.
+The ticker strip is one line tall (about 30px).
 
 ## 2. Type
 

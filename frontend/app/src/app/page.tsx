@@ -239,7 +239,7 @@ export default function MUSDash() {
                 Loop winnings into my BTC lock
               </label>
             )}
-            <TxNote k={["move", "loop"]} />
+            <TxNote k={["move", "loop"]} wallet={false} />
           </div>
         </section>
       </aside>

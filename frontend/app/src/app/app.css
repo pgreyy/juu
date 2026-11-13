@@ -2,6 +2,8 @@
 
 .page { min-height: 100vh; background: var(--bg); color: var(--ink); font-family: var(--fB); padding: 24px 28px 32px; }
 .card { min-width: 0; background: var(--surf); border: 1.5px solid var(--rule); min-height: 1340px; display: flex; overflow: clip; }
+/* Big monitors: the app stops growing at 1440px and sits centred, so the Ladder's pools stay next to their prices. */
+.card { max-width: 1440px; margin: 0 auto; }
 
 /* Rail */
 .rail { flex: 0 0 96px; background: var(--bg); border-right: 1.5px solid var(--rule2); padding: 22px 12px; display: flex; flex-direction: column; gap: 8px; }
@@ -22,7 +24,7 @@
 .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
 /* Header */
-.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 32px 14px; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 32px; }
 .brand { display: flex; align-items: center; min-height: 44px; gap: 14px; flex-wrap: wrap; text-decoration: none; color: inherit; }
 .brand .word { font-family: var(--fD); font-weight: 700; font-size: 38px; letter-spacing: 0.04em; line-height: 1; }
 .brand .tag { font-family: var(--fN); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
@@ -79,8 +81,8 @@ main.main { flex: 1; min-width: 0; padding: 24px 32px 32px; }
 .side-btn { height: 52px; font-family: var(--fD); font-weight: 700; font-size: 16px; letter-spacing: 0.06em; background: transparent; }
 .side-btn.bull { color: var(--bull); border: 1.5px solid var(--bullLine); }
 .side-btn.bear { color: var(--bear); border: 1.5px solid var(--bearLine); }
-.side-btn.bull[aria-pressed="true"] { background: var(--bullLine); color: var(--surf); }
-.side-btn.bear[aria-pressed="true"] { background: var(--bearLine); color: var(--surf); }
+.side-btn.bull[aria-pressed="true"] { background: var(--bull); color: var(--surf); }
+.side-btn.bear[aria-pressed="true"] { background: var(--bear); color: var(--surf); }
 .mt16 { margin-top: 16px; }
 .chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
 .chip { min-height: 44px; min-width: 0; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--fN); font-size: 11px; letter-spacing: 0; background: transparent; color: var(--ink); border: 1.5px solid var(--rule); }
@@ -155,3 +157,11 @@ main.main { flex: 1; min-width: 0; padding: 24px 32px 32px; }
   main.main { padding: 20px 16px 28px; }
   .juu-footer { padding: 36px 20px 24px; }
 }
+
+/* Wallet picker (EIP-6963: every installed wallet is listed) */
+.wallet-wrap { position: relative; }
+.wallet-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 50; min-width: 240px; max-width: calc(100vw - 32px); background: var(--surf); color: var(--ink); border: 1.5px solid var(--rule); padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.wallet-opt { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px; background: transparent; color: var(--ink); border: 1px solid var(--rule2); font-family: var(--fB); font-size: 14px; text-align: left; }
+.wallet-opt:hover, .wallet-opt:focus-visible { background: var(--sel); }
+.wallet-opt img { width: 24px; height: 24px; flex: 0 0 24px; }
+.wallet-dot { width: 24px; height: 24px; flex: 0 0 24px; border: 1.5px solid var(--rule); }

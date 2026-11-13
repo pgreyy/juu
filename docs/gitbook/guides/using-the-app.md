@@ -12,6 +12,15 @@ Every action asks your wallet to confirm. Some actions need two confirmations: f
 
 **DARK** / **LIGHT** at the top right switches the colour mode. The app remembers your choice.
 
+## Connecting a wallet
+
+**CONNECT WALLET** lists every wallet installed in your browser (MetaMask, Rabby, Coinbase Wallet, OKX, Trust or any
+other EVM wallet that announces itself the standard way, EIP-6963); pick one. If your wallet is on another network, Juu
+asks it to switch to Mezo testnet (chain 31611); if the wallet has never seen Mezo, it first asks to add it (Mezo
+Testnet, BTC with 18 decimals, `https://rpc.test.mezo.org`, explorer `https://explorer.test.mezo.org`). If you decline,
+the page says so and **SWITCH TO MEZO TESTNET** asks again. The app remembers your pick and reconnects quietly next time;
+click your address to pick another wallet or disconnect.
+
 ## The sidebar
 
 The icons on the left open each page. Click the Juu logo at the top of the sidebar to show the page names.

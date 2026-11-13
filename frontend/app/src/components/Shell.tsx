@@ -2,7 +2,7 @@
 import { Footer, Icon, StackMark, ThemeToggle, Ticker, shortAddr, tickerItems, type TickItem } from "@juu/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { stackAddr, useStack } from "@/lib/data";
 import { useMarket } from "@/lib/market";
 import { EXPLORER, useWallet } from "@/lib/wallet";
@@ -46,11 +46,60 @@ function Rail() {
 
 function WalletButton() {
   const w = useWallet();
+  const [menu, setMenu] = useState(false);
+  const open = w.picking || menu;
+  const close = () => {
+    setMenu(false);
+    w.setPicking(false);
+  };
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const onDown = (e: MouseEvent) => !(e.target as Element)?.closest?.(".wallet-wrap") && close();
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("mousedown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mousedown", onDown);
+    };
+  }); // eslint-disable-line react-hooks/exhaustive-deps
   const text = w.connecting ? "CONNECTING…" : !w.address ? "CONNECT WALLET" : !w.chainOk ? "SWITCH TO MEZO TESTNET" : shortAddr(w.address);
+  const click = () => {
+    if (w.address && !w.chainOk) return void w.switchNetwork();
+    if (w.address || w.wallets.length > 1) return setMenu(!open);
+    void w.connect();
+  };
   return (
-    <button type="button" className="hbtn" onClick={() => w.connect()} title={w.address || "Connect a wallet on Mezo testnet (chain 31611)"}>
-      {text}
-    </button>
+    <div className="wallet-wrap">
+      <button
+        type="button"
+        className="hbtn fill"
+        onClick={click}
+        aria-haspopup={w.wallets.length > 1 || Boolean(w.address) ? "menu" : undefined}
+        aria-expanded={open || undefined}
+        title={w.address ? `${w.walletName ?? "Wallet"} · ${w.address}` : "Connect a wallet on Mezo testnet (chain 31611)"}
+      >
+        {text}
+      </button>
+      {open && (
+        <div className="wallet-menu" role="menu" aria-label="Choose a wallet">
+          <div className="label" style={{ padding: "4px 4px 8px" }}>{w.address ? "CONNECTED · " + (w.walletName ?? "WALLET") : "CHOOSE A WALLET"}</div>
+          {w.wallets.length === 0 && <p className="c-muted" style={{ fontSize: 13, margin: 4 }}>No browser wallet found.</p>}
+          {w.wallets.map((o) => (
+            <button key={o.id} type="button" role="menuitem" className="wallet-opt" onClick={() => { close(); void w.connect(o); }}>
+              {o.icon ? <img src={o.icon} alt="" width={24} height={24} /> : <span className="wallet-dot" aria-hidden="true" />}
+              <span>{o.name}</span>
+            </button>
+          ))}
+          {w.address && (
+            <button type="button" role="menuitem" className="wallet-opt" onClick={() => { close(); w.disconnect(); }}>
+              <span className="wallet-dot" aria-hidden="true" />
+              <span>Disconnect</span>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -85,7 +134,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className="card">
         <Rail />
         <div className="col">
-          <header className="head">
+          <header className="head juu-head">
             <Link href="/" className="brand" aria-label="Juu, MUSDash">
               <StackMark size={40} />
               <span className="word">JUU</span>

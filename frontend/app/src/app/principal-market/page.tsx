@@ -112,12 +112,12 @@ export default function PrincipalMarket() {
           <div style={{ fontSize: 11, letterSpacing: "0.12em" }}>{isBuy ? "BUY" : "SELL"} PRINCIPAL · {pick ? seriesName(pick.endDate) : "—"}</div>
           {isBuy ? (
             <>
-              <div style={{ fontSize: 46, marginTop: 10 }}>{pick?.pMarket ? pct(pick.pMarket.fixedReturnToEnd) : "—"}</div>
+              <div style={{ fontSize: 46, marginTop: 10 }}>{pct(pick?.pMarket?.fixedReturnToEnd ?? 0)}</div>
               <div style={{ fontFamily: "var(--fB)", fontSize: 13 }}>fixed return if you hold to the end date</div>
             </>
           ) : (
             <>
-              <div style={{ fontSize: 46, marginTop: 10 }}>{w.address ? (held == null ? "…" : small(held)) : "—"}</div>
+              <div style={{ fontSize: 46, marginTop: 10 }}>{w.address && held == null ? "…" : held ? small(held) : "0"}</div>
               <div style={{ fontFamily: "var(--fB)", fontSize: 13 }}>Principal you hold in this series</div>
             </>
           )}

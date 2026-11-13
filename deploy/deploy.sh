@@ -19,7 +19,10 @@ echo "Code: $before -> $after"
 
 (cd backend && npm ci --omit=dev --no-audit --no-fund --loglevel=error)
 
-pm2 startOrReload deploy/ecosystem.config.cjs --update-env
+# Reload the backend and the MCP server only. The tunnel keeps running (restarting it drops every connection for
+# a few seconds); it is started only if it isn't running yet.
+pm2 startOrReload deploy/ecosystem.config.cjs --update-env --only juu-backend,juu-mcp
+pm2 describe juu-tunnel >/dev/null 2>&1 || pm2 start deploy/ecosystem.config.cjs --only juu-tunnel
 pm2 save --force >/dev/null
 
 echo "Waiting for the services..."

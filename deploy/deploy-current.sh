@@ -5,4 +5,4 @@ if [ "$(id -un)" != "juu" ]; then echo "Run this as the juu user."; exit 1; fi
 . "$(dirname "$0")/node-env.sh"
 cd "$HOME/juu"
 (cd backend && npm ci --omit=dev --no-audit --no-fund --loglevel=error)
-pm2 startOrReload deploy/ecosystem.config.cjs --update-env && pm2 save --force >/dev/null && pm2 ls
+pm2 startOrReload deploy/ecosystem.config.cjs --update-env --only juu-backend,juu-mcp && { pm2 describe juu-tunnel >/dev/null 2>&1 || pm2 start deploy/ecosystem.config.cjs --only juu-tunnel; } && pm2 save --force >/dev/null && pm2 ls

@@ -24,17 +24,17 @@ export default function Jackpot() {
         <div style={{ flex: "1 1 320px", minWidth: 0, fontFamily: "var(--fN)" }}>
           <div className="label">THIS WEEK&apos;S JACKPOT</div>
           <div style={{ fontSize: 80, lineHeight: 1.05 }} className="c-hi">
-            {jp ? amt(jp.jackpotNowMUSD) : "—"} <span style={{ fontSize: 18 }} className="c-muted">MUSD</span>
+            {amt(jp?.jackpotNowMUSD ?? 0)} <span style={{ fontSize: 18 }} className="c-muted">MUSD</span>
           </div>
           <div style={{ fontFamily: "var(--fB)", fontSize: 14 }} className="c-muted">Paid from the safety jar&apos;s overflow</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", marginTop: 26, borderTop: "1.5px solid var(--rule)" }}>
             <div className="stat" style={{ padding: "14px 0" }}><div className="k">DRAW IN</div><div className="v">{jp ? until(jp.epochEnds) : "—"}</div></div>
             <div className="stat" style={{ padding: "14px 0" }}>
               <div className="k">YOUR ODDS</div>
-              <div className="v c-bull">{t.data ? fmt(t.data.yourOdds * 100, 1) + "%" : "—"}</div>
+              <div className="v c-bull">{fmt((t.data?.yourOdds ?? 0) * 100, 1) + "%"}</div>
             </div>
-            <div className="stat" style={{ padding: "14px 0", borderTop: "1px solid var(--rule2)" }}><div className="k">YOUR TICKETS</div><div className="v">{t.data ? fmt(t.data.yourTickets) : "—"}</div></div>
-            <div className="stat" style={{ padding: "14px 0", borderTop: "1px solid var(--rule2)" }}><div className="k">ALL TICKETS</div><div className="v">{allTickets == null ? "—" : fmt(allTickets)}</div></div>
+            <div className="stat" style={{ padding: "14px 0", borderTop: "1px solid var(--rule2)" }}><div className="k">YOUR TICKETS</div><div className="v">{fmt(t.data?.yourTickets ?? 0)}</div></div>
+            <div className="stat" style={{ padding: "14px 0", borderTop: "1px solid var(--rule2)" }}><div className="k">ALL TICKETS</div><div className="v">{fmt(allTickets ?? 0)}</div></div>
           </div>
           <p style={{ fontFamily: "var(--fB)", fontSize: 13 }} className="c-muted">
             Tickets = position size × time held this week. One ticket is 1 MUSD held for one hour.{!w.address && " Connect a wallet to see your tickets."}

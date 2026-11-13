@@ -103,7 +103,7 @@ export default function Agents() {
               >
                 {on ? "REVOKE NOW" : "RESTORE PERMISSION"}
               </button>
-              <TxNote k={key} />
+              <TxNote k={key} wallet={false} />
             </section>
           );
         })}

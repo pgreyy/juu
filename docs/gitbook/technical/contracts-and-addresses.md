@@ -175,6 +175,9 @@ What the demo shows, in MUSD: #3 was worth 3.00 at the collapse, under its 6.00 
 | User revokes the agent | `0x2eb58b994d7e683b43b708c7bf8608769b1ddac60f3cf61f9406f6d855f26862` |
 | Agent opens through the MCP server | `0x0a6becd99ffcc7f1f79ec504240a6ddcdfe5055bcf8ab606d7d6dc3ac6e4ab73` |
 | Agent closes through the MCP server | `0x17ca6777f3a6a568571454e0cb3f7a41bb615a81a705307d6d72838aec1151c9` |
+| Agent opens through the hosted MCP server (`https://mcp.playjuu.xyz`, its own key as bearer token) | `0x6ce83f1bf752053c446f6c17b446dab433ad5741e1edd45330ece92f9af292c6` |
+| Agent climbs through the hosted MCP server | `0xbe326913360d4679725d0ebcadbd9c335a17bc8b91e9f2d94c489aef57ff96a9` |
+| Agent closes through the hosted MCP server | `0xd753682da814d2a8822e18889331b0f75b246aeeb430985809abc788d82ad662` |
 
 Refused as expected (simulated, no transaction): a 40 MUSD bet with a 30 MUSD limit (`BetTooBig`), floor 6 with a floor-5 limit (`FloorTooHigh`), any action after revoke (`NoSession`), any open after the daily loss limit (`StoppedForToday`).
 

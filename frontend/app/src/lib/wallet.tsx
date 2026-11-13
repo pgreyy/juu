@@ -11,8 +11,16 @@ export const EXPLORER = "https://explorer.test.mezo.org";
 export const reader = new JsonRpcProvider(RPC_URL, CHAIN_ID, { staticNetwork: true });
 export const read = (address: string, abi: readonly string[]) => new Contract(address, abi as string[], reader);
 
+/** Any EIP-1193 wallet (MetaMask, Rabby, Coinbase Wallet, OKX, Trust and others). Only standard calls are used. */
 type Eth = { request: (a: { method: string; params?: unknown[] }) => Promise<unknown>; on?: (e: string, f: (...a: unknown[]) => void) => void; removeListener?: (e: string, f: (...a: unknown[]) => void) => void };
-const eth = (): Eth | undefined => (typeof window === "undefined" ? undefined : (window as unknown as { ethereum?: Eth }).ethereum);
+/** A wallet found in the browser: announced through EIP-6963, or the single injected window.ethereum as a fallback. */
+export type WalletOption = { id: string; name: string; icon: string | null; rdns: string | null; provider: Eth };
+
+// The wallet the user picked. Kept outside React so contract calls can reach it.
+let active: Eth | undefined;
+const eth = (): Eth | undefined => active;
+const injected = (): Eth | undefined => (typeof window === "undefined" ? undefined : (window as unknown as { ethereum?: Eth }).ethereum);
+const PICK_KEY = "juu-wallet";
 
 export type TxState = { key: string; state: "wallet" | "pending" | "done" | "error"; msg: string; hash?: string };
 type Step = (signer: Signer) => Promise<unknown>;
@@ -21,7 +29,17 @@ type Wallet = {
   address: string | null;
   chainOk: boolean;
   connecting: boolean;
-  connect: () => Promise<string | null>;
+  /** Every wallet found in this browser (EIP-6963), or the injected one. */
+  wallets: WalletOption[];
+  /** The picker is open (several wallets, none picked yet). */
+  picking: boolean;
+  setPicking: (open: boolean) => void;
+  /** Connect: with a wallet, that one; without, the one already picked, the only one, or open the picker. */
+  connect: (choice?: WalletOption) => Promise<string | null>;
+  /** Ask the picked wallet to switch to Mezo testnet (adding the network first if it doesn't know it). */
+  switchNetwork: () => Promise<boolean>;
+  disconnect: () => void;
+  walletName: string | null;
   /** Runs wallet steps in order (for example approve, then open). Returns true when all confirmed. */
   run: (key: string, steps: Step[], doneMsg?: string) => Promise<boolean>;
   tx: TxState | null;
@@ -87,18 +105,74 @@ async function waitFor(hash: string) {
   throw new Error("No receipt after 4 minutes. Check the transaction on the explorer.");
 }
 
+/** True when the wallet says it doesn't know the chain yet (EIP-3326 code 4902, sometimes wrapped). */
+function unknownChain(err: unknown) {
+  const x = err as { code?: number; data?: { originalError?: { code?: number } }; message?: string };
+  return x?.code === 4902 || x?.data?.originalError?.code === 4902 || /unrecognized chain|not been added|unknown chain|wallet_addEthereumChain/i.test(x?.message || "");
+}
+
+function networkMessage(err: unknown) {
+  const x = err as { code?: number; message?: string };
+  if (x?.code === 4001) return "You declined the switch to Mezo testnet. Juu only runs there: click SWITCH TO MEZO TESTNET to try again.";
+  if (x?.message === "WRONG_NETWORK") return "Your wallet is still on another network. Switch it to Mezo testnet (chain 31611), or click SWITCH TO MEZO TESTNET.";
+  return "Couldn't switch your wallet to Mezo testnet: " + explain(err);
+}
+
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [tx, setTx] = useState<TxState | null>(null);
   const [bump, setBump] = useState(0);
+  const [wallets, setWallets] = useState<WalletOption[]>([]);
+  const [picked, setPicked] = useState<WalletOption | null>(null);
+  const [picking, setPicking] = useState(false);
 
+  // EIP-6963: every installed wallet announces itself; ask them to, and listen. If none does within a moment, fall
+  // back to the single injected window.ethereum (older wallets).
   useEffect(() => {
-    const e = eth();
+    const found = new Map<string, WalletOption>();
+    const onAnnounce = (ev: Event) => {
+      const d = (ev as CustomEvent<{ info: { uuid: string; name: string; icon: string; rdns: string }; provider: Eth }>).detail;
+      if (!d?.info || !d.provider) return;
+      found.set(d.info.uuid, { id: d.info.uuid, name: d.info.name, icon: d.info.icon || null, rdns: d.info.rdns || null, provider: d.provider });
+      setWallets([...found.values()]);
+    };
+    window.addEventListener("eip6963:announceProvider", onAnnounce);
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+    const t = setTimeout(() => {
+      const inj = injected();
+      if (found.size === 0 && inj) setWallets([{ id: "injected", name: "Browser wallet", icon: null, rdns: null, provider: inj }]);
+    }, 600);
+    return () => {
+      window.removeEventListener("eip6963:announceProvider", onAnnounce);
+      clearTimeout(t);
+    };
+  }, []);
+
+  // Reconnect quietly to the wallet picked last time (eth_accounts never opens a prompt).
+  useEffect(() => {
+    if (picked || wallets.length === 0) return;
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(PICK_KEY);
+    } catch {}
+    const w = wallets.find((x) => (x.rdns || x.id) === saved);
+    if (!w) return;
+    w.provider.request({ method: "eth_accounts" }).then((a) => {
+      const acc = ((a as string[])[0] as string) || null;
+      if (!acc) return;
+      active = w.provider;
+      setPicked(w);
+      setAddress(acc);
+      w.provider.request({ method: "eth_chainId" }).then((c) => setChainId(parseInt(c as string, 16))).catch(() => {});
+    }).catch(() => {});
+  }, [wallets, picked]);
+
+  // Follow account and network changes in the picked wallet.
+  useEffect(() => {
+    const e = picked?.provider;
     if (!e) return;
-    e.request({ method: "eth_accounts" }).then((a) => setAddress(((a as string[])[0] as string) || null)).catch(() => {});
-    e.request({ method: "eth_chainId" }).then((c) => setChainId(parseInt(c as string, 16))).catch(() => {});
     const onAcc = (a: unknown) => setAddress(((a as string[])[0] as string) || null);
     const onChain = (c: unknown) => setChainId(parseInt(c as string, 16));
     e.on?.("accountsChanged", onAcc);
@@ -107,49 +181,98 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       e.removeListener?.("accountsChanged", onAcc);
       e.removeListener?.("chainChanged", onChain);
     };
-  }, []);
+  }, [picked]);
 
+  // Puts the wallet on Mezo testnet: switch, and if the wallet has never seen the network (error 4902), add it with
+  // Mezo's published details, then switch. Network details: mezo.org/docs/developers/getting-started (Testnet).
   const switchChain = useCallback(async () => {
     const e = eth()!;
     const hex = "0x" + CHAIN_ID.toString(16);
+    const switchTo = () => e.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] });
     try {
-      await e.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] });
+      await switchTo();
     } catch (err) {
-      if ((err as { code?: number }).code !== 4902) throw err;
+      if (!unknownChain(err)) throw err;
       await e.request({
         method: "wallet_addEthereumChain",
         params: [{ chainId: hex, chainName: "Mezo Testnet", nativeCurrency: { name: "Bitcoin", symbol: "BTC", decimals: 18 }, rpcUrls: [RPC_URL], blockExplorerUrls: [EXPLORER] }],
       });
+      // Most wallets switch as part of adding; ask again for the ones that don't.
+      const now = parseInt((await e.request({ method: "eth_chainId" })) as string, 16);
+      if (now !== CHAIN_ID) await switchTo();
     }
-    setChainId(CHAIN_ID);
+    const c = parseInt((await e.request({ method: "eth_chainId" })) as string, 16);
+    setChainId(c);
+    if (c !== CHAIN_ID) throw new Error("WRONG_NETWORK");
   }, []);
 
-  const connect = useCallback(async () => {
-    const e = eth();
-    if (!e) {
-      setTx({ key: "wallet", state: "error", msg: "No browser wallet found. Install one (for example MetaMask), then connect." });
-      return null;
-    }
-    setConnecting(true);
+  const connect = useCallback(
+    async (choice?: WalletOption) => {
+      const w = choice || picked || (wallets.length === 1 ? wallets[0] : null);
+      if (!w) {
+        if (wallets.length === 0) {
+          setTx({ key: "wallet", state: "error", msg: "No browser wallet found. Install one (MetaMask, Rabby, Coinbase Wallet, OKX, Trust or another EVM wallet), then connect." });
+        } else {
+          setPicking(true);
+          setTx({ key: "wallet", state: "wallet", msg: "Pick your wallet at the top of the page." });
+        }
+        return null;
+      }
+      setPicking(false);
+      active = w.provider;
+      setPicked(w);
+      try {
+        localStorage.setItem(PICK_KEY, w.rdns || w.id);
+      } catch {}
+      setConnecting(true);
+      let step: "connect" | "network" = "connect";
+      try {
+        const a = (await w.provider.request({ method: "eth_requestAccounts" })) as string[];
+        setAddress(a[0] || null);
+        const c = parseInt((await w.provider.request({ method: "eth_chainId" })) as string, 16);
+        setChainId(c);
+        step = "network";
+        if (c !== CHAIN_ID) await switchChain();
+        setTx((t) => (t?.key === "wallet" ? null : t));
+        return a[0] || null;
+      } catch (err) {
+        setTx({ key: "wallet", state: "error", msg: step === "network" ? networkMessage(err) : explain(err) });
+        return null;
+      } finally {
+        setConnecting(false);
+      }
+    },
+    [picked, wallets, switchChain],
+  );
+
+  const switchNetwork = useCallback(async () => {
+    if (!eth()) return Boolean(await connect());
     try {
-      const a = (await e.request({ method: "eth_requestAccounts" })) as string[];
-      setAddress(a[0] || null);
-      const c = parseInt((await e.request({ method: "eth_chainId" })) as string, 16);
-      if (c !== CHAIN_ID) await switchChain();
-      return a[0] || null;
+      await switchChain();
+      setTx((t) => (t?.key === "wallet" ? null : t));
+      return true;
     } catch (err) {
-      setTx({ key: "wallet", state: "error", msg: explain(err) });
-      return null;
-    } finally {
-      setConnecting(false);
+      setTx({ key: "wallet", state: "error", msg: networkMessage(err) });
+      return false;
     }
-  }, [switchChain]);
+  }, [connect, switchChain]);
+
+  const disconnect = useCallback(() => {
+    active = undefined;
+    setPicked(null);
+    setAddress(null);
+    setChainId(null);
+    try {
+      localStorage.removeItem(PICK_KEY);
+    } catch {}
+  }, []);
 
   const run = useCallback(
     async (key: string, steps: Step[], doneMsg = "Done.") => {
       try {
         let a = address;
-        if (!a || chainId !== CHAIN_ID) a = await connect();
+        if (!a || !eth()) a = await connect();
+        else if (chainId !== CHAIN_ID && !(await switchNetwork())) return false;
         if (!a) return false;
         const signer = await new BrowserProvider(eth()! as never).getSigner();
         for (let i = 0; i < steps.length; i++) {
@@ -168,12 +291,27 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
     },
-    [address, chainId, connect],
+    [address, chainId, connect, switchNetwork],
   );
 
   const value = useMemo(
-    () => ({ address, chainOk: chainId === CHAIN_ID, connecting, connect, run, tx, clearTx: () => setTx(null), bump }),
-    [address, chainId, connecting, connect, run, tx, bump],
+    () => ({
+      address,
+      chainOk: chainId === CHAIN_ID,
+      connecting,
+      wallets,
+      picking,
+      setPicking,
+      connect,
+      switchNetwork,
+      disconnect,
+      walletName: picked?.name ?? null,
+      run,
+      tx,
+      clearTx: () => setTx(null),
+      bump,
+    }),
+    [address, chainId, connecting, wallets, picking, connect, switchNetwork, disconnect, picked, run, tx, bump],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

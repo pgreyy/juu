@@ -3,30 +3,63 @@
      strong #101010 · onStrong #F6F2E8 · panel #ECE6D8 · bull #0F7543 · bear #BA3118 · bullBar #1FAF66 · bearBar #E2452A · hi #6B7300.
    Dark: bg #0A0A0A · surf #101010 · ink #F0E9D8 · muted #929292 · rule #3A3A3A · rule2 #222222 · strong #E6F05A · onStrong #101010 ·
      panel #1C1C1C · bull #3DDC84 · bear #F24A2C · hi #E6F05A. (Defined once in @juu/ui/juu.css; this file only uses var(--token).)
+   Landing shades (defined below on .lp-page): two families so each section has its own shade.
+     Light: sand #F4F0E6 · #E9E3D3 · #DCD4BF; olive #EEF0DC · #D9DDB5; olive accent #5F6600 (button fill, sand text).
+     Dark:  sand #12110E · #1A1914 · #23211B; olive #1B1D12 · #262A15; olive accent #B8C24A (button fill, dark text).
+     Ink band (Agents): light #101010 / dark #0A0A08 with sand text. Header: head #D9DDB5 / #262A15 (from @juu/ui).
+     Buttons: primary = ink fill, secondary = olive fill, tertiary = outline, sand fill on the ink band.
    Type: Bricolage Grotesque 500/700/800 for headlines and body; DM Mono 400/500 for numbers, labels and buttons.
    Shape: radius 0 everywhere, borders 1.5px, dividers 1px, touch targets at least 44px.
    Assets: Stack logo and favicon from docs/design/assets; page icons from docs/design/assets/icons.
    Visuals: product parts only (Ladder, ticker, starburst, floor badges, Agaruzo! banner) from @juu/ui. */
 
-.lp-page { min-height: 100vh; padding: 24px 28px 32px; background: var(--bg); }
-.lp-card { background: var(--surf); border: 1.5px solid var(--rule); overflow: clip; }
+.lp-page {
+  --sand1: #F4F0E6; --sand2: #E9E3D3; --sand3: #DCD4BF; --olive1: #EEF0DC; --olive2: #D9DDB5;
+  --oliveX: #5F6600; --onOliveX: #F4F0E6; --btnInk: #101010; --onBtnInk: #F4F0E6;
+  --bandBg: #101010; --bandInk: #F4F0E6; --bandMuted: #9A9384; --bandRule2: #3A3830; --bandPanel: #1A1914;
+  --bg: var(--sand3); --surf: var(--sand1);
+  min-height: 100vh; padding: 24px 28px 32px; background: var(--bg);
+}
+html[data-theme="dark"] .lp-page {
+  --sand1: #12110E; --sand2: #1A1914; --sand3: #23211B; --olive1: #1B1D12; --olive2: #262A15;
+  --oliveX: #B8C24A; --onOliveX: #12110E; --btnInk: #F0E9D8; --onBtnInk: #12110E;
+  --bandBg: #0A0A08; --bandInk: #E9E3D3; --bandMuted: #9A9384; --bandRule2: #2E2C25; --bandPanel: #1A1914;
+}
+/* Big monitors: content stops at 1280px and sits centred. */
+.lp-card { max-width: 1280px; margin: 0 auto; background: var(--sand1); border: 1.5px solid var(--rule); overflow: clip; }
+
+/* Section shades */
+.s-sand1 { background: var(--sand1); --surf: var(--sand1); }
+.s-sand2 { background: var(--sand2); --surf: var(--sand2); }
+.s-olive1 { background: var(--olive1); --surf: var(--olive1); }
+.s-olive2 { background: var(--olive2); --surf: var(--olive2); }
+/* The ink band: dark in both themes, sand text; bull and bear use their dark-theme shades so they read on it. */
+.s-band {
+  --ink: var(--bandInk); --muted: var(--bandMuted); --rule: var(--bandInk); --rule2: var(--bandRule2);
+  --strong: var(--bandInk); --onStrong: var(--bandBg); --panel: var(--bandPanel); --onPanel: var(--bandInk);
+  --surf: var(--bandBg); --sel: #1E1E1E; --bull: #3DDC84; --bear: #F24A2C; --hi: #E6F05A;
+  background: var(--bandBg); color: var(--ink);
+}
+html[data-theme="dark"] .s-band { border-top-color: var(--oliveX); }
 
 /* Header */
-.lp-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 32px 14px; }
+.lp-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 32px; }
 .lp-brand { display: flex; align-items: center; min-height: 44px; gap: 14px; flex-wrap: wrap; color: inherit; text-decoration: none; }
 .lp-brand .word { font-family: var(--fD); font-weight: 700; font-size: 38px; letter-spacing: 0.04em; line-height: 1; }
 .lp-brand .tag { font-family: var(--fN); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
 .lp-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; }
-.lp-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-family: var(--fN); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; color: var(--ink); }
+.lp-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; font-family: var(--fN); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; color: var(--onHead); }
 .lp-nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .lp-head-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .hbtn { height: 46px; padding: 0 16px; background: transparent; color: var(--ink); border: 1.5px solid var(--rule); font-family: var(--fN); font-size: 13px; }
-.hbtn.quiet { padding: 0 14px; border-color: var(--rule2); color: var(--muted); }
+.hbtn.quiet { padding: 0 14px; }
 
 /* Buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 24px; font-family: var(--fD); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: 1.5px solid var(--strong); }
-.btn.strong { background: var(--strong); color: var(--onStrong); }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 24px; font-family: var(--fD); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: 1.5px solid var(--btnInk); }
+.btn.primary { background: var(--btnInk); color: var(--onBtnInk); border-color: var(--btnInk); }
+.btn.olive { background: var(--oliveX); color: var(--onOliveX); border-color: var(--oliveX); }
 .btn.line { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn.sand { background: var(--bandInk); color: var(--bandBg); border-color: var(--bandInk); }
 .btn.small { min-height: 46px; padding: 0 16px; font-size: 13px; }
 .btn:hover { text-decoration: underline; text-underline-offset: 4px; }
 
@@ -62,7 +95,7 @@
 
 /* Steps */
 .lp-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 36px; }
-.lp-step { border: 1.5px solid var(--rule); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+.lp-step { background: var(--sand1); border: 1.5px solid var(--rule); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
 .lp-step .top { display: flex; justify-content: space-between; align-items: center; }
 .lp-step .code { font-family: var(--fN); font-size: 28px; }
 .lp-step h3 { margin: 6px 0 0; font-family: var(--fD); font-weight: 700; font-size: 22px; letter-spacing: 0.02em; }
@@ -79,8 +112,8 @@
 
 /* Earn */
 .lp-earn { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 36px; }
-.lp-block { border: 1.5px solid var(--rule); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
-.lp-block.panel { background: var(--panel); color: var(--onPanel); border-color: var(--panel); }
+.lp-block { background: var(--sand2); border: 1.5px solid var(--rule); padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+.lp-block.olive { background: var(--olive2); }
 .lp-block h3 { margin: 0; font-family: var(--fD); font-weight: 800; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.1; }
 .lp-block .stat { font-family: var(--fN); font-size: clamp(40px, 4.4vw, 60px); line-height: 1; }
 .lp-block p { margin: 0; font-size: 15px; line-height: 1.6; }
@@ -88,7 +121,8 @@
 .lp-icon { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1.5px solid currentColor; }
 
 /* Agents */
-.lp-perm { border: 1.5px solid var(--rule); padding: 22px; margin-top: 28px; }
+.lp-perm { background: var(--panel); border: 1.5px solid var(--rule); padding: 22px; margin-top: 28px; }
+.lp-sec-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 .lp-perm .st { font-family: var(--fN); font-size: 11px; letter-spacing: 0.08em; padding: 4px 10px; background: var(--strong); color: var(--onStrong); }
 .lp-board { width: 100%; border-collapse: collapse; font-family: var(--fN); font-size: 14px; }
 .lp-board th { text-align: right; padding: 10px 0; font-weight: 400; font-size: 11px; letter-spacing: 0.12em; color: var(--muted); border-bottom: 1.5px solid var(--rule); }
@@ -117,6 +151,11 @@
 .lp-floors .floor-badge .n { font-size: clamp(20px, 2.4vw, 32px); }
 .lp-floors .floor-badge.hi .n { color: var(--hi); }
 
+@media (min-width: 1440px) {
+  .lp-page { padding: 32px 40px 40px; }
+  .lp-p { font-size: 18px; }
+  .lp-lede { font-size: 20px; }
+}
 @media (max-width: 1000px) {
   .lp-hero, .lp-split, .lp-jack { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   .lp-steps { grid-template-columns: minmax(0, 1fr); }
