@@ -235,3 +235,12 @@ The epoch before had positions open at the draw, so the Buffer was below its 5% 
 | Close the loan (all BTC back) | `0xd2838f2beb4eca4cf6a6963b3afed2643b35d01eec4630d5c49356da63f5f659` |
 | New account, guard tripped (150% guard on a 143% loan): keeper `guard(1)` closes bet 1 | `0xef6b712f9ac4aab24daa89d8c26e1622a18c8e464f95530878752baf08eebe45` |
 | Keeper `guard(1)` closes bet 2 a minute later | `0x5c4d77ba2bee1346166cfd0cab4d239a615e992e079dab4656b2d60d7a8a983c` |
+
+### Survivors and funding over three hours (first demo set, MUSDash v1 `0x756e4aA5a229bEB93591785CaB6dEd40a121E376`)
+
+Four Bulls (A 150, B 100, V 200 at 10x, and C 120 opened 90 minutes later by a second wallet) and one Bear (D 200) were held for about three hours at a fixed demo price.
+
+* **Funding:** each position's funding matched the formula `k x (bull - bear) / (bull + bear)` per hour, rebuilt independently segment by segment (the rate rose from 0.00385% to 0.00481% an hour when C opened), within 0.04% to 0.35%. The small gaps are the seconds between reading each position. Bulls paid 0.0676 MUSD, the Bear received 0.0261, and the 0.0415 difference is the funding on the gap, for the Bank.
+* **Survivors:** at a 9% drop V collapsed (`0xad1de53ac6c2b8e0b5dc4fa2c5728f2a04dc9ba92c1e999984d9251879b2e941`): 0.9868 MUSD to survivors, 0.4934 to the Buffer, 18.52 to the Bank. The survivors' share split by size x seconds held exactly as expected: A 0.477020, B 0.317695, C 0.192092 (C less per MUSD of size because it held for a shorter time); the Bear got nothing.
+* All positions closed afterwards (`0x8342c3396b005f7adb1fa471e32d72a6252f35dbe535d674603e6ac050f924cf`, `0xa098ca9eecb1e305c0d245fb71ed6f43f732a8ad281230d2d7ce5d713dbf3c48`, `0x8ca06004f454e434bbbf941f302a2711662f10a4f887cdd76cf657c40ad2580c`, `0xe1c925dbdcf5a5fc47ea243022f1e53f455a7e4f4f766e5807aa0bd4eaef4f81`). 1 wei of rounding was left in the game, in the Bank's favour.
+* **Bad debt** (same set): a 10x bet hit by an 11% drop was worth -1.000053 MUSD; the Buffer paid exactly 1.000053 to the Bank (`0xe31c29aa3291bbeb025b43ac13ae3eeb995d2f18bb7bc5e21071b8ebdee5bf48`).

@@ -308,6 +308,15 @@ Earlier account (v3) 0x6B09…9BC5: profit path tx 0xd91df310…986c (0.177 MUSD
 closed bet 3 by owner, trove closed tx 0xd2838f2b…f659.
 Follow-up: pass Mezo hints (HintHelpers.getApproxHint) in Bank and account trove calls to cut gas.
 
+## Survivors + funding run results (demo v1, 13 Nov 2026, 00:21 to 03:22 UTC)
+Funding rebuilt independently per segment (k=0.01%/h; rates 0.00385%/h then 0.00481%/h after C): expected vs contract
+A 0.019646/0.019654, B 0.013067/0.013072, D -0.026095/-0.026116, V 0.026090/0.026133, C 0.008686/0.008717 (0.04-0.35%,
+read-time drift). Bulls paid 0.067576, Bear received 0.026116; difference 0.041460 = funding on the gap (Bank).
+Collapse V at -9% (price tx 0xe9943ee2…eb13, liquidate tx 0xad1de53a…e941): equity 1.973613, survivors 0.986807,
+Buffer 0.493403, Bank 18.519790. Survivor shares by size x seconds: A 0.477020 (expected 0.47702), B 0.317695
+(0.31769), C 0.192092 (0.19209); Bear 0. Closes: A 86.837, B 41.224, D 117.866 (txs 0x8342c339…, 0xa098ca9e…,
+0x8ca06004…), C by funder 1 tx 0xe1c925db…4f81. Game left with 1 wei. Demo price back to following Mezo (tx 0x3e6ad0c6…c314).
+
 ## Public docs
 docs/gitbook/ (GitBook, SUMMARY.md). Standing task: update them with every contract build or change, in the same task.
 
