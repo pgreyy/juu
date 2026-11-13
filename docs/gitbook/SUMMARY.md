@@ -28,6 +28,7 @@
 
 ## Guides
 
+* [Using the app](guides/using-the-app.md)
 * [For players](guides/for-players.md)
 * [For savers](guides/for-savers.md)
 * [For fixed yield (P Market)](guides/for-fixed-yield.md)

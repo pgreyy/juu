@@ -404,6 +404,47 @@
         },
         "description": "Agent fee rate and split"
       }
+    },
+    {
+      "name": "Live feed",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/main/feed?limit=20",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "main",
+            "feed"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Jackpot tickets for an address",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/main/tickets/0x5Ac87a8AeC1EF2Ff28835e6EBbf52495C89Bc5eA",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "main",
+            "tickets",
+            "0x5Ac87a8AeC1EF2Ff28835e6EBbf52495C89Bc5eA"
+          ]
+        }
+      }
     }
   ],
   "variable": [

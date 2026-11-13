@@ -64,6 +64,19 @@ async function positionRow(s, id) {
   };
 }
 
+const blockTimes = new Map();
+async function blockTime(n) {
+  if (!blockTimes.has(n)) blockTimes.set(n, Number((await provider.getBlock(n)).timestamp));
+  return blockTimes.get(n);
+}
+
+// Positions opened through the Agent Gateway: position id -> { user, agent }.
+function agentPositions(stackName) {
+  const m = new Map();
+  for (const e of byEvent(stackName, "gateway", "AgentOpened")) m.set(String(e.args.positionId), { user: e.args.user, agent: e.args.agent });
+  return m;
+}
+
 export function api() {
   const app = express();
 
@@ -88,6 +101,8 @@ export function api() {
         "GET /api/:stack/leaderboard?type=all|agents|humans",
         "GET /api/:stack/agents/:user",
         "GET /api/:stack/agent-fee",
+        "GET /api/:stack/feed?limit=20",
+        "GET /api/:stack/tickets/:user",
       ],
     }),
   );
@@ -304,6 +319,18 @@ export function api() {
       r.playsFor.add(e.args.user);
       agents.set(e.args.agent, r);
     }
+    // Highest floor each player (or agent) has reached: from opens and climbs.
+    const ap = agentPositions(s.name);
+    const best = new Map();
+    for (const e of events(s.name).list) {
+      if (e.source !== "game" || (e.event !== "Opened" && e.event !== "Agaruzo")) continue;
+      const g = ap.get(String(e.args.id));
+      const who = (g ? g.agent : e.args.owner).toLowerCase();
+      const f = Number(e.event === "Opened" ? e.args.floor : e.args.toFloor);
+      best.set(who, Math.max(best.get(who) || 0, f));
+    }
+    for (const r of humans.values()) r.bestFloor = best.get(r.player.toLowerCase()) || null;
+    for (const r of agents.values()) r.bestFloor = best.get(r.player.toLowerCase()) || null;
     const agentRows = [...agents.values()].map((r) => ({ ...r, playsFor: [...r.playsFor] }));
     const rows = type === "agents" ? agentRows : type === "humans" ? [...humans.values()] : [...agentRows, ...humans.values()];
     rows.sort((a, b) => b.profitMUSD - a.profitMUSD);
@@ -331,6 +358,82 @@ export function api() {
   app.get("/api/:stack/agent-fee", wrap(async (req) => {
     const s = st(req);
     return { stack: s.name, rateOfSize: fmt(await s.gateway.agentFeeRate()), minimumMUSD: fmt(await s.gateway.agentFeeMin()), toBuffer: fmt(await s.gateway.agentFeeToBuffer()), toBank: 1 - fmt(await s.gateway.agentFeeToBuffer()) };
+  }));
+
+  // Recent game moves for the live feed: opens, climbs (Agaruzo), drops, closes, collapses and jackpot draws.
+  app.get("/api/:stack/feed", wrap(async (req) => {
+    const s = st(req);
+    const limit = Math.min(Number(req.query.limit || 20), 100);
+    const agents = agentPositions(s.name);
+    const pos = new Map();
+    const items = [];
+    for (const e of events(s.name).list) {
+      const a = e.args;
+      const who = (id, owner) => {
+        const g = agents.get(String(id));
+        return g ? { player: g.user, agent: g.agent, isAgent: true } : { player: owner, agent: null, isAgent: false };
+      };
+      const base = { block: e.block, tx: e.tx };
+      if (e.source === "game" && e.event === "Opened") {
+        const p = { side: SIDE[Number(a.side)], floor: Number(a.floor), chip: CHIP[Number(a.chip)] };
+        pos.set(String(a.id), p);
+        items.push({ kind: "open", id: Number(a.id), ...who(a.id, a.owner), ...p, size: fmt(a.size), price: fmt(a.price), ...base });
+      } else if (e.source === "game" && (e.event === "Agaruzo" || e.event === "Dropped")) {
+        const p = pos.get(String(a.id)) || {};
+        p.floor = Number(a.toFloor);
+        items.push({ kind: e.event === "Agaruzo" ? "climb" : "drop", id: Number(a.id), ...who(a.id, a.owner), side: p.side || null, fromFloor: Number(a.fromFloor), floor: Number(a.toFloor), size: fmt(a.size), price: fmt(a.price), ...base });
+      } else if (e.source === "game" && e.event === "Closed") {
+        const p = pos.get(String(a.id)) || {};
+        items.push({ kind: "close", id: Number(a.id), ...who(a.id, a.owner), side: p.side || null, floor: p.floor || null, pnl: fmt(a.pnl), price: fmt(a.price), ...base });
+      } else if (e.source === "game" && e.event === "FloorCollapsed") {
+        const p = pos.get(String(a.id)) || {};
+        items.push({ kind: "collapse", id: Number(a.id), ...who(a.id, a.owner), side: p.side || null, floor: p.floor || null, toSurvivors: fmt(a.toSurvivors), badDebt: fmt(a.badDebt), price: fmt(a.price), ...base });
+      } else if (e.source === "jackpot" && e.event === "Drawn") {
+        items.push({ kind: "jackpot", epoch: Number(a.epoch), player: a.winner, isAgent: false, prize: fmt(a.prize), ...base });
+      }
+    }
+    const out = items.slice(-limit).reverse();
+    await Promise.all(out.map(async (x) => (x.time = iso(await blockTime(x.block)))));
+    return { stack: s.name, scannedToBlock: events(s.name).lastBlock, feed: out };
+  }));
+
+  // Jackpot tickets this epoch for one player. 1 ticket = 1 MUSD of position size held for 1 hour.
+  // Counts the sealed ledger (closed or moved positions) plus every open position's time so far.
+  app.get("/api/:stack/tickets/:user", wrap(async (req) => {
+    const s = st(req);
+    const user = req.params.user.toLowerCase();
+    const agents = agentPositions(s.name);
+    const owner = (id, o) => (agents.get(String(id))?.user || o).toLowerCase();
+    const [e, len, t] = [Number(await s.game.currentEpoch()), Number(await s.game.epochLength()), await now()];
+    const start = e * len;
+    const n = Number(await s.game.ticketCount(e));
+    const ledger = await Promise.all(Array.from({ length: n }, (_, i) => s.game.ticketAt(e, i)));
+    let all = 0n, mine = 0n, prior = 0n;
+    for (const tk of ledger) {
+      const amt = tk.cum - prior;
+      prior = tk.cum;
+      all += amt;
+      if (owner(tk.positionId, tk.owner) === user) mine += amt;
+    }
+    const ids = await s.game.openPositionIds();
+    const open = await Promise.all(ids.map(async (id) => [id, await s.game.getPosition(id)]));
+    for (const [id, p] of open) {
+      const from = Math.max(Number(p.ticketsFrom), start);
+      if (t <= from) continue;
+      const amt = p.size * BigInt(t - from);
+      all += amt;
+      if (owner(id, p.owner) === user) mine += amt;
+    }
+    const toTickets = (x) => fmt(x) / 3600;
+    return {
+      stack: s.name,
+      epoch: e,
+      drawAfter: iso((e + 1) * len),
+      unit: "1 ticket = 1 MUSD of position size held for 1 hour",
+      yourTickets: toTickets(mine),
+      allTickets: toTickets(all),
+      yourOdds: all > 0n ? Number((mine * 1000000n) / all) / 1000000 : 0,
+    };
   }));
 
   return app;

@@ -1,0 +1,54 @@
+// Copy of backend/config/addresses.json (the deployed contracts). Keep the two in step after a redeploy.
+export const ADDR = {
+  "chainId": 31611,
+  "mezo": {
+    "musd": "0x118917a40FAF1CD7a13dB0Ef56C86De7973Ac503",
+    "btc": "0x7b7C000000000000000000000000000000000000",
+    "mezoToken": "0x7B7c000000000000000000000000000000000001",
+    "priceFeed": "0x86bCF0841622a5dAC14A313a15f96A95421b9366",
+    "borrowerOperations": "0xCdF7028ceAB81fA0C6971208e83fa7872994beE5",
+    "troveManager": "0xE47c80e8c23f6B4A1aE41c34837a0599D5D16bb0",
+    "veBTC": "0x38E35d92E6Bfc6787272A62345856B13eA12130a",
+    "voter": "0x263F1Fd5fB7F866881e1B6cD7d5d6c40Fd985F0D",
+    "router": "0x9a1ff7FE3a0F69959A3fBa1F1e5ee18e1A9CD7E9",
+    "poolFactory": "0x4947243CC818b627A5D06d14C4eCe7398A23Ce1A",
+    "smusd": "0x6f461c68B2c5492C0F5CCEc5a264d692aA7A8e16",
+    "smusdGaugePool": "0x6f461c68B2c5492C0F5CCEc5a264d692aA7A8e16",
+    "musdBtcPool": "0xd16A5Df82120ED8D626a1a15232bFcE2366d6AA9"
+  },
+  "shared": {
+    "splitter": "0xC97F652387E213a92DD2DaBDb41754CdD535ce5e",
+    "pmarket": "0x6748eA3C557B03611Fb360889ea61B4fB72B891c",
+    "savings": "0xF7857dB1d1Aa1Aa60a8576EBc1b2F8236b4A22f4"
+  },
+  "stacks": {
+    "main": {
+      "label": "main",
+      "priceFeed": "0x86bCF0841622a5dAC14A313a15f96A95421b9366",
+      "pricer": "0xe25F6095665626342ffF7FeA7d8BE0c40517Cf34",
+      "bank": "0x55726A86c321347db688f2C6A331445465eeE9BE",
+      "buffer": "0xAB61604F82f645110A062b49F2bC204cbb473d39",
+      "game": "0xb86Ef40aB59dFbc9fAE812Bc379D248DB3D6Defd",
+      "jackpot": "0xAca44212b5Ac418E17B750142F9152314eccdE5e",
+      "loop": "0x33c807030053b821B1efCEcbF40F9A7025edec28",
+      "gateway": "0x87968C86f9728FB0f946453e6DECD0Cea70204Fd",
+      "accountFactory": "0x6Fe844B458829e60CCe1dcd0000eeA94B96C76e4",
+      "fromBlock": 16745655,
+      "deployedAt": 1794531190
+    },
+    "demo": {
+      "label": "demo (DEMO ONLY: price can be set by the owner)",
+      "priceFeed": "0x01297A4923330BC49EAA21777284b3e6440498E8",
+      "pricer": "0x009BcfeC38cF0F15215E87B44fF1DF53c868A0D1",
+      "bank": "0x136fc7b4f5C7A2028C33d27055cf1ab8387Aa4fD",
+      "buffer": "0xaa07cCbd7DC5662321D0E2bc7D4CFa34a9eB62A0",
+      "game": "0x652C3Db601a194f4f7BD4294e7447f1fDbe99525",
+      "jackpot": "0x357B24D3dc36f8F40601aD50E7325c5D076d8296",
+      "loop": "0x6509684FF00DE88c0E233Ca16c2082b01Ce450a1",
+      "gateway": "0x5E2DFd2992CACb5d8ca505069FD79154Bf15e4F5",
+      "accountFactory": null,
+      "fromBlock": 16745681,
+      "deployedAt": 1794531282
+    }
+  }
+} as const;

@@ -1,0 +1,10 @@
+{
+  "name": "juu-frontend",
+  "private": true,
+  "workspaces": ["shared", "app", "landing"],
+  "scripts": {
+    "dev:app": "npm run dev -w app",
+    "dev:landing": "npm run dev -w landing",
+    "build": "npm run build -w app && npm run build -w landing"
+  }
+}

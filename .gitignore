@@ -8,3 +8,8 @@ cache/
 broadcast/
 backend/data/
 contracts/lib/
+
+# frontend builds
+.next/
+*.tsbuildinfo
+next-env.d.ts

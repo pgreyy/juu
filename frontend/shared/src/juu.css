@@ -1,0 +1,116 @@
+/* Juu shared styles. Tokens: Ascension, light by default, dark under html[data-theme="dark"].
+   Light: bg #E6E1D5 · surf #F6F2E8 · ink #101010 · muted #55524B · rule #101010 · rule2 #D6CFBF · strong #101010 ·
+          onStrong #F6F2E8 · panel #ECE6D8 · bull #12804A · bear #C8361B · bullBar #1FAF66 · bearBar #E2452A · hi #6B7300 · sel #ECE6D8
+   Dark:  bg #0A0A0A · surf #101010 · ink #F0E9D8 · muted #929292 · rule #3A3A3A · rule2 #222222 · strong #E6F05A ·
+          onStrong #101010 · panel #1C1C1C · bull #3DDC84 · bear #F04427 · bullBar #3DDC84 · bearBar #F04427 · hi #E6F05A · sel #1E1E1E
+   Fonts: Bricolage Grotesque 500/700/800 (headlines, body), DM Mono 400/500 (numbers, labels, buttons). Radius 0. Borders 1.5px, dividers 1px. */
+
+:root {
+  --bg: #E6E1D5; --surf: #F6F2E8; --ink: #101010; --muted: #55524B; --rule: #101010; --rule2: #D6CFBF;
+  --strong: #101010; --onStrong: #F6F2E8; --panel: #ECE6D8; --onPanel: #101010;
+  --bull: #12804A; --bear: #C8361B; --bullBar: #1FAF66; --bearBar: #E2452A; --bearLine: #C8361B; --bullLine: #12804A;
+  --hi: #6B7300; --sel: #ECE6D8; --rMinor: #D6CFBF; --rBull: #1FAF66; --rBear: #E2452A;
+  --fD: 'Bricolage Grotesque', sans-serif;
+  --fB: 'Bricolage Grotesque', sans-serif;
+  --fN: 'DM Mono', monospace;
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  --bg: #0A0A0A; --surf: #101010; --ink: #F0E9D8; --muted: #929292; --rule: #3A3A3A; --rule2: #222222;
+  --strong: #E6F05A; --onStrong: #101010; --panel: #1C1C1C; --onPanel: #F0E9D8;
+  --bull: #3DDC84; --bear: #F04427; --bullBar: #3DDC84; --bearBar: #F04427; --bearLine: #F04427; --bullLine: #3DDC84;
+  --hi: #E6F05A; --sel: #1E1E1E; --rMinor: #2E2E2E; --rBull: #3DDC84; --rBear: #F04427;
+  color-scheme: dark;
+}
+
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fB); }
+*, *::before, *::after { box-sizing: border-box; }
+a { color: inherit; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.55; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Text helpers */
+.mono { font-family: var(--fN); }
+.label { font-family: var(--fN); font-size: 11px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+.c-bull { color: var(--bull); } .c-bear { color: var(--bear); } .c-hi { color: var(--hi); } .c-muted { color: var(--muted); } .c-ink { color: var(--ink); }
+
+/* Stack logo */
+.juu-mark { display: flex; align-items: center; justify-content: center; }
+.juu-mark svg { width: 100%; height: 100%; display: block; }
+
+/* Ticker */
+@keyframes juuTick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.juu-tickwrap { overflow: hidden; border-top: 1px solid var(--rule2); border-bottom: 1px solid var(--rule2); }
+.juu-tick { display: flex; width: max-content; animation: juuTick 52s linear infinite; }
+.juu-tickwrap:hover .juu-tick { animation-play-state: paused; }
+.juu-tick-item { display: flex; align-items: center; gap: 10px; padding: 8px 26px; border-right: 1px solid var(--rule2); white-space: nowrap; min-height: 60px; }
+.juu-tick-label { font-family: var(--fN); font-size: 11px; letter-spacing: 0.12em; color: var(--muted); }
+.juu-tick-value { font-family: var(--fN); font-size: 18px; font-weight: 500; }
+.juu-tick-sub { font-family: var(--fN); font-size: 12px; color: var(--muted); }
+
+/* Starburst ray chart */
+.juu-burst { position: relative; display: inline-block; }
+.juu-burst > span.ray { position: absolute; left: 50%; top: 50%; margin-left: -1px; transform-origin: 50% 0; }
+.juu-burst-mini { width: 40px; height: 40px; flex: 0 0 40px; }
+.juu-burst-core { position: absolute; left: 50%; top: 50%; border-radius: 50%; background: var(--surf); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--fN); text-align: center; }
+
+/* The Ladder */
+.ladder { border: 1.5px solid var(--rule); }
+.ladder-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.ladder-head { padding: 10px 14px; font-family: var(--fN); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); border-bottom: 1px solid var(--rule2); }
+.ladder-mark { display: flex; justify-content: center; align-items: baseline; gap: 12px; padding: 10px; background: var(--strong); color: var(--onStrong); font-family: var(--fN); }
+.ladder-mark .k { font-size: 11px; letter-spacing: 0.12em; }
+.ladder-mark .v { font-size: 22px; font-weight: 600; }
+.ladder-mark .d { font-size: 12px; }
+.ladder-row { position: relative; width: 100%; align-items: center; height: 46px; padding: 0 14px; background: transparent; border: 0; border-bottom: 1px solid var(--rule2); color: var(--ink); font-family: var(--fN); font-size: 14px; text-align: left; }
+.ladder-row[aria-pressed="true"] { background: var(--sel); }
+.ladder-row > span { position: relative; }
+.ladder-row .depth { position: absolute; top: 4px; bottom: 4px; opacity: 0.18; pointer-events: none; transition: width 0.6s ease; }
+.ladder-row .depth.bull { left: 0; background: var(--bullBar); }
+.ladder-row .depth.bear { right: 0; background: var(--bearLine); }
+.ladder-row .num { text-align: center; font-family: var(--fD); font-weight: 700; font-size: 18px; }
+.ladder-row .r { text-align: right; }
+.ladder-caption { margin-top: 12px; font-family: var(--fN); font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
+
+/* Agaruzo! banner */
+.agaruzo { background: var(--strong); color: var(--onStrong); padding: 10px 18px; display: flex; align-items: baseline; gap: 12px; }
+.agaruzo .big { font-family: var(--fD); font-weight: 700; font-size: 24px; letter-spacing: 0.06em; }
+.agaruzo .small { font-family: var(--fN); font-size: 12px; }
+
+/* Floor badge */
+.floor-badge { background: var(--panel); color: var(--onPanel); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.floor-badge .k { font-family: var(--fN); font-size: 10px; letter-spacing: 0.12em; }
+.floor-badge .n { font-family: var(--fD); font-weight: 700; font-size: 36px; line-height: 1; }
+
+/* Footer */
+.juu-footer { border-top: 1.5px solid var(--rule); background: var(--bg); padding: 48px 40px 28px; font-family: var(--fB); }
+.juu-footer-cols { display: flex; flex-wrap: wrap; gap: 40px 48px; }
+.juu-footer-brand { flex: 2 1 300px; min-width: 0; max-width: 380px; }
+.juu-footer-brand .name { font-family: var(--fD); font-weight: 700; font-size: 26px; }
+.juu-footer-brand p { margin: 16px 0 0; font-size: 14px; line-height: 1.6; color: var(--ink); }
+.juu-footer-col { flex: 1 1 150px; min-width: 0; }
+.juu-footer-col .t { font-family: var(--fD); font-weight: 700; font-size: 16px; }
+.juu-footer-col ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.juu-footer-col a, .juu-footer-col .plain { display: inline-block; min-height: 32px; line-height: 32px; color: var(--ink); font-size: 14px; text-decoration: none; }
+.juu-footer-col a:hover { text-decoration: underline; }
+.juu-footer-col .plain { color: var(--muted); }
+.juu-footer-col .note { margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.juu-footer-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--rule2); font-size: 12px; color: var(--muted); }
+
+/* Narrow screens: the Ladder keeps all five columns, tighter. */
+@media (max-width: 560px) {
+  .ladder-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) 36px minmax(0, 1fr) minmax(0, 0.8fr); gap: 4px; }
+  .ladder-head { padding: 10px 8px; font-size: 9px; letter-spacing: 0.06em; }
+  .ladder-row { padding: 0 8px; font-size: 12px; }
+  .ladder-row > span { overflow: hidden; text-overflow: clip; white-space: nowrap; }
+  .ladder-mark .v { font-size: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .juu-tick { animation: none; }
+  .ladder-row .depth { transition: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
