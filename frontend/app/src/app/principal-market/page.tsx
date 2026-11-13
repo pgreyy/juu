@@ -1,7 +1,8 @@
 "use client";
 import { fmt } from "@juu/ui";
 import { Contract, formatUnits, parseUnits, type Signer } from "ethers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { BTC_GAS_RESERVE, PctButtons } from "@/components/PctButtons";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { ADDR } from "@/lib/addresses";
@@ -9,6 +10,7 @@ import { useBtcBalance } from "@/lib/balances";
 import { useRead } from "@/lib/data";
 import { btc, daysLeft, seriesName } from "@/lib/format";
 import { useMarket } from "@/lib/market";
+import { POOL_ABI } from "@/lib/swap";
 import { call, read, useWallet } from "@/lib/wallet";
 
 const pct = (x: number) => fmt(x * 100, 2) + "%";
@@ -21,12 +23,8 @@ export default function PrincipalMarket() {
   const rows = (m.series || []).filter((s) => s.kind === "veBTC" && s.pMarket && s.phase !== "Matured").sort((a, b) => a.endDate.localeCompare(b.endDate));
   const [sel, setSel] = useState<number | null>(null);
   const pick = rows.find((s) => s.id === sel) || rows.find((s) => s.phase === "Open") || rows[0] || null;
+  // Starts empty; 25% to MAX fill it from the wallet.
   const [pay, setPay] = useState("");
-  const [typed, setTyped] = useState(false);
-  // A starting amount (0.001 Principal's worth) once prices load, unless you have already typed one.
-  useEffect(() => {
-    if (pick?.pMarket && !typed) setPay(fmt(pick.pMarket.btcPerP * 0.001, 6));
-  }, [pick?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [mode, setMode] = useState<"buy" | "sell">("buy");
   const isBuy = mode === "buy";
@@ -38,15 +36,26 @@ export default function PrincipalMarket() {
     return Number(formatUnits(out[1], 18));
   }, 15000);
   const held = useRead(pick && w.address ? `p-${pick.id}-${w.address}` : null, async () => Number(formatUnits(await read(pick!.pToken, ABI.erc20).balanceOf(w.address), 18)), 20000, w.bump);
-  const disc = pick?.pMarket ? 1 - pick.pMarket.btcPerP : 0;
   const myBtc = useBtcBalance(w.address, w.bump);
-  const tooMuch = isBuy ? myBtc != null && n > 0 && n > myBtc - 0.00001 : held != null && n > held;
+  const tooMuch = isBuy ? myBtc != null && n > 0 && n > myBtc - BTC_GAS_RESERVE : held != null && n > held;
   // Price impact: how far this order's average price is from the pool's price now. The pools are small, so a big
   // order moves the price a lot; above 5% the button stays off.
   const spot = pick?.pMarket?.btcPerP ?? 0;
   const avg = quote && n > 0 ? (isBuy ? n / quote : quote / n) : null; // BTC per Principal for this order
   const impact = avg && spot > 0 ? (isBuy ? avg / spot - 1 : 1 - avg / spot) : null;
   const tooBig = impact != null && impact > 0.05;
+  // The largest order under the 5% limit, from the pool's reserves (r = the reserve of what you pay in). For a
+  // constant-product pool an order of a·r moves the price by about a (plus the 0.04% fee); measured in BTC per
+  // Principal a buy reads a little higher, so 4.5% of the reserve keeps both under 5%.
+  const reserves = useRead(pick?.pMarket?.pool ? `pmres-${pick.pMarket.pool}` : null, async () => {
+    const p = read(pick!.pMarket!.pool, POOL_ABI);
+    const [t0, r] = await Promise.all([p.token0(), p.getReserves()]);
+    const pIs0 = t0.toLowerCase() === pick!.pToken.toLowerCase();
+    return { p: Number(formatUnits(pIs0 ? r[0] : r[1], 18)), btc: Number(formatUnits(pIs0 ? r[1] : r[0], 18)) };
+  }, 30000, w.bump);
+  const largest = reserves ? 0.045 * (isBuy ? reserves.btc : reserves.p) : null;
+  // The fixed return to the end date: for this order when an amount is entered (its own price), else at the pool price.
+  const orderReturn = isBuy && quote && n > 0 && !tooBig ? quote / n - 1 : pick?.pMarket?.fixedReturnToEnd ?? 0;
 
   const go = () => {
     if (!pick || n <= 0 || !quote) return;
@@ -106,13 +115,13 @@ export default function PrincipalMarket() {
         </section>
         <section className="panel" style={{ flex: "1 1 300px", minWidth: 0 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
-            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={isBuy} onClick={() => { setMode("buy"); if (pick?.pMarket) setPay(fmt(pick.pMarket.btcPerP * 0.001, 6)); }}>BUY</button>
-            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={!isBuy} onClick={() => { setMode("sell"); setPay(held ? fmt(held, 6).replace(/,/g, "") : ""); }}>SELL</button>
+            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={isBuy} onClick={() => { setMode("buy"); setPay(""); }}>BUY</button>
+            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={!isBuy} onClick={() => { setMode("sell"); setPay(""); }}>SELL</button>
           </div>
           <div style={{ fontSize: 11, letterSpacing: "0.12em" }}>{isBuy ? "BUY" : "SELL"} PRINCIPAL · {pick ? seriesName(pick.endDate) : "—"}</div>
           {isBuy ? (
             <>
-              <div style={{ fontSize: 46, marginTop: 10 }}>{pct(pick?.pMarket?.fixedReturnToEnd ?? 0)}</div>
+              <div style={{ fontSize: 46, marginTop: 10 }}>{pct(orderReturn)}</div>
               <div style={{ fontFamily: "var(--fB)", fontSize: 13 }}>fixed return if you hold to the end date</div>
             </>
           ) : (
@@ -122,19 +131,37 @@ export default function PrincipalMarket() {
             </>
           )}
           <label htmlFor="mkAmt" style={{ display: "block", fontSize: 11, letterSpacing: "0.12em", marginTop: 18 }}>{isBuy ? "PAY (BTC)" : "SELL (PRINCIPAL)"}</label>
-          <input id="mkAmt" className="line" style={{ fontSize: 28, padding: "6px 0" }} value={pay} onChange={(e) => { setTyped(true); setPay(e.target.value); }} inputMode="decimal" autoComplete="off" />
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 14, fontSize: 13 }}>
-            <span>You get</span>
-            <span>{quote == null ? "—" : isBuy ? `${small(quote)} Principal → ${small(quote)} BTC` : `${small(quote)} BTC now`}</span>
-          </div>
+          <input id="mkAmt" className="line" style={{ fontSize: 28, padding: "6px 0" }} value={pay} onChange={(e) => setPay(e.target.value)} inputMode="decimal" autoComplete="off" placeholder="0" />
+          <PctButtons balance={w.address ? (isBuy ? myBtc : held) : null} reserve={isBuy ? BTC_GAS_RESERVE : 0} decimals={8} onPick={setPay} label={isBuy ? "BTC" : "Principal"} />
+          <p className="pm-get">
+            {isBuy
+              ? `You get ${small(quote ?? 0)} Principal (worth ${small(quote ?? 0)} BTC on ${pick ? seriesName(pick.endDate) : "its end date"})`
+              : `You get ${small(quote ?? 0)} BTC now`}
+          </p>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 8, fontSize: 13 }}>
             <span>Price impact</span>
             <span className={tooBig ? "c-bear" : undefined}>{impact == null ? "—" : pct(Math.max(impact, 0))}</span>
           </div>
           {tooMuch && <p className="txnote error">{isBuy ? `You have ${small(myBtc!)} BTC in this wallet.` : `You hold ${small(held!)} Principal in this series.`}</p>}
-          {tooBig && !tooMuch && <p className="txnote error">This order would move the pool&apos;s price by more than 5%. Try a smaller amount.</p>}
+          {tooBig && !tooMuch && (
+            <p className="txnote error">
+              Too large for the pool right now, try a smaller amount.
+              {largest != null && largest > 0 && (
+                <>
+                  {" "}The largest under 5% is about{" "}
+                  <button type="button" className="linkbtn" onClick={() => setPay(String(Math.floor(largest * 1e8) / 1e8))}>{small(largest)} {isBuy ? "BTC" : "Principal"}</button>.
+                </>
+              )}
+            </p>
+          )}
           <button type="button" className="btn-strong" style={{ marginTop: 20, height: 54, fontSize: 15 }} onClick={go} disabled={!pick || !quote || tooMuch || tooBig || busy(w.tx, "buy")}>
-            {busy(w.tx, "buy") ? (isBuy ? "BUYING…" : "SELLING…") : isBuy ? `BUY AT ${pct(disc)} OFF` : "SELL FOR BTC"}
+            {busy(w.tx, "buy")
+              ? isBuy ? "BUYING…" : "SELLING…"
+              : n <= 0 ? "ENTER AN AMOUNT"
+              : tooMuch ? (isBuy ? "NOT ENOUGH BTC" : "NOT ENOUGH PRINCIPAL")
+              : tooBig ? "TOO LARGE FOR THE POOL"
+              : isBuy ? `BUY FOR A ${pct(orderReturn)} FIXED RETURN`
+              : quote ? `SELL FOR ${small(quote)} BTC` : "SELL FOR BTC"}
           </button>
           <TxNote k="buy" />
         </section>

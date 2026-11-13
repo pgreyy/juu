@@ -2,6 +2,7 @@
 import { Agaruzo, FloorBadge, Ladder, amt, collapsePrice, fmt, lev, pad2, shortAddr, signed, usd, type LadderRow } from "@juu/ui";
 import { Contract, formatUnits, parseUnits, type Signer } from "ethers";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PctButtons } from "@/components/PctButtons";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { ADDR } from "@/lib/addresses";
@@ -40,7 +41,7 @@ export default function MUSDash() {
   const m = useMarket();
   const [side, setSide] = useState<"Bull" | "Bear">("Bull");
   const [chip, setChip] = useState<Chip>("MUSD");
-  const [amount, setAmount] = useState("100");
+  const [amount, setAmount] = useState("");
   const [floor, setFloor] = useState(5);
   const [pick, setPick] = useState<number | null>(null);
   const [cheer, setCheer] = useState<number | null>(null);
@@ -58,6 +59,9 @@ export default function MUSDash() {
   );
   const chipLabel = (c: Chip) => (c === "MUSD" ? "MUSD" : `${c === "Y" ? "Yield" : "Principal"} ${series ? seriesShort(series.endDate) : ""}`.trim());
   const unit = chip === "MUSD" ? "MUSD" : chip === "Y" ? "YIELD" : "PRINCIPAL";
+  // The wallet's balance of the chip being bet (MUSD, or this series' Yield or Principal), for 25% to MAX.
+  const chipToken = chip === "MUSD" ? ADDR.mezo.musd : chip === "Y" ? series?.yToken : series?.pToken;
+  const chipBal = useRead(w.address && chipToken ? `chipbal-${chipToken}-${w.address}` : null, async () => Number(formatUnits(await read(chipToken!, ABI.erc20).balanceOf(w.address), 18)), 20000, w.bump);
   const perToken = chip === "MUSD" ? 1 : chip === "Y" ? series?.yMarginValuePerY ?? 0 : series?.pMarginValuePerP ?? 0;
 
   const n = Number(amount.replace(/,/g, "")) || 0;
@@ -177,6 +181,7 @@ export default function MUSDash() {
             <input id="amt" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" />
             <span className="unit">{unit}</span>
           </div>
+          <PctButtons balance={chipBal} decimals={chip === "MUSD" ? 2 : 6} onPick={setAmount} label={unit.toLowerCase()} />
           <div className="label mt16">FLOOR</div>
           <div className="picks">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((f) => (

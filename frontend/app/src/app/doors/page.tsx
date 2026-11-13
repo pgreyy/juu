@@ -2,6 +2,7 @@
 import { fmt } from "@juu/ui";
 import { Contract, ZeroAddress, formatUnits, parseUnits, type Signer } from "ethers";
 import { useState } from "react";
+import { BTC_GAS_RESERVE, PctButtons } from "@/components/PctButtons";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { ADDR } from "@/lib/addresses";
@@ -25,11 +26,12 @@ export default function Doors() {
   const w = useWallet();
   const m = useMarket();
   const [door, setDoor] = useState<DoorKey>("btc");
-  const [amount, setAmount] = useState("0.0100");
+  const [amount, setAmount] = useState("");
   const [debt, setDebt] = useState("1800");
   const [pickId, setPickId] = useState<number | null>(null);
   const d = DOORS.find((x) => x.k === door)!;
   const myBtc = useBtcBalance(w.address, w.bump);
+  const mySmusd = useRead(w.address ? `smusd-${w.address}` : null, async () => Number(formatUnits(await read(ADDR.mezo.smusd, ABI.erc20).balanceOf(w.address), 18)), 20000, w.bump);
 
   const kind = door === "smusd" ? "sMUSD" : "veBTC";
   const options = (m.series || [])
@@ -107,7 +109,7 @@ export default function Doors() {
             aria-pressed={door === x.k}
             onClick={() => {
               setDoor(x.k);
-              setAmount(x.k === "ve" ? "" : x.k === "smusd" ? "100" : "0.0100");
+              setAmount("");
             }}
           >
             <span className="code">{x.code}</span>
@@ -124,6 +126,9 @@ export default function Doors() {
             <input id="doorAmt" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode={door === "ve" ? "numeric" : "decimal"} placeholder={door === "ve" ? "veBTC NFT id" : "0"} autoComplete="off" />
             <span className="unit">{d.unit}</span>
           </div>
+          {door !== "ve" && (
+            <PctButtons balance={door === "smusd" ? mySmusd : myBtc} reserve={door === "smusd" ? 0 : BTC_GAS_RESERVE} decimals={door === "smusd" ? 2 : 6} onPick={setAmount} label={d.unit} />
+          )}
           {door === "trove" ? (
             <>
               <label htmlFor="doorDebt" className="label" style={{ display: "block", marginTop: 16 }}>BORROW</label>

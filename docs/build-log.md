@@ -381,3 +381,15 @@ matched), server keeper's first transactions: veBTC harvest series 0 tx 0xf2749c
 * MEZO on testnet: 0x7B7c000000000000000000000000000000000001 (18 decimals). An existing MUSD/MEZO volatile pool from
   Mezo's PoolFactory, 0x8eb88d745B0aFFF9D71AbC40d7F550Cded7bB342 (72.03 MUSD / 88.85 MEZO when checked), so no pool was
   created or seeded. The Swap page routes MEZO through it (BTC <-> MEZO via MUSD) and Portfolio prices MEZO from it.
+
+## Principal Market liquidity top-up (13 Nov 2026)
+
+From the deployer, through Mezo's Router: 400 MUSD -> BTC (tx 0x765a445f3cee8ba2d057aecde6502fb1d106ffc474cff0c1ae30efd54a415f3d),
+zaps for Principal (series 1 tx 0x3c10a38f6328099d4a9cf9d57194f8d865fa530206a490e8e9451577fa7d96ef, series 2 tx
+0xa8c09b25f8f1eaa6966696ef9e9c024c2a6b4fe99bd948c5b1cdc2a1b81b3923), then liquidity at the pool price:
+series 0 (10 Dec 26) 0.0005 P + 0.000495 BTC (tx 0xef4d0e3d74fbfcd9dbf341221493a27bd4e29160fb0ca8d1df62736061ec3ff6),
+series 1 (31 Dec 26) 0.006129 P + 0.005979 BTC (tx 0x737e04cbf23d57d2cccf81e5241b3002a5d2532b46c708d73f78f18a2938c949),
+series 2 (25 Mar 27) 0.006129 P + 0.006009 BTC (tx 0xfb45ee2f4b4d0abdf6c92bb2f88709e44fd1354fcd1b08277a582af91a6145d7).
+Pools after: 0.0010 / 0.0066 / 0.0066 P against 0.0010 / 0.0065 / 0.0065 BTC. Test buy 0.00005 BTC on series 1: 0.81%
+price impact (tx 0x8037bfc3da38cfcf1c0079a66b767e7cbeafe4b71caa7feba7efb66bafba1844). The deployer's Bank shares (all of
+both Banks) were left in place.

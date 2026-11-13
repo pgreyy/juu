@@ -1,13 +1,14 @@
 "use client";
 import { fmt, shortAddr } from "@juu/ui";
-import { Contract, Wallet, isAddress, parseUnits, type Signer } from "ethers";
+import { Contract, Wallet, formatUnits, isAddress, parseUnits, type Signer } from "ethers";
 import { useState } from "react";
 import { ConnectAgent, CopyButton } from "@/components/ConnectAgent";
+import { PctButtons } from "@/components/PctButtons";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { ADDR } from "@/lib/addresses";
-import { stackAddr, usePoll, useStack } from "@/lib/data";
-import { call, useWallet } from "@/lib/wallet";
+import { stackAddr, usePoll, useRead, useStack } from "@/lib/data";
+import { call, read, useWallet } from "@/lib/wallet";
 
 type Session = { agent: string; active: boolean; expires: string; maxChipsMUSD: number; maxFloor: number; dailyLossLimitMUSD: number; lossTodayMUSD: number; netTodayMUSD: number; canSetLoop: boolean };
 type Fee = { rateOfSize: number; minimumMUSD: number; toBuffer: number; toBank: number };
@@ -26,7 +27,7 @@ export default function Agents() {
   const sessions = usePoll<{ sessions: Session[] }>(w.address ? `/api/${stack}/agents/${w.address}` : null, 30000, w.bump);
   const fee = usePoll<Fee>(`/api/${stack}/agent-fee`, 300000);
   const [agent, setAgent] = useState("");
-  const [maxBet, setMaxBet] = useState("500");
+  const [maxBet, setMaxBet] = useState("");
   const [floor, setFloor] = useState("6");
   const [loss, setLoss] = useState("200");
   const [days, setDays] = useState("7");
@@ -38,6 +39,7 @@ export default function Agents() {
   const [fundGas, setFundGas] = useState(true);
   const [created, setCreated] = useState<{ address: string; key: string | null } | null>(null);
   const GAS_BTC = "0.00002";
+  const myMusd = useRead(w.address ? `musd-${w.address}` : null, async () => Number(formatUnits(await read(ADDR.mezo.musd, ABI.erc20).balanceOf(w.address), 18)), 30000, w.bump);
 
   const gw = (s: Signer) => new Contract(A.gateway, ABI.gateway, s);
   const grant = (who: string, maxChips: number, maxFloor: number, dailyLoss: number, d: number, key: string, gasBtc?: string) => {
@@ -201,7 +203,8 @@ export default function Agents() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 12, marginTop: 12 }}>
             <div>
               <label htmlFor="agMax" style={{ fontSize: 11, letterSpacing: "0.12em" }}>MAX PER BET (MUSD)</label>
-              <input id="agMax" className="line" style={{ fontSize: 15 }} value={maxBet} onChange={(e) => setMaxBet(e.target.value)} inputMode="decimal" />
+              <input id="agMax" className="line" style={{ fontSize: 15 }} value={maxBet} onChange={(e) => setMaxBet(e.target.value)} inputMode="decimal" placeholder="0" />
+              <PctButtons balance={myMusd} decimals={2} onPick={setMaxBet} label="MUSD" />
             </div>
             <div>
               <label htmlFor="agFloor" style={{ fontSize: 11, letterSpacing: "0.12em" }}>HIGHEST FLOOR</label>

@@ -219,3 +219,11 @@ main.main p, .lede, .note { max-width: 72ch; }
 .sw-slip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.4fr); gap: 6px; margin-top: 8px; align-items: center; }
 .sw-slip input.line { margin-top: 0; font-size: 13px; }
 .swap .readout dd { overflow-wrap: anywhere; }
+
+/* 25% / 50% / 75% / MAX under amount inputs */
+.pct { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 8px; }
+.pct-btn { min-height: 36px; padding: 0; font-family: var(--fN); font-size: 11px; letter-spacing: 0.04em; background: transparent; color: inherit; border: 1px solid currentColor; opacity: 0.9; }
+.pct-btn:disabled { opacity: 0.35; }
+.pm-get { margin: 14px 0 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 600px) { .pm-get { white-space: normal; } }
+.linkbtn { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }

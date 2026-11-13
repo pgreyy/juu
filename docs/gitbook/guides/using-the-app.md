@@ -66,6 +66,11 @@ of the limit today's losses have used; the gateway stops the agent when they rea
 **price impact**: how far your order's average price is from the pool's price. Above 5% the button stays off; try a
 smaller amount.
 
+## Amounts
+
+Every amount box starts empty. **25%**, **50%**, **75%** and **MAX** under it fill it from your real balance of that token;
+MAX on BTC keeps 0.00001 BTC back for gas.
+
 ## Checks before you sign
 
 Pages that pay in BTC (Doors, Bank, Principal Market) check your wallet's BTC first and say how much you have if the

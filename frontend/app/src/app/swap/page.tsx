@@ -2,6 +2,7 @@
 import { fmt } from "@juu/ui";
 import { Contract, formatUnits, parseUnits, type Signer } from "ethers";
 import { useState } from "react";
+import { BTC_GAS_RESERVE, PctButtons } from "@/components/PctButtons";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { useRead } from "@/lib/data";
@@ -12,13 +13,13 @@ const n18 = (x: bigint) => Number(formatUnits(x, 18));
 const show = (s: Sym, v: number) => (s === "BTC" ? (v > 0 && v < 0.01 ? fmt(v, 8) : fmt(v, 6)) : fmt(v, 4));
 const SLIPS = [0.1, 0.5, 1];
 // Leave a little BTC for gas when swapping BTC away.
-const GAS_LEFT = 0.00001;
+const GAS_LEFT = BTC_GAS_RESERVE;
 
 export default function Swap() {
   const w = useWallet();
   const [from, setFrom] = useState<Sym>("BTC");
   const [to, setTo] = useState<Sym>("MUSD");
-  const [amount, setAmount] = useState("0.0001");
+  const [amount, setAmount] = useState("");
   const [slip, setSlip] = useState(0.5);
   const [custom, setCustom] = useState("");
   const slipPct = custom ? Number(custom) || 0 : slip;
@@ -106,7 +107,8 @@ export default function Swap() {
           <div style={{ fontSize: 12 }}>{w.address ? `Balance ${show(from, have ?? 0)} ${from}` : ""}</div>
         </div>
         <Picker side="from" value={from} />
-        <input aria-label={`Amount of ${from}`} className="line sw-amt" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" />
+        <input aria-label={`Amount of ${from}`} className="line sw-amt" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" placeholder="0" />
+        <PctButtons balance={w.address ? have : null} reserve={from === "BTC" ? BTC_GAS_RESERVE : 0} decimals={from === "BTC" ? 8 : 4} onPick={setAmount} label={from} />
         <div style={{ display: "flex", justifyContent: "center", margin: "10px 0" }}>
           <button type="button" className="btn-line sw-flip" onClick={flip} aria-label="Swap direction">↓↑</button>
         </div>

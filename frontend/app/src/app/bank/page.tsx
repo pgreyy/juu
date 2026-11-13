@@ -2,6 +2,7 @@
 import { amt, fmt } from "@juu/ui";
 import { Contract, formatUnits, parseUnits } from "ethers";
 import { useState } from "react";
+import { BTC_GAS_RESERVE, PctButtons } from "@/components/PctButtons";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { stackAddr, usePoll, useRead, useStack } from "@/lib/data";
@@ -22,7 +23,7 @@ export default function Bank() {
   const A = stackAddr(stack);
   const w = useWallet();
   const [mode, setMode] = useState<"dep" | "wd">("dep");
-  const [amount, setAmount] = useState("0.0100");
+  const [amount, setAmount] = useState("");
   const bank = usePoll<BankRes>(`/api/${stack}/bank`, 20000, w.bump);
   const chain = useRead(
     `bank-${stack}-${w.address}`,
@@ -71,14 +72,15 @@ export default function Bank() {
       <div style={{ display: "flex", flexWrap: "wrap", gap: 32, marginTop: 24 }}>
         <section style={{ flex: "1 1 340px", minWidth: 0 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 6 }}>
-            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={isDep} onClick={() => setMode("dep")}>DEPOSIT</button>
-            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={!isDep} onClick={() => setMode("wd")}>WITHDRAW</button>
+            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={isDep} onClick={() => { setMode("dep"); setAmount(""); }}>DEPOSIT</button>
+            <button type="button" className="btn-line" style={{ height: 48, fontSize: 13 }} aria-pressed={!isDep} onClick={() => { setMode("wd"); setAmount(""); }}>WITHDRAW</button>
           </div>
           <label htmlFor="bankAmt" className="label" style={{ display: "block", marginTop: 16 }}>{isDep ? "DEPOSIT" : "WITHDRAW"} BTC</label>
           <div className="amount-row">
             <input id="bankAmt" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" autoComplete="off" />
             <span className="unit">BTC</span>
           </div>
+          <PctButtons balance={w.address ? (isDep ? myBtc : shareBTC) : null} reserve={isDep ? BTC_GAS_RESERVE : 0} decimals={8} onPick={setAmount} label="BTC" />
           <p className="note">
             {isDep
               ? `Your BTC becomes Bank shares. The Bank borrows MUSD on Mezo at 1% and backs the game with it. Its trove aims for ${bank.data ? fmt(bank.data.trove.target * 100) : "300"}%.`
