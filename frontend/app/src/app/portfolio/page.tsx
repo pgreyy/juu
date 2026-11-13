@@ -1,6 +1,8 @@
 "use client";
 import { amt, fmt, lev, pad2, shortAddr, signed, usd } from "@juu/ui";
 import { Contract, ZeroAddress, formatUnits } from "ethers";
+import { useEffect, useState } from "react";
+import { SwapCard } from "@/components/SwapCard";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { ADDR } from "@/lib/addresses";
@@ -9,7 +11,7 @@ import { stackAddr, usePoll, useRead, useStack } from "@/lib/data";
 import { btc, daysLeft, seriesName } from "@/lib/format";
 import { useMarket } from "@/lib/market";
 import type { Pos } from "@/lib/types";
-import { POOL_ABI, SWAP } from "@/lib/swap";
+import { POOL_ABI, SWAP, SYMS, type Sym } from "@/lib/swap";
 import { EXPLORER, call, read, useWallet } from "@/lib/wallet";
 
 type Activity = {
@@ -19,7 +21,7 @@ type Activity = {
 };
 type PortfolioRes = { realizedTodayMUSD: number; activity: Activity[] };
 type Tickets = { yourTickets: number; allTickets: number; yourOdds: number };
-type Line = { what: string; detail: string; amount: string; usd: number; note?: string };
+type Line = { what: string; detail: string; amount: string; usd: number; note?: string; swap?: Sym };
 
 const n18 = (x: bigint) => Number(formatUnits(x, 18));
 // Small BTC amounts need more than btc()'s 4 decimals.
@@ -46,7 +48,36 @@ function activityLine(a: Activity): { text: string; tone: string } {
   }
 }
 
+type Tab = "overview" | "swap";
+const asSym = (v: string | null) => (v && (SYMS as string[]).includes(v.toUpperCase()) ? (v.toUpperCase() as Sym) : undefined);
+
 export default function Portfolio() {
+  // Tabs live in the address (?tab=swap&from=BTC&to=MUSD), so links from elsewhere open the right one.
+  const [tab, setTab] = useState<Tab>("overview");
+  const [swapFrom, setSwapFrom] = useState<Sym | undefined>();
+  const [swapTo, setSwapTo] = useState<Sym | undefined>();
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("tab") === "swap") setTab("swap");
+    setSwapFrom(asSym(q.get("from")));
+    setSwapTo(asSym(q.get("to")));
+  }, []);
+  const openTab = (t: Tab, from?: Sym, to?: Sym) => {
+    setTab(t);
+    setSwapFrom(from);
+    setSwapTo(to);
+    const q = new URLSearchParams(window.location.search);
+    for (const k of ["tab", "from", "to"]) q.delete(k);
+    if (t === "swap") {
+      q.set("tab", "swap");
+      if (from) q.set("from", from);
+      if (to) q.set("to", to);
+    }
+    const qs = q.toString();
+    window.history.replaceState(null, "", window.location.pathname + (qs ? "?" + qs : ""));
+    window.scrollTo({ top: 0 });
+  };
+
   const { stack } = useStack();
   const A = stackAddr(stack);
   const w = useWallet();
@@ -97,9 +128,9 @@ export default function Portfolio() {
   // ones MUSDash uses for chips. MEZO rewards have no price here, so they are listed but not counted.
   const lines: Line[] = [];
   if (me) {
-    lines.push({ what: "Wallet", detail: "BTC", amount: `${b8(walletBtc ?? 0)} BTC`, usd: (walletBtc ?? 0) * price });
-    lines.push({ what: "Wallet", detail: "MUSD", amount: `${amt(walletMusd ?? 0)} MUSD`, usd: walletMusd ?? 0 });
-    if ((walletMezo ?? 0) > 0) lines.push({ what: "Wallet", detail: "MEZO", amount: `${amt(walletMezo ?? 0)} MEZO`, usd: (walletMezo ?? 0) * (mezoPrice ?? 0), note: mezoPrice == null ? "no MEZO price" : "priced from Mezo's MEZO/MUSD pool" });
+    lines.push({ what: "Wallet", detail: "BTC", amount: `${b8(walletBtc ?? 0)} BTC`, usd: (walletBtc ?? 0) * price, swap: "BTC" });
+    lines.push({ what: "Wallet", detail: "MUSD", amount: `${amt(walletMusd ?? 0)} MUSD`, usd: walletMusd ?? 0, swap: "MUSD" });
+    if ((walletMezo ?? 0) > 0) lines.push({ what: "Wallet", detail: "MEZO", amount: `${amt(walletMezo ?? 0)} MEZO`, usd: (walletMezo ?? 0) * (mezoPrice ?? 0), note: mezoPrice == null ? "no MEZO price" : "priced from Mezo's MEZO/MUSD pool", swap: "MEZO" });
     for (const b of bals || []) {
       const name = `${seriesName(b.s.endDate)}${b.s.kind === "sMUSD" ? " · sMUSD" : ""} · ${daysLeft(b.s.endDate)}`;
       const ve = b.s.kind === "veBTC";
@@ -129,6 +160,14 @@ export default function Portfolio() {
   return (
     <>
       <h1 className="h1">PORTFOLIO</h1>
+      <div className="pf-tabs" role="tablist" aria-label="Portfolio">
+        <button type="button" role="tab" className="btn-line" aria-selected={tab === "overview"} aria-pressed={tab === "overview"} onClick={() => openTab("overview")}>OVERVIEW</button>
+        <button type="button" role="tab" className="btn-line" aria-selected={tab === "swap"} aria-pressed={tab === "swap"} onClick={() => openTab("swap")}>SWAP</button>
+      </div>
+      {tab === "swap" ? (
+        <SwapCard key={`${swapFrom ?? ""}-${swapTo ?? ""}`} initialFrom={swapFrom} initialTo={swapTo} />
+      ) : (
+      <>
       <p className="lede">Everything this wallet holds in Juu, valued at today&apos;s BTC price.</p>
       {!me ? (
         <div className="empty" style={{ fontSize: 14 }}>Connect a wallet to see your portfolio.</div>
@@ -165,6 +204,9 @@ export default function Portfolio() {
                   <tr key={i}>
                     <td style={{ padding: "14px 0", fontWeight: 600 }}>
                       {l.what}
+                      {l.swap && (
+                        <button type="button" className="pf-swap" onClick={() => openTab("swap", l.swap)} aria-label={`Swap your ${l.swap}`}>SWAP</button>
+                      )}
                       <span className="pf-sub c-muted">{l.detail}{l.note ? ` · ${l.note}` : ""}</span>
                     </td>
                     <td style={{ textAlign: "left" }} className="pf-detail c-muted">{l.detail}{l.note ? ` · ${l.note}` : ""}</td>
@@ -228,6 +270,8 @@ export default function Portfolio() {
           );
         })}
       </section>
+      </>
+      )}
     </>
   );
 }

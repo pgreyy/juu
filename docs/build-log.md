@@ -393,3 +393,11 @@ series 2 (25 Mar 27) 0.006129 P + 0.006009 BTC (tx 0xfb45ee2f4b4d0abdf6c92bb2f88
 Pools after: 0.0010 / 0.0066 / 0.0066 P against 0.0010 / 0.0065 / 0.0065 BTC. Test buy 0.00005 BTC on series 1: 0.81%
 price impact (tx 0x8037bfc3da38cfcf1c0079a66b767e7cbeafe4b71caa7feba7efb66bafba1844). The deployer's Bank shares (all of
 both Banks) were left in place.
+
+Swap moved into Portfolio (Swap tab), new card: 0.00005 BTC -> 3.91 MUSD through Mezo's Router (approve tx
+0x3c5c8d22801faea264f2028cdf6e8891d82faa4a668e4224711f12df6a947be3, swap tx
+0x8ba42701937186fa9a008041d7bb9d20acc8ad2a9a69099e8506a7c2660c2b42).
+MCP without `user` on demo (test agent 0x5028…429a, one owner): juu_whoami showed playsFor = the deployer; juu_open #11 tx
+0x9f1f25c83e327407042cf1ad6eaf4c80913742f715ca969132fdfcf43df046b5, closed tx 0x800f906abae361aee8db849485a35a92926a96512a7ff26150b403aa37f611b8.
+Agents Remove on demo: revoke tx 0xd3143cbf5ce7e9dfcf0e9746574d9fcc35c6426125a546dfdd6f195bdaffdbdb, then a signed hide (no
+transaction); the Data API refused a live agent (409) and another wallet's signature (403).

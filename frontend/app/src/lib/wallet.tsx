@@ -277,15 +277,17 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         else if (chainId !== CHAIN_ID && !(await switchNetwork())) return false;
         if (!a) return false;
         const signer = await new BrowserProvider(eth()! as never).getSigner();
+        let last: string | undefined;
         for (let i = 0; i < steps.length; i++) {
           setTx({ key, state: "wallet", msg: steps.length > 1 ? `Confirm step ${i + 1} of ${steps.length} in your wallet.` : "Confirm in your wallet." });
           const t = (await steps[i](signer)) as TransactionResponse | null;
           if (!t) continue;
+          last = t.hash;
           setTx({ key, state: "pending", msg: "Waiting for Mezo testnet…", hash: t.hash });
           const r = await waitFor(t.hash);
           if (r.status !== 1) throw new Error("The transaction failed on chain.");
         }
-        setTx({ key, state: "done", msg: doneMsg });
+        setTx({ key, state: "done", msg: doneMsg, hash: last });
         setBump((b) => b + 1);
         return true;
       } catch (err) {

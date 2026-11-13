@@ -10,7 +10,11 @@ const config: NextConfig = {
   turbopack: { root: path.join(__dirname, "..") },
   // Positions became Portfolio; old links keep working (the query, e.g. ?stack=demo, is kept).
   async redirects() {
-    return [{ source: "/positions", destination: "/portfolio", permanent: true }];
+    return [
+      { source: "/positions", destination: "/portfolio", permanent: true },
+      // Swap lives in Portfolio's Swap tab.
+      { source: "/swap", destination: "/portfolio?tab=swap", permanent: true },
+    ];
   },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API}/api/:path*` }];

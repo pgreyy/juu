@@ -13,7 +13,6 @@ export const TABS = [
   { href: "/doors", label: "Doors", icon: "doors" },
   { href: "/bank", label: "Bank", icon: "bank" },
   { href: "/principal-market", label: "Principal Market", icon: "principal-market" },
-  { href: "/swap", label: "Swap", icon: "swap" },
   { href: "/jackpot", label: "Jackpot", icon: "jackpot" },
   { href: "/agents", label: "Agents", icon: "agents" },
   { href: "/leaderboard", label: "Leaderboard", icon: "leaderboard" },
@@ -155,7 +154,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <Footer
             LinkAs={NextLink}
             play={[{ label: "MUSDash", href: "/" }, { label: "Jackpot", href: "/jackpot" }, { label: "Leaderboard", href: "/leaderboard" }, { label: "Agents", href: "/agents" }]}
-            earn={[{ label: "Doors", href: "/doors" }, { label: "Portfolio", href: "/portfolio" }, { label: "Bank", href: "/bank" }, { label: "Principal Market", href: "/principal-market" }, { label: "Swap", href: "/swap" }]}
+            earn={[{ label: "Doors", href: "/doors" }, { label: "Portfolio", href: "/portfolio" }, { label: "Bank", href: "/bank" }, { label: "Principal Market", href: "/principal-market" }, { label: "Swap", href: "/portfolio?tab=swap" }]}
             build={[
               { label: "Docs", href: docs },
               { label: "Data API", href: docs + "/agents/data-api" },

@@ -183,6 +183,9 @@ export default function MUSDash() {
             <span className="unit">{unit}</span>
           </div>
           <PctButtons balance={chipBal} decimals={chip === "MUSD" ? 2 : 6} onPick={setAmount} label={unit.toLowerCase()} />
+          {chip === "MUSD" && short && (
+            <a className="getmusd" href={"/portfolio?tab=swap&to=MUSD" + (stack === "demo" ? "&stack=demo" : "")}>Not enough MUSD. Get MUSD →</a>
+          )}
           <div className="label mt16">FLOOR</div>
           <div className="picks">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((f) => (
