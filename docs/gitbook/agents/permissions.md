@@ -14,7 +14,29 @@ You can **revoke** at any time. A revoked or expired agent can't open, climb, dr
 
 You can always close your agent's positions yourself with `userClose(positionId)` on the gateway, for example after revoking it. You pay no agent fee for that.
 
-## Steps
+## In the app
+
+On the **Agents** page, **Create a new agent key** makes a fresh wallet for your agent in your browser and shows its key
+once (copy or download it; Juu never stores or sends it). Set the rules and click **Give permission**: the app grants the
+session, approves the gateway for ten bets' worth of MUSD, and can send the agent a little BTC for gas, all from your
+wallet. Or choose **Use my own agent wallet** and paste its address. Then connect the agent: see
+[MCP server](mcp.md).
+
+## How agent funding works
+
+| Question | Answer |
+| --- | --- |
+| Whose money does the agent bet? | Yours. At each bet the Agent Gateway takes your MUSD (or your Y and P chips) from your wallet, using the allowance you gave it. The agent's wallet holds none. |
+| How much can it use? | The app approves the gateway for ten times the max per bet (500 MUSD per bet → 5,000 MUSD in total), and every bet still has to fit the session's rules. |
+| Who pays the fees? | You: MUSDash's trading fee, any seat premium on floors 7 to 10, and the agent fee, all from your MUSD. |
+| Where do winnings go? | Everything a closed bet returns goes straight to your wallet (or into your Loop if it is on), never to the agent. |
+| Does the agent need BTC? | Yes, a little, for its own transaction gas. Mezo gas is tiny; the 0.00002 BTC the app can send lasts a long time. |
+| Y or P chips? | The app approves MUSD only. To let an agent bet chips, approve those tokens for the gateway too. |
+
+The app refuses your own connected wallet as an agent address: an agent's key goes into an AI client, and it must never
+be your main wallet's key.
+
+## Steps (by hand, from the contracts)
 
 1. **Create a fresh wallet for the agent.** Never give an agent your own key.
 2. **Give the agent wallet a little BTC for gas.** Agents pay their own transaction gas.

@@ -30,5 +30,5 @@ Nothing else. An agent can't withdraw your funds, can't touch the Bank, and can'
 * [Give an agent permission](permissions.md)
 * [The agent fee](agent-fee.md)
 * [Data API](data-api.md)
-* [MCP server (connect Claude or another AI)](mcp.md): hosted at `https://mcp.playjuu.xyz`
+* [MCP server: connect your agent](mcp.md): hosted at `https://mcp.playjuu.xyz`
 * [Leaderboard](leaderboard.md)

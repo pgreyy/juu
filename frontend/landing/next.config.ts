@@ -8,6 +8,10 @@ const config: NextConfig = {
   transpilePackages: ["@juu/ui"],
   agentRules: false,
   turbopack: { root: path.join(__dirname, "..") },
+  // The docs are built from docs/gitbook; the MCP guide has the short address /docs/mcp.
+  async redirects() {
+    return [{ source: "/docs/agents/mcp", destination: "/docs/mcp", permanent: true }];
+  },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API}/api/:path*` }];
   },

@@ -120,7 +120,7 @@ main.main p, .lede, .note { max-width: 72ch; }
 .pos-switch button[aria-pressed="true"] { border-color: var(--rule); }
 
 /* Positions */
-.bets { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 10px; }
+.bets { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; margin-top: 10px; }
 .bet { display: flex; gap: 14px; border: 1.5px solid var(--rule); padding: 14px; }
 .bet .fb { flex: 0 0 64px; display: flex; align-items: center; justify-content: center; font-family: var(--fD); font-weight: 700; font-size: 26px; }
 .bet .fb.bull { background: var(--panel); color: var(--onPanel); }
@@ -152,7 +152,7 @@ main.main p, .lede, .note { max-width: 72ch; }
 .earn-row span:last-child { font-family: var(--fN); font-size: 13px; text-align: right; }
 
 /* Agents */
-.agents { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.agents { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 18px; }
 .agent { border: 1.5px solid var(--rule); padding: 20px; }
 .agent .st { font-family: var(--fN); font-size: 11px; letter-spacing: 0.08em; padding: 4px 10px; border: 1.5px solid var(--rule); }
 .agent .st.on { background: var(--strong); color: var(--onStrong); }
@@ -193,3 +193,18 @@ main.main p, .lede, .note { max-width: 72ch; }
   .pf-tbl .pf-detail { display: none; }
   .pf-sub { display: block; margin-top: 4px; font-weight: 400; font-size: 12px; line-height: 1.4; }
 }
+
+/* Agents: a new agent's key (shown once) and the "Connect your agent" configs */
+.keybox { margin-top: 4px; padding: 10px; border: 1.5px dashed var(--onPanel); font-size: 13px; overflow-wrap: anywhere; user-select: all; }
+.h2 { margin: 0; font-family: var(--fD); font-weight: 700; font-size: 24px; letter-spacing: 0.04em; }
+.connect { margin-top: 40px; border-top: 1.5px solid var(--rule); padding-top: 22px; }
+.snippets { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 14px; margin-top: 14px; }
+.snippet { border: 1.5px solid var(--rule); padding: 14px; min-width: 0; }
+.snippet-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.snippet pre { margin: 0; padding: 12px; background: var(--panel); color: var(--onPanel); overflow-x: auto; font-family: var(--fN); font-size: 12px; line-height: 1.55; }
+.connect a { color: inherit; }
+
+.howfund { margin: 0 0 20px; border: 1.5px solid var(--rule); padding: 0 14px; max-width: 900px; }
+.howfund summary { min-height: 44px; display: flex; align-items: center; font-family: var(--fN); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.howfund .readout { grid-template-columns: 120px minmax(0, 1fr); padding-bottom: 12px; font-size: 13px; line-height: 1.5; }
+.howfund .readout dd { text-align: left; font-family: var(--fB); }

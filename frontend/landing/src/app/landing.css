@@ -190,3 +190,41 @@ html[data-theme="dark"] .s-band { border-top-color: var(--oliveX); }
 
 /* The hosted MCP address: mono, wraps on narrow phones. */
 .lp-mcp { font-family: var(--fN); font-size: 0.92em; overflow-wrap: anywhere; color: var(--ink); }
+
+/* Docs (playjuu.xyz/docs): page list on the left, the page on the right, inside the 1280px content width. */
+.doc-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; padding: 40px var(--pad) 72px; border-top: 1.5px solid var(--rule); }
+.doc-side { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; padding-right: 8px; }
+.doc-navsec { margin-bottom: 18px; }
+.doc-navsec .label { margin-bottom: 6px; }
+.doc-navsec ul { list-style: none; margin: 0; padding: 0; }
+.doc-navsec a { display: block; padding: 6px 0 6px 10px; border-left: 2px solid transparent; font-size: 14px; line-height: 1.4; text-decoration: none; color: var(--ink); }
+.doc-navsec a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.doc-navsec a[aria-current="page"] { border-left-color: var(--ink); font-weight: 700; }
+.doc-fold { display: none; }
+.doc-main { min-width: 0; }
+.doc-body { max-width: 760px; font-size: 16px; line-height: 1.65; }
+.doc-body h1 { font-family: var(--fD); font-weight: 800; font-size: clamp(32px, 4vw, 48px); line-height: 1.05; margin: 0 0 18px; }
+.doc-body h2 { font-family: var(--fD); font-weight: 700; font-size: 26px; margin: 40px 0 10px; padding-top: 18px; border-top: 1px solid var(--rule2); }
+.doc-body h3 { font-family: var(--fD); font-weight: 700; font-size: 19px; margin: 28px 0 8px; }
+.doc-body p, .doc-body ul, .doc-body ol { margin: 0 0 14px; }
+.doc-body li { margin: 4px 0; }
+.doc-body a { color: inherit; text-underline-offset: 3px; }
+.doc-body code { font-family: var(--fN); font-size: 0.88em; background: var(--sand2); padding: 1px 5px; overflow-wrap: anywhere; }
+.doc-body pre { position: relative; background: var(--panel); color: var(--onPanel); padding: 16px 16px 16px; margin: 0 0 18px; overflow-x: auto; border: 1.5px solid var(--rule); }
+.doc-body pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.doc-copy { position: absolute; top: 8px; right: 8px; min-height: 32px; padding: 0 10px; font-family: var(--fN); font-size: 11px; background: var(--sand1); color: var(--ink); border: 1.5px solid var(--rule); }
+.doc-body table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: 14px; display: block; overflow-x: auto; }
+.doc-body th { text-align: left; font-family: var(--fN); font-weight: 400; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-bottom: 1.5px solid var(--rule); padding: 8px 12px 8px 0; }
+.doc-body td { border-bottom: 1px solid var(--rule2); padding: 9px 12px 9px 0; vertical-align: top; }
+.doc-body blockquote { margin: 0 0 14px; padding-left: 14px; border-left: 3px solid var(--rule); }
+.doc-hint { border: 1.5px solid var(--rule); background: var(--olive1); padding: 14px 16px 0; margin: 0 0 18px; }
+.doc-hint.warning { background: var(--sand2); border-left-width: 6px; }
+.doc-pager { display: flex; justify-content: space-between; gap: 12px; max-width: 760px; margin-top: 48px; padding-top: 18px; border-top: 1.5px solid var(--rule); font-family: var(--fN); font-size: 13px; }
+.doc-pager a { color: inherit; min-height: 44px; display: inline-flex; align-items: center; }
+@media (max-width: 900px) {
+  .doc-wrap { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-top: 20px; }
+  .doc-side { display: none; }
+  .doc-fold { display: block; border: 1.5px solid var(--rule); padding: 0 12px; }
+  .doc-fold summary { min-height: 44px; display: flex; align-items: center; font-family: var(--fN); font-size: 13px; letter-spacing: 0.06em; cursor: pointer; }
+  .doc-fold nav { padding: 6px 0 12px; }
+}

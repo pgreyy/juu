@@ -123,7 +123,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const { stack } = useStack();
   const ticker = useTicker();
   const m = useMarket();
-  const docs = process.env.NEXT_PUBLIC_DOCS_URL || null;
+  const docs = "https://playjuu.xyz/docs";
   const net = [
     { label: "Contracts on explorer", href: `${EXPLORER}/address/${stackAddr(stack).game}` },
     { label: "X", href: process.env.NEXT_PUBLIC_X_URL || null },
@@ -157,9 +157,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
             earn={[{ label: "Doors", href: "/doors" }, { label: "Portfolio", href: "/portfolio" }, { label: "Bank", href: "/bank" }, { label: "Principal Market", href: "/principal-market" }]}
             build={[
               { label: "Docs", href: docs },
-              { label: "Data API", href: process.env.NEXT_PUBLIC_DATA_API_URL || null },
-              { label: "MCP server", href: docs ? docs.replace(/\/$/, "") + "/agents/mcp" : null },
-              { label: "Source on GitHub", href: process.env.NEXT_PUBLIC_SOURCE_URL || null },
+              { label: "Data API", href: docs + "/agents/data-api" },
+              { label: "MCP server", href: docs + "/mcp" },
+              { label: "Source on GitHub", href: null },
             ]}
             network={net}
             right={<span>Live data from Mezo testnet, {stack} stack.</span>}

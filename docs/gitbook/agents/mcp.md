@@ -6,28 +6,78 @@ MCP (Model Context Protocol) is the standard way AI assistants plug into tools. 
 The MCP server only ever uses the **agent's own key**: a fresh wallet that you granted a session to in the Agent Gateway. Never put your main wallet key into it. If you don't give it an agent key, it can only read.
 {% endhint %}
 
-## Use the hosted server
+## Get an agent key
 
-The hosted server is at **`https://mcp.playjuu.xyz`** (Streamable HTTP; `https://mcp.playjuu.xyz/mcp` works too). It
-reads the main stack; add `?stack=demo` for the demo stack.
+On the app's **Agents** page, choose **Create a new agent key**. The app makes a new wallet for your agent in your
+browser and shows its private key **once**, with copy and download buttons. Save it then: Juu never sends it anywhere and
+never stores it. Then set the rules and click **Give permission**: that registers the agent's address on the Agent
+Gateway, lets the gateway use your MUSD under those rules, and (optionally) sends the agent a little BTC for gas.
+
+Already have a wallet for your agent? Choose **Use my own agent wallet** and paste its address; no key is shown. Never
+use your main wallet as an agent: its key would then sit in your MCP client.
+
+## Connect your agent
+
+The hosted server is at **`https://mcp.playjuu.xyz`** (Streamable HTTP; `/mcp` works too). It reads the main stack; add
+`?stack=demo` for the demo stack.
 
 * **Read tools** are open: no key needed.
-* **Play tools** need your agent's session key, sent by your client on every request as
-  `Authorization: Bearer <agent session key>`. The server acts only as that agent, uses the key for that one request,
-  keeps it in memory only and never writes or logs it. Without a valid key, play tools refuse; a token that isn't a
-  private key is refused outright.
-* Before any play, the server checks that the user named in the call has given **this** agent a live session, and the
-  Agent Gateway then enforces the session's limits (max per bet, highest floor, daily loss stop, expiry).
+* **Play tools** need your agent's key, sent by your client on every request as
+  `Authorization: Bearer <agent key>`. The server acts only as that agent, uses the key for that one request, keeps it
+  in memory only and never writes or logs it. Without a valid key, play tools refuse.
+* Before any play the server checks that the user named in the call (your wallet address) has given **this** agent a
+  live session; the Agent Gateway then enforces the rules (max per bet, highest floor, daily loss stop, expiry).
 
-Claude Code:
+Right after you create an agent, the Agents page shows these configs with its key already filled in, on that screen only.
+Here, replace `<AGENT_PRIVATE_KEY>` with your agent's key.
+
+**Claude Code** (run in a terminal):
 
 ```
 claude mcp add --transport http juu https://mcp.playjuu.xyz \
-  --header "Authorization: Bearer <the agent wallet's key>"
+  --header "Authorization: Bearer <AGENT_PRIVATE_KEY>"
 ```
 
-Leave out `--header` for read only. Other clients: any MCP client that speaks Streamable HTTP and can send a header.
-For Claude Desktop, use the `mcp-remote` bridge:
+**Cursor** (`~/.cursor/mcp.json`, or `.cursor/mcp.json` in a project):
+
+```json
+{
+  "mcpServers": {
+    "juu": {
+      "url": "https://mcp.playjuu.xyz",
+      "headers": { "Authorization": "Bearer <AGENT_PRIVATE_KEY>" }
+    }
+  }
+}
+```
+
+**Any MCP client** that takes a Streamable HTTP server with headers:
+
+```json
+{
+  "mcpServers": {
+    "juu": {
+      "type": "http",
+      "url": "https://mcp.playjuu.xyz",
+      "headers": { "Authorization": "Bearer <AGENT_PRIVATE_KEY>" }
+    }
+  }
+}
+```
+
+Then tell your agent your wallet address: the play tools take it as `user`.
+
+### Which clients work
+
+| Client | Read tools | Play tools |
+| --- | --- | --- |
+| Claude Code | Yes | Yes (`--header`) |
+| Cursor | Yes | Yes (`headers`) |
+| Any client that can send a header | Yes | Yes |
+| Claude app, custom connector | Yes ("No sign-in") | Only where the **Request headers** option is available (in beta, not on every account): set `authorization` to `Bearer <AGENT_PRIVATE_KEY>`. Otherwise use Claude Code, Cursor, or the bridge below |
+| Claude Desktop, config file | Through the `mcp-remote` bridge | Yes, through the bridge |
+
+The `mcp-remote` bridge for Claude Desktop's config file:
 
 ```json
 {
@@ -35,16 +85,16 @@ For Claude Desktop, use the `mcp-remote` bridge:
     "juu": {
       "command": "npx",
       "args": ["mcp-remote", "https://mcp.playjuu.xyz", "--header", "Authorization: Bearer ${JUU_AGENT_KEY}"],
-      "env": { "JUU_AGENT_KEY": "<the agent wallet's key>" }
+      "env": { "JUU_AGENT_KEY": "<AGENT_PRIVATE_KEY>" }
     }
   }
 }
 ```
 
 {% hint style="warning" %}
-Over the hosted server, your agent key travels over HTTPS to Cloudflare and the Juu server on every request. Only ever
-use an agent session key with limits you are happy with, and revoke it on the Agents page if in doubt. To keep the agent
-key on your own computer, run the server yourself (below).
+Your agent key travels over HTTPS to Cloudflare and the Juu server on every request. Only ever use an agent key with
+limits you are happy with, and revoke the agent on the Agents page if in doubt. To keep the key on your own computer,
+run the server yourself (below).
 {% endhint %}
 
 ## Tools

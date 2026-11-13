@@ -1,7 +1,8 @@
 "use client";
 import { fmt, shortAddr } from "@juu/ui";
-import { Contract, isAddress, parseUnits, type Signer } from "ethers";
+import { Contract, Wallet, isAddress, parseUnits, type Signer } from "ethers";
 import { useState } from "react";
+import { ConnectAgent, CopyButton } from "@/components/ConnectAgent";
 import { busy, TxNote } from "@/components/TxNote";
 import { ABI } from "@/lib/abis";
 import { ADDR } from "@/lib/addresses";
@@ -29,36 +30,80 @@ export default function Agents() {
   const [floor, setFloor] = useState("6");
   const [loss, setLoss] = useState("200");
   const [days, setDays] = useState("7");
+  // New agent: a fresh keypair made in this browser. The key is shown once and kept only in this tab's memory: never
+  // sent anywhere, never saved by the app. Or the user's own agent wallet (an address, no key shown).
+  const [mode, setMode] = useState<"new" | "own">("new");
+  const [gen, setGen] = useState<{ address: string; privateKey: string } | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [fundGas, setFundGas] = useState(true);
+  const [created, setCreated] = useState<{ address: string; key: string | null } | null>(null);
+  const GAS_BTC = "0.00002";
 
   const gw = (s: Signer) => new Contract(A.gateway, ABI.gateway, s);
-  const grant = (who: string, maxChips: number, maxFloor: number, dailyLoss: number, d: number, key: string) => {
+  const grant = (who: string, maxChips: number, maxFloor: number, dailyLoss: number, d: number, key: string, gasBtc?: string) => {
     const expiry = Math.floor(Date.now() / 1000) + Math.round(d * 86400);
     // The agent spends your MUSD through the gateway, so the gateway also needs an allowance: ten bets' worth.
     const allowance = parseUnits(String(maxChips * 10), 18);
-    w.run(
-      key,
-      [
-        (s) => call(gw(s), "grant", [who, parseUnits(String(maxChips), 18), maxFloor, parseUnits(String(dailyLoss), 18), expiry, false]),
-        async (s) => {
-          const t = new Contract(ADDR.mezo.musd, ABI.erc20, s);
-          return (await t.allowance(await s.getAddress(), A.gateway)) >= allowance ? null : call(t, "approve", [A.gateway, allowance]);
-        },
-      ],
-      "Permission given.",
-    );
+    const steps: ((s: Signer) => Promise<unknown>)[] = [
+      (s) => call(gw(s), "grant", [who, parseUnits(String(maxChips), 18), maxFloor, parseUnits(String(dailyLoss), 18), expiry, false]),
+      async (s) => {
+        const t = new Contract(ADDR.mezo.musd, ABI.erc20, s);
+        return (await t.allowance(await s.getAddress(), A.gateway)) >= allowance ? null : call(t, "approve", [A.gateway, allowance]);
+      },
+    ];
+    // A fresh agent wallet has no BTC for gas; Mezo gas is tiny, so a little lasts a long time.
+    if (gasBtc) steps.push((s) => s.sendTransaction({ to: who, value: parseUnits(gasBtc, 18) }));
+    return w.run(key, steps, gasBtc ? "Permission given and gas sent. Your agent can play." : "Permission given.");
   };
-  const add = () => {
-    if (!isAddress(agent)) return;
-    grant(agent, Number(maxBet) || 0, Number(floor), Number(loss) || 0, Number(days) || 1, "grant");
+
+  const own = w.address?.toLowerCase();
+  const target = mode === "new" ? gen?.address ?? "" : agent;
+  const isSelf = Boolean(own && target && target.toLowerCase() === own);
+  const add = async () => {
+    if (!isAddress(target) || isSelf) return;
+    const ok = await grant(target, Number(maxBet) || 0, Number(floor), Number(loss) || 0, Number(days) || 1, "grant", mode === "new" && fundGas ? GAS_BTC : undefined);
+    if (ok) {
+      setCreated({ address: target, key: mode === "new" ? gen?.privateKey ?? null : null });
+      setGen(null);
+      setSaved(false);
+      setAgent("");
+    }
+  };
+  const makeKey = () => {
+    const k = Wallet.createRandom(); // uses the browser's secure random generator
+    setGen({ address: k.address, privateKey: k.privateKey });
+    setSaved(false);
+    setCreated(null);
+  };
+  const download = () => {
+    if (!gen) return;
+    const text = `Juu agent wallet (${stack} stack)\nAddress: ${gen.address}\nPrivate key: ${gen.privateKey}\n\nKeep this private. Anyone with the key can play within this agent's rules until you revoke it on the Agents page.\nNever use it for anything else.\n`;
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `juu-agent-${gen.address.slice(0, 8)}.txt`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   const list = sessions.data?.sessions || [];
-  const valid = isAddress(agent) && Number(maxBet) > 0 && Number(days) > 0;
+  const valid = isAddress(target) && !isSelf && Number(maxBet) > 0 && Number(days) > 0 && (mode === "own" || saved);
 
   return (
     <>
       <h1 className="h1">AGENTS</h1>
       <p className="lede">Let your bot play. You set the rules. You can pull the plug any time.</p>
+      <details className="howfund">
+        <summary>How agent funding works</summary>
+        <dl className="readout" style={{ marginTop: 10 }}>
+          <dt>Whose money</dt><dd>Yours. At each bet the Agent Gateway takes your MUSD (or your Yield and Principal chips) from your wallet. The agent&apos;s wallet holds none.</dd>
+          <dt>How much</dt><dd>Giving permission lets the gateway use up to ten times the max per bet in total (500 → 5,000 MUSD), and only within the rules.</dd>
+          <dt>Fees</dt><dd>Each bet pays MUSDash&apos;s trading fee and the agent fee, from your MUSD.</dd>
+          <dt>Winnings</dt><dd>Everything a closed bet returns goes straight to your wallet (or your Loop), never to the agent.</dd>
+          <dt>Gas</dt><dd>The agent&apos;s wallet pays its own gas in BTC. Mezo gas is tiny: the 0.00002 BTC the app can send lasts a long time.</dd>
+          <dt>Chips</dt><dd>The app approves MUSD only. To let an agent bet Yield or Principal chips, approve those tokens for the gateway too.</dd>
+        </dl>
+      </details>
       <div className="agents">
         {!w.address && (
           <section className="agent" style={{ display: "flex", alignItems: "center" }}>
@@ -80,6 +125,9 @@ export default function Agents() {
                 <span style={{ fontFamily: "var(--fD)", fontWeight: 700, fontSize: 22 }} title={a.agent}>{shortAddr(a.agent)}</span>
                 <span className={"st" + (on ? " on" : "")}>{on ? "ACTIVE" : expired && a.active ? "EXPIRED" : "REVOKED"}</span>
               </div>
+              {own && a.agent.toLowerCase() === own && on && (
+                <p className="txnote error" style={{ marginTop: 8 }}>This agent is your own wallet, so its key is your main key. Revoke it and create a new agent below.</p>
+              )}
               <div className={"mono " + (a.netTodayMUSD > 0.005 ? "c-bull" : a.netTodayMUSD < -0.005 ? "c-bear" : "c-ink")} style={{ fontSize: 30, marginTop: 10 }}>
                 {a.netTodayMUSD > 0.005 ? "+" + fmt(a.netTodayMUSD, 2) : a.netTodayMUSD < -0.005 ? "−" + fmt(-a.netTodayMUSD, 2) : "0.00"}
               </div>
@@ -109,8 +157,47 @@ export default function Agents() {
         })}
         <section className="panel" style={{ padding: 20 }}>
           <div style={{ fontFamily: "var(--fD)", fontWeight: 700, fontSize: 22 }}>+ NEW AGENT</div>
-          <label htmlFor="agAddr" style={{ display: "block", fontSize: 11, letterSpacing: "0.12em", marginTop: 14 }}>AGENT ADDRESS</label>
-          <input id="agAddr" className="line" style={{ fontSize: 16 }} placeholder="0x…" value={agent} onChange={(e) => setAgent(e.target.value.trim())} autoComplete="off" />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 12 }}>
+            <button type="button" className="btn-line" style={{ fontSize: 11 }} aria-pressed={mode === "new"} onClick={() => setMode("new")}>CREATE A NEW AGENT KEY</button>
+            <button type="button" className="btn-line" style={{ fontSize: 11 }} aria-pressed={mode === "own"} onClick={() => setMode("own")}>USE MY OWN AGENT WALLET</button>
+          </div>
+          {mode === "new" ? (
+            !gen ? (
+              <>
+                <p style={{ fontSize: 13, lineHeight: 1.5, margin: "12px 0 0", fontFamily: "var(--fB)" }}>
+                  Juu makes a new wallet for your agent here in your browser. You get its key once, to put in your MCP client. It is never sent anywhere and never stored.
+                </p>
+                <button type="button" className="btn-strong" style={{ marginTop: 12, height: 48, fontSize: 13 }} onClick={makeKey}>CREATE AGENT KEY</button>
+              </>
+            ) : (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 11, letterSpacing: "0.12em" }}>AGENT ADDRESS</div>
+                <div className="mono" style={{ fontSize: 13, overflowWrap: "anywhere", marginTop: 4 }}>{gen.address}</div>
+                <div style={{ fontSize: 11, letterSpacing: "0.12em", marginTop: 12 }}>AGENT PRIVATE KEY</div>
+                <div className="keybox mono">{gen.privateKey}</div>
+                <p className="txnote error" role="alert" style={{ fontWeight: 600 }}>Save this now. It won&apos;t be shown again: Juu doesn&apos;t keep it.</p>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+                  <CopyButton text={gen.privateKey} label="COPY KEY" />
+                  <button type="button" className="btn-line" style={{ minHeight: 36, padding: "0 12px", fontSize: 11 }} onClick={download}>DOWNLOAD .TXT</button>
+                </div>
+                <label className="check" style={{ marginTop: 12 }}>
+                  <input type="checkbox" checked={saved} onChange={(e) => setSaved(e.target.checked)} />
+                  I saved the key somewhere safe
+                </label>
+                <label className="check" style={{ marginTop: 8 }}>
+                  <input type="checkbox" checked={fundGas} onChange={(e) => setFundGas(e.target.checked)} />
+                  Also send it {GAS_BTC} BTC for gas
+                </label>
+              </div>
+            )
+          ) : (
+            <>
+              <label htmlFor="agAddr" style={{ display: "block", fontSize: 11, letterSpacing: "0.12em", marginTop: 14 }}>AGENT WALLET ADDRESS</label>
+              <input id="agAddr" className="line" style={{ fontSize: 16 }} placeholder="0x…" value={agent} onChange={(e) => setAgent(e.target.value.trim())} autoComplete="off" />
+              <p style={{ fontSize: 12, lineHeight: 1.5, margin: "8px 0 0", fontFamily: "var(--fB)" }}>A wallet only your agent uses. You keep its key; Juu never sees it. It needs a little BTC for gas.</p>
+            </>
+          )}
+          {isSelf && <p className="txnote error">That&apos;s the wallet you&apos;re connected with. An agent needs its own wallet.</p>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 12, marginTop: 12 }}>
             <div>
               <label htmlFor="agMax" style={{ fontSize: 11, letterSpacing: "0.12em" }}>MAX PER BET (MUSD)</label>
@@ -140,8 +227,12 @@ export default function Agents() {
             {busy(w.tx, "grant") ? "WAITING…" : "GIVE PERMISSION"}
           </button>
           <TxNote k="grant" />
+          {created && (
+            <p className="txnote done">Agent {shortAddr(created.address)} can now play for you on the {stack} stack. Its configs are filled in below{created.key ? "" : " (with a placeholder: use the key you keep)"}.</p>
+          )}
         </section>
       </div>
+      <ConnectAgent stack={stack} agentKey={created?.key ?? null} user={w.address} />
     </>
   );
 }
