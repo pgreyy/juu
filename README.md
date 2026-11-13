@@ -9,7 +9,7 @@
 
 ### Ten floors. How high?
 
-**A gamified Bitcoin money layer built on Mezo DeFi.**
+**A gamified money layer on Mezo.**
 
 [Live app](https://app.playjuu.xyz) · [Website](https://playjuu.xyz) · [Docs](https://playjuu.xyz/docs) · [MCP for agents](https://playjuu.xyz/docs/mcp) · [2 min demo video](#demo-video)
 <!-- demo-video: replace the #demo-video link above and the "Watch the demo" button below with the video URL -->

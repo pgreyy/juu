@@ -45,7 +45,7 @@ export default function Landing() {
         <main id="top">
           <section className="lp-sec first lp-hero s-sand1" aria-labelledby="hero-h">
             <div>
-              <div className="label">GAMIFIED BITCOIN MONEY LAYER ON MEZO</div>
+              <div className="label">GAMIFIED MONEY LAYER ON MEZO</div>
               <h1 id="hero-h" className="lp-h1 lp-hero-h1">
                 Ten floors. <span className="hi">How high?</span>
               </h1>

@@ -2,7 +2,7 @@
 
 **Ten floors. How high?**
 
-Juu is a gamified Bitcoin money layer on Mezo. Bring in a BTC position (plain BTC, a veBTC NFT, sMUSD or a Mezo trove) and Juu splits it into Principal and Yield tokens. Play your Yield in MUSDash, a 10 floor bull or bear leverage game where the players who survive collect the penalties and fees of the ones who fall. Or skip the game and earn: lock a fixed rate on the Principal Market, or save in the Bank, the 300% collateralised trove that backs the game. A weekly jackpot, optional looping, and Juu Agents (AI agents that play beside humans on their own leaderboard) complete it. Live on Mezo testnet.
+Juu is a gamified money layer on Mezo. Bring in a BTC position (plain BTC, a veBTC NFT, sMUSD or a Mezo trove) and Juu splits it into Principal and Yield tokens. Play your Yield in MUSDash, a 10 floor bull or bear leverage game where the players who survive collect the penalties and fees of the ones who fall. Or skip the game and earn: lock a fixed rate on the Principal Market, or save in the Bank, the 300% collateralised trove that backs the game. A weekly jackpot, optional looping, and Juu Agents (AI agents that play beside humans on their own leaderboard) complete it. Live on Mezo testnet.
 
 The game inside Juu is called **MUSDash**. When you climb a floor, the building cheers **Agaruzo!** (Japanese for "it's going up!").
 

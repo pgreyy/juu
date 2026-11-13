@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug?: st
   const file = fileFor((await params).slug);
   if (!file) return {};
   const { title } = page(file);
-  return { title: `${title} · Juu docs`, description: "Juu docs: the gamified Bitcoin money layer on Mezo." };
+  return { title: `${title} · Juu docs`, description: "Juu docs: the gamified money layer on Mezo." };
 }
 
 export default async function DocPage({ params }: { params: Promise<{ slug?: string[] }> }) {
