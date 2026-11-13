@@ -1,5 +1,6 @@
-import { Agaruzo, Footer, Icon, Ladder, StackMark, ThemeToggle, Wordmark, type LadderRow } from "@juu/ui";
+import { Agaruzo, Footer, Icon, StackMark, ThemeToggle, Wordmark, type LadderRow } from "@juu/ui";
 import { BoardPreview, JackpotBurst, LiveLadder, LiveTicker } from "@/components/Live";
+import { HeroLadder } from "@/components/HeroLadder";
 
 const APP = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 const DOCS = "/docs";
@@ -44,28 +45,31 @@ export default function Landing() {
 
         <main id="top">
           <section className="lp-sec first lp-hero s-sand1" aria-labelledby="hero-h">
-            <div>
-              <div className="label">GAMIFIED MONEY LAYER ON MEZO</div>
-              <h1 id="hero-h" className="lp-h1 lp-hero-h1">
-                <span className="ph">Ten floors.</span> <span className="ph hi">How high?</span>
-              </h1>
-              <p className="lp-lede">Bring your Bitcoin in, split it into Principal and Yield, then climb the tower, save with it or lock in a fixed return.</p>
-              <div className="lp-ctas">
-                <EnterButton />
-                <a className="btn line" href="#how">How it works</a>
+            <div className="hero-grid">
+              <div className="hero-text">
+                <div className="hero-label">GAMIFIED MONEY LAYER ON MEZO</div>
+                <h1 id="hero-h" className="hero-h1">
+                  <span className="ph">Ten floors.</span> <span className="ph hi">How high?</span>
+                </h1>
+                <p className="hero-p">Bring your Bitcoin in, split it into Principal and Yield, then climb the tower, save with it or lock in a fixed return.</p>
+                <div className="hero-ctas">
+                  <EnterButton />
+                  <a className="btn line" href="#how">How it works</a>
+                </div>
+                <div className="lp-facts hero-meta">
+                  <span>MEZO TESTNET</span>
+                  <span>TEN FLOORS · 1.5× TO 10×</span>
+                  <span>FIRST DEMO SERIES ENDS THU 10 DEC 2026</span>
+                </div>
               </div>
-              <div className="lp-facts">
-                <span>MEZO TESTNET</span>
-                <span>TEN FLOORS · 1.5× TO 10×</span>
-                <span>FIRST DEMO SERIES ENDS THU 10 DEC 2026</span>
+              <div className="hero-ladder lp-breathe" aria-label="Preview of the MUSDash tower" role="group">
+                <div className="hl-top">
+                  <span>MUSDASH · THE LADDER</span>
+                  <span>GAME PREVIEW</span>
+                </div>
+                <HeroLadder mark={71000} rows={PREVIEW} selected={5} />
+                <div className="hl-caption">SAMPLE POOLS AT A $71,000 MARK</div>
               </div>
-            </div>
-            <div className="lp-breathe" aria-label="Preview of the MUSDash tower" role="group">
-              <div className="lp-titlerow lp-hero-label">
-                <span className="label" style={{ color: "var(--ink)" }}><span className="lp-wide">MUSDASH · </span>THE LADDER</span>
-              </div>
-              <Ladder mark={71000} rows={PREVIEW} selected={5} />
-              <div className="lp-caption">GAME PREVIEW · SAMPLE POOLS AT A $71,000 MARK</div>
             </div>
           </section>
 
