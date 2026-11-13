@@ -21,6 +21,8 @@ type Tickets = { yourTickets: number; allTickets: number; yourOdds: number };
 type Line = { what: string; detail: string; amount: string; usd: number; note?: string };
 
 const n18 = (x: bigint) => Number(formatUnits(x, 18));
+// Small BTC amounts need more than btc()'s 4 decimals.
+const b8 = (x: number) => (x > 0 && x < 0.01 ? fmt(x, 8) : btc(x));
 const when = (iso: string) => {
   const d = new Date(iso);
   return `${String(d.getUTCDate()).padStart(2, "0")} ${d.toLocaleString("en", { month: "short", timeZone: "UTC" }).toUpperCase()} ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
@@ -85,24 +87,24 @@ export default function Portfolio() {
   // ones MUSDash uses for chips. MEZO rewards have no price here, so they are listed but not counted.
   const lines: Line[] = [];
   if (me) {
-    lines.push({ what: "Wallet", detail: "BTC", amount: `${btc(walletBtc ?? 0)} BTC`, usd: (walletBtc ?? 0) * price });
+    lines.push({ what: "Wallet", detail: "BTC", amount: `${b8(walletBtc ?? 0)} BTC`, usd: (walletBtc ?? 0) * price });
     lines.push({ what: "Wallet", detail: "MUSD", amount: `${amt(walletMusd ?? 0)} MUSD`, usd: walletMusd ?? 0 });
     for (const b of bals || []) {
       const name = `${seriesName(b.s.endDate)}${b.s.kind === "sMUSD" ? " · sMUSD" : ""} · ${daysLeft(b.s.endDate)}`;
       const ve = b.s.kind === "veBTC";
-      if (b.p > 0) lines.push({ what: "Principal", detail: name, amount: ve ? `${btc(b.p)} P` : `${amt(b.p)} P`, usd: ve ? b.p * (b.s.pMarginValuePerP ?? 0) : b.p });
-      if (b.y > 0) lines.push({ what: "Yield", detail: name, amount: ve ? `${btc(b.y)} Y` : `${amt(b.y)} Y`, usd: ve ? b.y * (b.s.yMarginValuePerY ?? 0) : 0, note: ve ? undefined : "valued by what it has earned" });
+      if (b.p > 0) lines.push({ what: "Principal", detail: name, amount: ve ? `${b8(b.p)} P` : `${amt(b.p)} P`, usd: ve ? b.p * (b.s.pMarginValuePerP ?? 0) : b.p });
+      if (b.y > 0) lines.push({ what: "Yield", detail: name, amount: ve ? `${b8(b.y)} Y` : `${amt(b.y)} Y`, usd: ve ? b.y * (b.s.yMarginValuePerY ?? 0) : 0, note: ve ? undefined : "valued by what it has earned" });
       for (const e of b.earned.filter((x) => x.v > 0)) {
         const v = e.sym === "BTC" ? e.v * price : e.sym === "MUSD" ? e.v : 0;
-        lines.push({ what: "Earned, to claim", detail: name, amount: `${e.sym === "BTC" ? btc(e.v) : amt(e.v)} ${e.sym}`, usd: v, note: e.sym === "MEZO" ? "not counted: no MEZO price here" : undefined });
+        lines.push({ what: "Earned, to claim", detail: name, amount: `${e.sym === "BTC" ? b8(e.v) : amt(e.v)} ${e.sym}`, usd: v, note: e.sym === "MEZO" ? "not counted: no MEZO price here" : undefined });
       }
     }
-    lines.push({ what: "Bank", detail: `your share (${stack} stack)`, amount: `${btc(bank ?? 0)} BTC`, usd: (bank ?? 0) * price });
+    lines.push({ what: "Bank", detail: `your share (${stack} stack)`, amount: `${b8(bank ?? 0)} BTC`, usd: (bank ?? 0) * price });
     lines.push({ what: "MUSDash", detail: `${ownBets.length} open bet${ownBets.length === 1 ? "" : "s"}`, amount: `${amt(ownBets.reduce((s, p) => s + (p.equity ?? 0), 0))} MUSD`, usd: ownBets.reduce((s, p) => s + (p.equity ?? 0), 0) });
     lines.push({ what: "Your agents", detail: `${agentBets.length} open bet${agentBets.length === 1 ? "" : "s"} with your MUSD`, amount: `${amt(agentBets.reduce((s, p) => s + (p.equity ?? 0), 0))} MUSD`, usd: agentBets.reduce((s, p) => s + (p.equity ?? 0), 0) });
     if (account) {
       const net = (account.btc + account.coll) * price + account.musd - account.debt;
-      lines.push({ what: "Juu account", detail: `${btc(account.coll)} BTC in its trove · ${amt(account.debt)} MUSD owed · ${amt(account.musd)} MUSD held`, amount: `${amt(net)} USD net`, usd: net });
+      lines.push({ what: "Juu account", detail: `${b8(account.coll)} BTC in its trove · ${amt(account.debt)} MUSD owed · ${amt(account.musd)} MUSD held`, amount: `${amt(net)} USD net`, usd: net });
     }
   }
   const totalUsd = lines.reduce((s, l) => s + l.usd, 0);
@@ -124,7 +126,7 @@ export default function Portfolio() {
           <div className="stats" style={{ marginTop: 8 }}>
             <div className="stat">
               <div className="k">TOTAL VALUE</div>
-              <div className="v">{loaded ? btc(totalBtc) : "…"} BTC</div>
+              <div className="v">{loaded ? b8(totalBtc) : "…"} BTC</div>
             </div>
             <div className="stat">
               <div className="k">IN USD</div>
@@ -143,15 +145,18 @@ export default function Portfolio() {
 
           <div className="label" style={{ marginTop: 28 }}>BREAKDOWN</div>
           <div className="tbl-wrap" style={{ marginTop: 8 }}>
-            <table className="tbl" style={{ minWidth: 640 }}>
+            <table className="tbl pf-tbl">
               <thead>
-                <tr><th>HOLDING</th><th style={{ textAlign: "left" }}>DETAIL</th><th>AMOUNT</th><th>VALUE (USD)</th></tr>
+                <tr><th>HOLDING</th><th className="pf-detail" style={{ textAlign: "left" }}>DETAIL</th><th>AMOUNT</th><th>VALUE (USD)</th></tr>
               </thead>
               <tbody>
                 {lines.map((l, i) => (
                   <tr key={i}>
-                    <td style={{ padding: "14px 0", fontWeight: 600 }}>{l.what}</td>
-                    <td style={{ textAlign: "left" }} className="c-muted">{l.detail}{l.note ? ` · ${l.note}` : ""}</td>
+                    <td style={{ padding: "14px 0", fontWeight: 600 }}>
+                      {l.what}
+                      <span className="pf-sub c-muted">{l.detail}{l.note ? ` · ${l.note}` : ""}</span>
+                    </td>
+                    <td style={{ textAlign: "left" }} className="pf-detail c-muted">{l.detail}{l.note ? ` · ${l.note}` : ""}</td>
                     <td>{l.amount}</td>
                     <td>{usd(l.usd)}</td>
                   </tr>

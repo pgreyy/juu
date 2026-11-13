@@ -184,3 +184,12 @@ main.main p, .lede, .note { max-width: 72ch; }
 .wallet-opt:hover, .wallet-opt:focus-visible { background: var(--sel); }
 .wallet-opt img { width: 24px; height: 24px; flex: 0 0 24px; }
 .wallet-dot { width: 24px; height: 24px; flex: 0 0 24px; border: 1.5px solid var(--rule); }
+
+/* Portfolio breakdown: on phones the detail moves under the holding's name so the table fits the screen. */
+.pf-tbl { min-width: 640px; }
+.pf-sub { display: none; }
+@media (max-width: 600px) {
+  .pf-tbl { min-width: 0; }
+  .pf-tbl .pf-detail { display: none; }
+  .pf-sub { display: block; margin-top: 4px; font-weight: 400; font-size: 12px; line-height: 1.4; }
+}
