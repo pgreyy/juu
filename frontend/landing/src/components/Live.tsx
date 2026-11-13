@@ -1,6 +1,6 @@
 "use client";
 // Live parts of the landing page: they read the Juu data API (main stack) and show a dash while loading.
-import { Ladder, Starburst, Ticker, collapsePrice, fmt, lev, pad2, shortAddr, signed, tickerItems, usd, type LadderRow } from "@juu/ui";
+import { Ladder, Starburst, Ticker, collapsePrice, fmt, lev, pad2, shortAddr, signed, tickerItems, usd, utcLongDate, utcWeekday, type LadderRow } from "@juu/ui";
 import { useEffect, useState } from "react";
 
 function useJson<T>(path: string, ms = 30000) {
@@ -30,7 +30,7 @@ export function LiveTicker() {
   const hist = useJson<{ samples: { price: number }[] }>("/api/main/price/history?minutes=1440", 60000);
   const sides = useJson<Sides>("/api/main/sides");
   const funding = useJson<{ bullPaysPerHour: number; bearPaysPerHour: number }>("/api/main/funding", 60000);
-  const jackpot = useJson<{ bufferMUSD: number; jackpotNowMUSD: number }>("/api/main/jackpot");
+  const jackpot = useJson<{ bufferMUSD: number; jackpotNowMUSD: number; epochEnds: string }>("/api/main/jackpot");
   const feed = useJson<{ feed: { kind: string; floor?: number | null; side?: "Bull" | "Bear" | null }[] }>("/api/main/feed?limit=20");
   const climb = useJson<{ premiumOn: boolean; floors: { floor: number; nextSeatPremium: number }[] }>("/api/main/climb-premium");
   const agents = useJson<{ ranking: { player: string; profitMUSD: number }[] }>("/api/main/leaderboard?type=agents", 60000);
@@ -117,13 +117,32 @@ export function BoardPreview({ appUrl }: { appUrl: string }) {
 /** The ticket chamber. Green and red follow the live bull and bear split; an even split while nothing is open. */
 export function JackpotBurst() {
   const sides = useJson<Sides>("/api/main/sides");
+  const jp = useJson<{ epochEnds: string }>("/api/main/jackpot", 60000);
   const oi = sides ? sides.bull + sides.bear : 0;
   return (
     <Starburst big bullShare={oi > 0 ? sides!.bull / oi : 0.5} label="The jackpot ticket chamber">
       <span className="juu-burst-core" style={{ width: 124, height: 124, margin: "-62px 0 0 -62px" }}>
-        <span style={{ fontSize: 24 }}>THU</span>
+        <span style={{ fontSize: 24 }}>{jp?.epochEnds ? utcWeekday(jp.epochEnds) : "—"}</span>
         <span className="c-muted" style={{ fontSize: 10, letterSpacing: "0.12em" }}>DRAW</span>
       </span>
     </Starburst>
   );
+}
+
+// The demo series (series 0) keeps its own wording while it is the next one to end.
+const DEMO_SERIES_END = "2026-12-10";
+
+/**
+ * Hero fact: the soonest series end date that hasn't passed yet (chain time, from /api/series), for example
+ * "NEXT SERIES ENDS THU 31 DEC 2026". Renders nothing while loading or when no future series exists, so the
+ * line keeps no dangling dot.
+ */
+export function NextSeriesFact() {
+  const data = useJson<{ now: string; series: { endDate: string }[] }>("/api/series", 300000);
+  if (!data?.series) return null;
+  const now = Date.parse(data.now) || Date.now();
+  const next = data.series.map((s) => s.endDate).filter((d) => Date.parse(d) > now).sort((a, b) => Date.parse(a) - Date.parse(b))[0];
+  if (!next) return null;
+  const label = next.startsWith(DEMO_SERIES_END) ? "FIRST DEMO SERIES ENDS" : "NEXT SERIES ENDS";
+  return <span>{label} {utcLongDate(next)}</span>;
 }

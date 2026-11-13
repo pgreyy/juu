@@ -44,7 +44,7 @@ export function JackpotView() {
         <div className="jp-burstwrap" style={{ flex: "1 1 420px", minWidth: 0, display: "flex", justifyContent: "center" }}>
           <Starburst big bullShare={bull + bear > 0 ? bull / (bull + bear) : null} label="Ticket chamber. Green rays are the bull share of open positions, red the bear share.">
             <span className="juu-burst-core" style={{ width: 124, height: 124, margin: "-62px 0 0 -62px" }}>
-              <span style={{ fontSize: 24 }}>{jp ? weekday(jp.epochEnds) : "THU"}</span>
+              <span style={{ fontSize: 24 }}>{jp ? weekday(jp.epochEnds) : "—"}</span>
               <span className="c-muted" style={{ fontSize: 10, letterSpacing: "0.12em" }}>DRAW</span>
             </span>
           </Starburst>

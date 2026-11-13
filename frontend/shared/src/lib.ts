@@ -34,6 +34,15 @@ export function signed(n: number, d = 2) {
 export function pct(n: number, d = 2) {
   return fmt(n * 100, d) + "%";
 }
+const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+/** "THU", in UTC (Juu's series ends and Mezo's weeks fall on 00:00 UTC). */
+export const utcWeekday = (iso: string) => DAYS[new Date(iso).getUTCDay()];
+/** "THU 10 DEC 2026", in UTC. */
+export function utcLongDate(iso: string) {
+  const d = new Date(iso);
+  return `${DAYS[d.getUTCDay()]} ${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
 export const shortAddr = (a: string) => (a ? a.slice(0, 6) + "…" + a.slice(-4) : "");
 
 export type Ray = { deg: number; len: number; w: number; major: boolean };

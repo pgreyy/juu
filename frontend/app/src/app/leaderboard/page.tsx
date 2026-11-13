@@ -85,7 +85,7 @@ export default function Leaderboard() {
         <span className="c-hi v">{amt(jp?.jackpotNowMUSD ?? 0)}</span>
         <span className="u">MUSD</span>
         <span className="sep">·</span>
-        <span>draws {jp ? weekday(jp.epochEnds).charAt(0) + weekday(jp.epochEnds).slice(1).toLowerCase() : "Thu"} in <span className="v">{jp ? until(jp.epochEnds) : "0m"}</span></span>
+        <span>draws {jp ? weekday(jp.epochEnds).charAt(0) + weekday(jp.epochEnds).slice(1).toLowerCase() : "—"} in <span className="v">{jp ? until(jp.epochEnds) : "0m"}</span></span>
         <span className="go" aria-hidden="true">→</span>
       </button>
       <div className="pf-tabs" role="tablist" aria-label="Leaderboard">

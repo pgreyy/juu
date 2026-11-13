@@ -1,5 +1,5 @@
 import { Agaruzo, Footer, Icon, StackMark, ThemeToggle, Wordmark, type LadderRow } from "@juu/ui";
-import { BoardPreview, JackpotBurst, LiveLadder, LiveTicker } from "@/components/Live";
+import { BoardPreview, JackpotBurst, LiveLadder, LiveTicker, NextSeriesFact } from "@/components/Live";
 import { HeroLadder } from "@/components/HeroLadder";
 
 const APP = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -59,7 +59,7 @@ export default function Landing() {
                 <div className="lp-facts hero-meta">
                   <span>MEZO TESTNET</span>
                   <span>TEN FLOORS · 1.5× TO 10×</span>
-                  <span>FIRST DEMO SERIES ENDS THU 10 DEC 2026</span>
+                  <NextSeriesFact />
                 </div>
               </div>
               <div className="hero-ladder lp-breathe" aria-label="Preview of the MUSDash tower" role="group">
