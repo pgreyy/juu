@@ -249,6 +249,32 @@ Leaderboard (demo): agents: test agent -0.45 (plays for deployer); humans: deplo
 MCP: errors now decoded via a simulated call before sending.
 Daily loss limit: re-grant with 0.20 limit after 0.31 lost -> StoppedForToday (simulated).
 
+## GitHub (13 Nov 2026)
+Private repo created with gh (name juu, branch main). First commit d2411f7 "Add Juu contracts, backend, docs and spec".
+Before it: .gitignore covers .env, research/, broadcast/, cache/, out/, contracts/lib/ (reinstall with forge install),
+backend/data/ (keeper secrets, event cache), node_modules/. Key scan: the 5 private keys in .env checked against all 79
+staged files, 0 hits; no key-like assignments. .claude/settings.json sets includeCoAuthoredBy false. No attribution in
+commits. scripts/precommit-scan.sh repeats the scan before every commit.
+
+## RPC flakiness (13 Nov 2026)
+Mezo's RPC sometimes fails eth_getTransactionReceipt ("method handler crashed" / null response). It crashed the
+backend once (ethers' tx.wait threw outside a try). Fix: the backend and MCP server poll receipts themselves with
+retries; unhandled errors become warnings. scripts/send.sh now submits with --async and polls the receipt.
+
+## Juu account test (main, 13 Nov 2026)
+Account 0x6B09715cb102ff39ecb15375dCDF624131049BC5 (factory create tx 0xd8b53466…5da4). BTC came from the old demo
+Bank (withdraw all tx 0xb1a5e1ba…1e79, 40 MUSD returned to it for the open funding run, tx 0x219ed77e…c9ad), the
+demo v2 Bank (withdraw tx 0x66f520d9…bcfb) and 300 MUSD swapped to 0.00382 BTC (tx 0x8c218e49…dcda3).
+- openTrove 0.0405 BTC, borrow 1800: tx 0x21a9fd65810d4d1518be967df061bda74d38bc4aa7516bbc406d998d7c6f6337, ICR 143.3%,
+  cash 1800, capacity 2133.
+- withdrawMUSD 1700 to owner (RPC null reply; state confirms cash 100, capacity 774).
+- play #2 Bull f2 120 MUSD: borrowed ~20.26 straight from the trove (debt 2001.8 -> 2022.06), position owned by the
+  account (RPC null reply on the receipt; state confirms).
+- close #2: tx 0x34277d2842a7491d1bbc1cd08d95b0d113936699574aa4426ac68be337801294, Returned: margin 120, got 119.70,
+  repaid 22.06 (debt back to Mezo's 2000 floor), no profit to swap.
+- play #3 Bull f10 20 (tx 0x6baf3869…99df) and #4 Bear f10 20 (tx 0x556f127f…c23c); a background watcher closes the
+  first one to profit after fees (profit -> BTC collateral path).
+
 ## Public docs
 docs/gitbook/ (GitBook, SUMMARY.md). Standing task: update them with every contract build or change, in the same task.
 
