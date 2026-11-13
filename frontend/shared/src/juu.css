@@ -5,7 +5,22 @@
    Dark:  bg #0A0A0A · surf #101010 · ink #F0E9D8 · muted #929292 · rule #3A3A3A · rule2 #222222 · strong #E6F05A ·
           onStrong #101010 · panel #1C1C1C · bull #3DDC84 · bear #F24A2C · bullBar #3DDC84 · bearBar #F04427 · hi #E6F05A · sel #1E1E1E
           head #262A15 · onHead #B8C24A · headMuted #A3AA6A
-   Fonts: Bricolage Grotesque 500/700/800 (headlines, body), DM Mono 400/500 (numbers, labels, buttons). Radius 0. Borders 1.5px, dividers 1px. */
+   Fonts: Geist (headlines, body), Geist Mono (labels, small uppercase, mono buttons), Martian Mono (numbers only:
+   every digit, through the 'Juu Digits' / 'Juu Numerals' faces below). Radius 0. Borders 1.5px, dividers 1px. */
+
+/* Martian Mono, served from the site (public/fonts), limited to the characters of numbers. */
+@font-face {
+  font-family: 'Juu Digits';
+  src: url('/fonts/martian-mono-latin.woff2') format('woff2');
+  font-weight: 100 800; font-stretch: 75% 112.5%; font-style: normal; font-display: swap;
+  unicode-range: U+0030-0039, U+0024, U+0025, U+002B, U+00D7, U+2212;
+}
+@font-face {
+  font-family: 'Juu Numerals';
+  src: url('/fonts/martian-mono-latin.woff2') format('woff2');
+  font-weight: 100 800; font-stretch: 75% 112.5%; font-style: normal; font-display: swap;
+  unicode-range: U+0030-0039, U+0024, U+0025, U+002B, U+002C, U+002E, U+003A, U+00D7, U+2212;
+}
 
 :root {
   --bg: #E6E1D5; --surf: #F6F2E8; --ink: #101010; --muted: #55524B; --rule: #101010; --rule2: #D6CFBF;
@@ -13,9 +28,11 @@
   --bull: #0F7543; --bear: #BA3118; --bullBar: #1FAF66; --bearBar: #E2452A; --bearLine: #C8361B; --bullLine: #12804A;
   --hi: #5A6100; --sel: #ECE6D8; --rMinor: #D6CFBF; --rBull: #1FAF66; --rBear: #E2452A;
   --head: #D9DDB5; --onHead: #101010; --headMuted: #55524B;
-  --fD: 'Bricolage Grotesque', sans-serif;
-  --fB: 'Bricolage Grotesque', sans-serif;
-  --fN: 'DM Mono', monospace;
+  /* Numbers in Martian Mono wherever they appear: the 'Juu Digits' face covers only digits and number signs, so the
+     words around a number stay in Geist / Geist Mono. Mono text also takes . , : from it (prices, times). */
+  --fD: 'Juu Digits', 'Geist', system-ui, sans-serif;
+  --fB: 'Juu Digits', 'Geist', system-ui, sans-serif;
+  --fN: 'Juu Numerals', 'Geist Mono', ui-monospace, monospace;
   color-scheme: light;
 }
 html[data-theme="dark"] {
@@ -28,6 +45,10 @@ html[data-theme="dark"] {
 }
 
 html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fB); }
+/* Tabular figures: digits keep their width as values update. */
+html { font-variant-numeric: tabular-nums; }
+/* Dense number places use Martian Mono's narrower width (87.5%): the Ladder, tables and the ticker. */
+.ladder, .tbl, .juu-tick, .lp-board, .doc-body table { font-stretch: 87.5%; }
 *, *::before, *::after { box-sizing: border-box; }
 a { color: inherit; }
 button, input, select { font: inherit; color: inherit; }

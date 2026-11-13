@@ -8,7 +8,7 @@
      Dark:  sand #12110E · #1A1914 · #23211B; olive #1B1D12 · #262A15; olive accent #B8C24A (button fill, dark text).
      Ink band (Agents): light #101010 / dark #0A0A08 with sand text. Header: head #D9DDB5 / #262A15 (from @juu/ui).
      Buttons: primary = ink fill, secondary = olive fill, tertiary = outline, sand fill on the ink band.
-   Type: Bricolage Grotesque 500/700/800 for headlines and body; DM Mono 400/500 for numbers, labels and buttons.
+   Type: Geist for headlines and body; Geist Mono for labels and mono buttons; Martian Mono for every number.
    Shape: radius 0 everywhere, borders 1.5px, dividers 1px, touch targets at least 44px.
    Assets: Stack logo and favicon from docs/design/assets; page icons from docs/design/assets/icons.
    Visuals: product parts only (Ladder, ticker, starburst, floor badges, Agaruzo! banner) from @juu/ui. */

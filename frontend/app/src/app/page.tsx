@@ -65,6 +65,7 @@ export default function MUSDash() {
   const perToken = chip === "MUSD" ? 1 : chip === "Y" ? series?.yMarginValuePerY ?? 0 : series?.pMarginValuePerP ?? 0;
 
   const n = Number(amount.replace(/,/g, "")) || 0;
+  const short = Boolean(w.address) && chipBal != null && n > chipBal;
   const value = n * perToken;
   const exposure = value * lev(floor);
   const mark = m.floors?.price ?? null;
@@ -196,8 +197,8 @@ export default function MUSDash() {
             <dt>Climb premium</dt><dd className="c-muted">{premiumText}</dd>
           </dl>
           {tooBig && <p className="txnote error">The Bank can cover up to {fmt(bank.data!.largestBetSizeNowMUSD)} MUSD of exposure right now. Try a smaller amount.</p>}
-          <button type="button" className="btn-strong open-btn" onClick={open} disabled={busy(w.tx, "open") || n <= 0}>
-            {busy(w.tx, "open") ? "OPENING…" : `OPEN ON FLOOR ${floor}`}
+          <button type="button" className="btn-strong open-btn" onClick={open} disabled={busy(w.tx, "open") || n <= 0 || short}>
+            {busy(w.tx, "open") ? "OPENING…" : n <= 0 ? "ENTER AN AMOUNT" : short ? `NOT ENOUGH ${chip === "MUSD" ? "MUSD" : unit}` : `OPEN ON FLOOR ${floor}`}
           </button>
           <TxNote k="open" />
         </section>

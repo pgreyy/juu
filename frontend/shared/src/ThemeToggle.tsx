@@ -112,4 +112,4 @@ export function ThemeToggle({ className = "hbtn quiet" }: { className?: string }
 
 /** Inline script for <head>: applies the saved theme, or the device setting, before the first paint. */
 export const THEME_SCRIPT = `try{var t=localStorage.getItem('juu-theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.dataset.theme='dark'}catch(e){}`;
-export const FONTS_URL = "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Mono:wght@400;500&display=swap";
+export const FONTS_URL = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap";

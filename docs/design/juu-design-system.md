@@ -74,12 +74,20 @@ The ticker strip is one line tall (about 30px).
 
 ## 2. Type
 
-- Headlines and body: **Bricolage Grotesque** 500 / 700 / 800.
-- Numbers, labels, prices, tickers, buttons: **DM Mono** 400 / 500.
-- Labels: uppercase DM Mono 11px, letter spacing 0.12em, muted.
-- Big numbers: DM Mono, one colour, no greyed decimals.
-- Google Fonts: `family=Bricolage+Grotesque:wght@500;700;800&family=DM+Mono:wght@400;500`
-
+- Headings and body: **Geist** 400 / 500 / 600 / 700 / 800.
+- Labels, small uppercase text, column headers (BULL POOL, MARK, FLOOR), ticker labels and mono buttons: **Geist Mono** 400 / 500 / 600.
+- Numbers only: **Martian Mono**, for every numeric value (prices, amounts, balances, percentages, leverage, floor
+  numbers, P&L, ticker values, input amounts, timestamps). Words next to a number stay Geist or Geist Mono.
+- How: Martian Mono is served from the sites (`public/fonts/martian-mono-latin.woff2`, variable weight and width) under
+  two font faces limited by `unicode-range`: **Juu Digits** (0-9 $ % + − ×) heads the Geist stack and **Juu Numerals**
+  (the same plus `. , :`) heads the Geist Mono stack. So a number renders in Martian Mono wherever it appears, without
+  extra markup.
+- Tabular figures everywhere (`font-variant-numeric: tabular-nums`), so digits don't shift as values update.
+- Narrower numbers (Martian Mono at `font-stretch: 87.5%`) in dense places: the Ladder, tables (`.tbl`, the landing's
+  leaderboard, docs tables) and the ticker.
+- Labels: uppercase Geist Mono 11px, letter spacing 0.12em, muted.
+- Google Fonts (Geist and Geist Mono only): `family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600`
+- The logo mark is unchanged; the JUU wordmark next to it is set in Geist 700.
 
 ## 3. Shape and spacing
 
@@ -94,7 +102,7 @@ The ticker strip is one line tall (about 30px).
 - `juu-logo.svg` and `juu-logo-dark.svg`: the Stack mark (three blocks narrowing upward).
 - `favicon.svg`.
 - `icons/`: the eight page icons plus `sidebar.svg`. 24px grid, stroke 1.8, round caps, currentColor.
-- Wordmark: Stack mark + "JUU" in Bricolage Grotesque 700, letter spacing 0.04em. Tagline "THE MUSDASH TOTE" in DM Mono 12px, letter spacing 0.12em, muted.
+- Wordmark: Stack mark + "JUU" in Geist 700, letter spacing 0.04em. Tagline "THE MUSDASH TOTE" in Geist Mono 12px, letter spacing 0.12em, muted.
 
 
 ## 5. App shell
@@ -111,7 +119,7 @@ The ticker strip is one line tall (about 30px).
 **Ticker** under the header, full width, like a perp exchange:
 - Scrolls left in a seamless loop (content duplicated, 52s per loop), pauses on hover, stops for reduced motion.
 - Items: BTC/USD with % change · open interest with a 40px mini starburst ray chart and bull/bear split · bull open · bear open · funding · safety jar · jackpot · collapsed floors · climb premium · top agent.
-- Labels DM Mono 11px muted, values DM Mono 18px coloured by meaning.
+- Labels Geist Mono 11px muted, values in Martian Mono (narrow, 87.5%) coloured by meaning.
 
 **Footer** (background `bg`):
 - Brand block: Stack logo + "Juu", then one line: "Bring your Bitcoin positions in, split them into Principal and Yield, then play them, save with them or lock in a fixed return."
@@ -126,17 +134,17 @@ Two columns: the tower (grows) and a right column (basis 380px, stretches its ch
 **Tower: the Ladder** (order-book style):
 - Bordered box. Header row labels: BULL POOL · BULL FALLS AT · FLOOR · BEAR FALLS AT · BEAR POOL.
 - A `strong` bar with MARK price and % change.
-- Ten rows, floor 10 at top. Each row: bull pool (bull colour) | bull collapse price | floor number (Bricolage 18px, `hi` for floors 7 to 10) | bear collapse price | bear pool.
+- Ten rows, floor 10 at top. Each row: bull pool (bull colour) | bull collapse price | floor number (Martian Mono 18px, `hi` for floors 7 to 10) | bear collapse price | bear pool.
 - Depth shading behind each row: bull from the left, bear from the right, 18% opacity, width = pool size.
 - Selected floor row gets `sel`. Clicking a row selects that floor.
 - Collapse price: mark × (1 − (1/leverage − 2%)) for bull, mark × (1 + (1/leverage − 2%)) for bear. Leverage per floor: 1.5, 2, 3 … 10.
-- Caption under it in muted DM Mono.
+- Caption under it in muted Geist Mono.
 - **Live feed** sits under the tower with 56px of space above it.
 
 **Right column:**
 - Bull / Bear buttons (selected = filled with its colour, text in `surf`).
 - Chips: MUSD · Yield 31 DEC · Principal 31 DEC. Three equal columns, **one line each** (11px, no wrapping).
-- Amount input: DM Mono 30px. The input must be allowed to shrink (width 0 + flex grow) so it never forces the column wider.
+- Amount input: Martian Mono 30px. The input must be allowed to shrink (width 0 + flex grow) so it never forces the column wider.
 - Floor picker: 2 rows of 5.
 - Readout: leverage, exposure, collapses at (bear colour), fee, climb premium.
 - Primary button "OPEN ON FLOOR N".
