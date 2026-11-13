@@ -204,10 +204,10 @@ main.main p, .lede, .note { max-width: 72ch; }
 .snippet pre { margin: 0; padding: 12px; background: var(--panel); color: var(--onPanel); overflow-x: auto; font-family: var(--fN); font-size: 12px; line-height: 1.55; }
 .connect a { color: inherit; }
 
-.howfund { margin: 0 0 20px; border: 1.5px solid var(--rule); padding: 0 14px; max-width: 900px; }
+.howfund { margin: 0 0 20px; border: 1.5px solid var(--rule); padding: 0 14px; }
+.howfund-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 4px 24px; padding: 4px 0 14px; }
+.howfund-grid p { margin: 4px 0 10px; font-size: 13px; line-height: 1.5; max-width: none; }
 .howfund summary { min-height: 44px; display: flex; align-items: center; font-family: var(--fN); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
-.howfund .readout { grid-template-columns: 120px minmax(0, 1fr); padding-bottom: 12px; font-size: 13px; line-height: 1.5; }
-.howfund .readout dd { text-align: left; font-family: var(--fB); }
 
 /* Swap */
 .swap { max-width: 520px; padding: 22px; }

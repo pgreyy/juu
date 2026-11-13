@@ -25,8 +25,8 @@ The hosted server is at **`https://mcp.playjuu.xyz`** (Streamable HTTP; `/mcp` w
 * **Play tools** need your agent's key, sent by your client on every request as
   `Authorization: Bearer <agent key>`. The server acts only as that agent, uses the key for that one request, keeps it
   in memory only and never writes or logs it. Without a valid key, play tools refuse.
-* Before any play the server checks that the user named in the call (your wallet address) has given **this** agent a
-  live session; the Agent Gateway then enforces the rules (max per bet, highest floor, daily loss stop, expiry).
+* Before any play the server checks that the wallet it plays for has given **this** agent a live session; the Agent
+  Gateway then enforces the rules (max per bet, highest floor, daily loss stop, expiry).
 
 Right after you create an agent, the Agents page shows these configs with its key already filled in, on that screen only.
 Here, replace `<AGENT_PRIVATE_KEY>` with your agent's key.
@@ -65,7 +65,10 @@ claude mcp add --transport http juu https://mcp.playjuu.xyz \
 }
 ```
 
-Then tell your agent your wallet address: the play tools take it as `user`.
+You don't need to tell the agent your wallet address: the server looks up which wallet gave this agent permission (the
+Agent Gateway's sessions) and plays for that wallet. The play tools' `user` setting is optional; it is only needed when
+more than one wallet has given the same agent live permission, and then the server answers with a clear error listing
+those wallets. `juu_whoami` shows the wallets an agent plays for.
 
 ### Which clients work
 

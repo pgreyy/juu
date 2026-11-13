@@ -42,7 +42,7 @@ function Snippet({ title, note, text }: { title: string; note?: string; text: st
  * "Connect your agent": the hosted MCP address and ready-to-copy configs. With `agentKey` (only right after creating an
  * agent on this screen) the key is filled in; otherwise a placeholder. The key never leaves this browser tab.
  */
-export function ConnectAgent({ stack, agentKey, user }: { stack: string; agentKey?: string | null; user?: string | null }) {
+export function ConnectAgent({ stack, agentKey }: { stack: string; agentKey?: string | null; user?: string | null }) {
   const url = stack === "demo" ? `${MCP}/?stack=demo` : MCP;
   const key = agentKey || "<AGENT_PRIVATE_KEY>";
   const claudeCode = `claude mcp add --transport http juu ${url} \\\n  --header "Authorization: Bearer ${key}"`;
@@ -53,12 +53,9 @@ export function ConnectAgent({ stack, agentKey, user }: { stack: string; agentKe
       <h2 id="connect-h" className="h2">CONNECT YOUR AGENT</h2>
       <p className="note" style={{ marginTop: 6 }}>
         Point any MCP client at <span className="mono" style={{ color: "var(--ink)" }}>{url}</span>. Reading needs no key. To play, the client sends its
-        agent&apos;s own key on every request; the server uses it for that request only and never stores it. Full guide:{" "}
+        agent&apos;s own key on every request; the server uses it for that request only and never stores it. The server finds the wallet your agent plays for from its permission. Full guide:{" "}
         <a href={DOCS_MCP}>playjuu.xyz/docs/mcp</a>.
       </p>
-      {user && (
-        <p className="note">Tell your agent which wallet it plays for: <span className="mono" style={{ color: "var(--ink)" }}>{user}</span> (the play tools take it as <span className="mono">user</span>).</p>
-      )}
       {agentKey ? (
         <p className="txnote error" role="alert">These configs contain your agent&apos;s private key. Keep them private: anyone with the key can play within this agent&apos;s rules until you revoke it. They are shown on this screen only.</p>
       ) : (

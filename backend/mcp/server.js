@@ -106,6 +106,17 @@ function buildServer(agent, STACK) {
     if (Number(x.expiry) <= Math.floor(Date.now() / 1000)) throw new Error("the session has expired; the user can renew it on the Agents page");
   }
 
+  // The wallet this agent plays for: the one given, or found from the gateway's sessions (via the Data API).
+  // Needed only when more than one wallet gives this agent live permission.
+  async function whoFor(user) {
+    needAgent();
+    if (user) return user;
+    const { owners } = await get(`/api/${STACK}/agent/${agent.address}/owners`);
+    if (owners.length === 1) return owners[0].user;
+    if (owners.length === 0) throw new Error(`no wallet gives agent ${agent.address} permission on the ${STACK} stack right now (it may be revoked or expired)`);
+    throw new Error(`agent ${agent.address} plays for ${owners.length} wallets on the ${STACK} stack: ${owners.map((o) => o.user).join(", ")}. Say which one with user.`);
+  }
+
   async function ownerOf(id) {
     const p = await gateway.positions(id);
     if (p.agent.toLowerCase() !== agent.address.toLowerCase()) throw new Error(`position #${id} was not opened by this agent`);
@@ -215,9 +226,13 @@ function buildServer(agent, STACK) {
 
   server.registerTool(
     "juu_my_session",
-    { description: "The rules a user gave this agent (max chips, highest floor, daily loss limit, expiry).", inputSchema: { user: z.string() } },
+    { description: "The rules a user gave this agent (max chips, highest floor, daily loss limit, expiry). Without user: every wallet that gives this agent permission now.", inputSchema: { user: z.string().optional() } },
     async ({ user }) => {
       try {
+        if (!user) {
+          if (!agent) return text({ agent: null, note: "send your agent key to see who it plays for" });
+          return text(await get(`/api/${STACK}/agent/${agent.address}/owners`));
+        }
         const all = await get(`/api/${STACK}/agents/${user}`);
         const mine = agent ? all.sessions.filter((s) => s.agent.toLowerCase() === agent.address.toLowerCase()) : all.sessions;
         return text({ agent: agent?.address ?? null, user, sessions: mine });
@@ -233,10 +248,11 @@ function buildServer(agent, STACK) {
     "juu_open",
     {
       description: "Open a position for a user with their MUSD, through the Agent Gateway. Pays MUSDash's trading fee, the seat premium on floors 7-10, and the agent fee. The user's session rules apply.",
-      inputSchema: { user: z.string(), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), margin_musd: z.number().positive() },
+      inputSchema: { user: z.string().optional().describe("The wallet to play for. Optional: found from the agent's permission when only one wallet gave it."), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), margin_musd: z.number().positive() },
     },
-    async ({ user, side, floor, margin_musd }) => {
+    async ({ user: given, side, floor, margin_musd }) => {
       try {
+        const user = await whoFor(given);
         await needSession(user);
         const r = await sendTx("openMUSD", [user, SIDES[side], floor, ethers.parseEther(String(margin_musd))]);
         const ev = r.logs.map((l) => { try { return gateway.interface.parseLog(l); } catch { return null; } }).find((x) => x?.name === "AgentOpened");
@@ -251,10 +267,11 @@ function buildServer(agent, STACK) {
     "juu_open_with_tokens",
     {
       description: "Open a position for a user with their Y or P chips of a series.",
-      inputSchema: { user: z.string(), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), chip: z.enum(["y", "p"]), series_id: z.number().int().min(0), amount: z.number().positive() },
+      inputSchema: { user: z.string().optional().describe("The wallet to play for. Optional: found from the agent's permission."), side: z.enum(["bull", "bear"]), floor: z.number().int().min(1).max(10), chip: z.enum(["y", "p"]), series_id: z.number().int().min(0), amount: z.number().positive() },
     },
-    async ({ user, side, floor, chip, series_id, amount }) => {
+    async ({ user: given, side, floor, chip, series_id, amount }) => {
       try {
+        const user = await whoFor(given);
         await needSession(user);
         const r = await sendTx("openTokens", [user, SIDES[side], floor, CHIPS[chip], series_id, ethers.parseEther(String(amount))]);
         const ev = r.logs.map((l) => { try { return gateway.interface.parseLog(l); } catch { return null; } }).find((x) => x?.name === "AgentOpened");
@@ -299,9 +316,10 @@ function buildServer(agent, STACK) {
 
   server.registerTool(
     "juu_set_loop",
-    { description: "Turn the user's Loop on or off (only if the user allowed this agent to).", inputSchema: { user: z.string(), on: z.boolean(), series_id: z.number().int().min(0) } },
-    async ({ user, on, series_id }) => {
+    { description: "Turn the user's Loop on or off (only if the user allowed this agent to).", inputSchema: { user: z.string().optional().describe("Optional: found from the agent's permission."), on: z.boolean(), series_id: z.number().int().min(0) } },
+    async ({ user: given, on, series_id }) => {
       try {
+        const user = await whoFor(given);
         await needSession(user);
         const r = await sendTx("setLoopFor", [user, on, series_id]);
         return text({ ...r, logs: undefined });
@@ -311,9 +329,11 @@ function buildServer(agent, STACK) {
     },
   );
 
-  server.registerTool("juu_whoami", { description: "This connection's stack, the agent address your key belongs to (never the key) and whether play tools are available.", inputSchema: {} }, async () =>
-    text({ stack: STACK, gateway: stackAddr.gateway, agent: agent?.address ?? null, canAct: Boolean(agent), howToPlay: agent ? null : "send your agent's session key as Authorization: Bearer <key>" }),
-  );
+  server.registerTool("juu_whoami", { description: "This connection's stack, the agent address your key belongs to (never the key), the wallets it plays for, and whether play tools are available.", inputSchema: {} }, async () => {
+    let playsFor = null;
+    if (agent) playsFor = (await get(`/api/${STACK}/agent/${agent.address}/owners`).catch(() => ({ owners: [] }))).owners.map((o) => o.user);
+    return text({ stack: STACK, gateway: stackAddr.gateway, agent: agent?.address ?? null, playsFor, canAct: Boolean(agent), howToPlay: agent ? null : "send your agent's session key as Authorization: Bearer <key>" });
+  });
   return server;
 }
 

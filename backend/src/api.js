@@ -2,7 +2,9 @@
 import express from "express";
 import { ethers } from "ethers";
 import { ABI } from "./abis.js";
-import { addresses, env, STACKS } from "./config.js";
+import fs from "node:fs";
+import path from "node:path";
+import { DATA_DIR, addresses, env, STACKS } from "./config.js";
 import { c, fmt, now, provider, shared, stack } from "./chain.js";
 import { byEvent, events } from "./events.js";
 import { history } from "./history.js";
@@ -112,6 +114,15 @@ function agentPositions(stackName) {
   return m;
 }
 
+// Agents a user removed from their Agents page (revoked or expired ones only): { stack: { user: [agent, ...] } }.
+// Kept in data/hidden-agents.json so the choice holds on every device. Results stay on the leaderboard.
+const HIDDEN_FILE = path.join(DATA_DIR, "hidden-agents.json");
+const hidden = fs.existsSync(HIDDEN_FILE) ? JSON.parse(fs.readFileSync(HIDDEN_FILE, "utf8")) : {};
+const isHidden = (st, user, agent) => (hidden[st]?.[user.toLowerCase()] || []).includes(agent.toLowerCase());
+/** The exact text a user signs to remove an agent; the server rebuilds it to check the signature. */
+export const hideMessage = (st, user, agent, time) =>
+  `Juu: remove agent ${agent} from my Agents page on the ${st} stack.\nWallet: ${user}\nTime: ${time}\nThis costs nothing and changes nothing on chain.`;
+
 // Browsers may read the API from these sites (comma-separated origins, e.g. the two Vercel sites). The API is
 // read only, so this only controls which web pages can fetch it directly.
 const ORIGINS = env("CORS_ORIGINS", "")
@@ -127,7 +138,7 @@ export function api() {
     if (o && ORIGINS.includes(o)) {
       res.set("Access-Control-Allow-Origin", o);
       res.set("Vary", "Origin");
-      res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+      res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
       res.set("Access-Control-Allow-Headers", "Content-Type");
     }
     if (req.method === "OPTIONS") return res.sendStatus(204);
@@ -155,6 +166,8 @@ export function api() {
         "GET /api/:stack/leaderboard?type=all|agents|humans",
         "GET /api/:stack/agents/:user",
         "GET /api/:stack/portfolio/:user",
+        "POST /api/:stack/agents/:user/hide",
+        "GET /api/:stack/agent/:agent/owners",
         "GET /api/:stack/agent-fee",
         "GET /api/:stack/feed?limit=20",
         "GET /api/:stack/tickets/:user",
@@ -438,9 +451,56 @@ export function api() {
       const x = await s.gateway.session(req.params.user, agent);
       // The gateway resets lossToday lazily, on the agent's next move; a value from an earlier day is 0 today.
       const lossToday = Number(x.day) === today ? fmt(x.lossToday) : 0;
+      const live = x.active && Number(x.expiry) > Math.floor(Date.now() / 1000);
+      if (!live && isHidden(s.name, req.params.user, agent)) continue;
       out.push({ agent, active: x.active, expires: iso(x.expiry), maxChipsMUSD: fmt(x.maxChips), maxFloor: Number(x.maxFloor), dailyLossLimitMUSD: fmt(x.dailyLossLimit), lossTodayMUSD: lossToday, netTodayMUSD: net.get(agent.toLowerCase()) || 0, canSetLoop: x.canSetLoop });
     }
     return { stack: s.name, user: req.params.user, sessions: out };
+  }));
+
+  // Remove (hide) a revoked or expired agent from the user's Agents page. Proven by the user's signature over
+  // hideMessage(); no transaction. A live agent can't be hidden: revoke it first.
+  app.post("/api/:stack/agents/:user/hide", express.json({ limit: "4kb" }), async (req, res) => {
+    try {
+      const s = st(req);
+      const user = req.params.user;
+      const { agent, time, signature } = req.body || {};
+      if (!ethers.isAddress(user) || !ethers.isAddress(agent)) return res.status(400).json({ error: "user and agent must be addresses" });
+      const age = Date.now() - Date.parse(time);
+      if (!(age >= -60000 && age < 10 * 60000)) return res.status(400).json({ error: "the signed time is too old or invalid; try again" });
+      let signer;
+      try {
+        signer = ethers.verifyMessage(hideMessage(s.name, user, agent, time), signature);
+      } catch {
+        return res.status(400).json({ error: "bad signature" });
+      }
+      if (signer.toLowerCase() !== user.toLowerCase()) return res.status(403).json({ error: "the signature is not from this wallet" });
+      const x = await s.gateway.session(user, agent);
+      if (x.active && Number(x.expiry) > Math.floor(Date.now() / 1000)) return res.status(409).json({ error: "this agent still has permission: revoke it first" });
+      const list = ((hidden[s.name] ||= {})[user.toLowerCase()] ||= []);
+      if (!list.includes(agent.toLowerCase())) list.push(agent.toLowerCase());
+      fs.writeFileSync(HIDDEN_FILE, JSON.stringify(hidden));
+      for (const k of cache.keys()) if (k.toLowerCase().includes(`/agents/${user.toLowerCase()}`)) cache.delete(k);
+      res.json({ ok: true, stack: s.name, user, agent, hidden: true });
+    } catch (e) {
+      res.status(500).json({ error: (e.shortMessage || e.message || String(e)).slice(0, 300) });
+    }
+  });
+
+  // Which wallets currently give this agent permission (a live session): the MCP server uses it to find the
+  // user an agent plays for when the client doesn't say.
+  app.get("/api/:stack/agent/:agent/owners", wrap(async (req) => {
+    const s = st(req);
+    const agent = req.params.agent;
+    if (!ethers.isAddress(agent)) throw Object.assign(new Error("agent must be an address"), { status: 400 });
+    const users = [...new Set(byEvent(s.name, "gateway", "SessionGranted").filter((e) => e.args.agent.toLowerCase() === agent.toLowerCase()).map((e) => e.args.user))];
+    const t = Math.floor(Date.now() / 1000);
+    const owners = [];
+    for (const user of users) {
+      const x = await s.gateway.session(user, agent);
+      if (x.active && Number(x.expiry) > t) owners.push({ user, expires: iso(x.expiry), maxChipsMUSD: fmt(x.maxChips), maxFloor: Number(x.maxFloor) });
+    }
+    return { stack: s.name, agent, owners };
   }));
 
   app.get("/api/:stack/agent-fee", wrap(async (req) => {

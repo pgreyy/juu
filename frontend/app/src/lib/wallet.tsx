@@ -40,6 +40,8 @@ type Wallet = {
   switchNetwork: () => Promise<boolean>;
   disconnect: () => void;
   walletName: string | null;
+  /** Ask the wallet to sign a plain-text message (personal_sign). No transaction, no gas. */
+  sign: (message: string) => Promise<string>;
   /** Runs wallet steps in order (for example approve, then open). Returns true when all confirmed. */
   run: (key: string, steps: Step[], doneMsg?: string) => Promise<boolean>;
   tx: TxState | null;
@@ -306,6 +308,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       switchNetwork,
       disconnect,
       walletName: picked?.name ?? null,
+      sign: async (message: string) => {
+        if (!eth()) throw new Error("Connect a wallet first.");
+        return (await new BrowserProvider(eth()! as never).getSigner()).signMessage(message);
+      },
       run,
       tx,
       clearTx: () => setTx(null),

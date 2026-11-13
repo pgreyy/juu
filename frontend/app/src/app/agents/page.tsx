@@ -13,6 +13,10 @@ import { call, read, useWallet } from "@/lib/wallet";
 type Session = { agent: string; active: boolean; expires: string; maxChipsMUSD: number; maxFloor: number; dailyLossLimitMUSD: number; lossTodayMUSD: number; netTodayMUSD: number; canSetLoop: boolean };
 type Fee = { rateOfSize: number; minimumMUSD: number; toBuffer: number; toBank: number };
 
+/** Must match the Data API's hideMessage() exactly: the server rebuilds it to check the signature. */
+const hideMessage = (stack: string, user: string, agent: string, time: string) =>
+  `Juu: remove agent ${agent} from my Agents page on the ${stack} stack.\nWallet: ${user}\nTime: ${time}\nThis costs nothing and changes nothing on chain.`;
+
 function expiresText(iso: string) {
   const ms = new Date(iso).getTime() - Date.now();
   if (ms <= 0) return "Expired";
@@ -88,6 +92,31 @@ export default function Agents() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
+  const [removing, setRemoving] = useState<string | null>(null);
+  const [removeMsg, setRemoveMsg] = useState<{ agent: string; text: string; ok: boolean } | null>(null);
+  // Remove a revoked or expired agent from this list, on every device: the wallet signs a short message (no
+  // transaction); the Data API checks it and hides the agent for this wallet. Results stay on the leaderboard.
+  const remove = async (agentAddr: string) => {
+    if (!w.address) return;
+    if (!window.confirm(`Remove agent ${agentAddr} from your list?\n\nIts permission is already off. Its past results stay on the leaderboard. You sign a message to confirm; there is no transaction.`)) return;
+    setRemoving(agentAddr);
+    setRemoveMsg(null);
+    try {
+      const time = new Date().toISOString();
+      const signature = await w.sign(hideMessage(stack, w.address, agentAddr, time));
+      const r = await fetch(`/api/${stack}/agents/${w.address}/hide`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ agent: agentAddr, time, signature }) });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.error || `HTTP ${r.status}`);
+      setRemoveMsg({ agent: agentAddr, text: "Removed.", ok: true });
+      await sessions.reload();
+    } catch (e) {
+      const err = e as { code?: string | number; message?: string };
+      setRemoveMsg({ agent: agentAddr, text: err.code === "ACTION_REJECTED" || err.code === 4001 ? "Cancelled in your wallet." : `Couldn't remove it: ${err.message}`, ok: false });
+    } finally {
+      setRemoving(null);
+    }
+  };
+
   const list = sessions.data?.sessions || [];
   const valid = isAddress(target) && !isSelf && Number(maxBet) > 0 && Number(days) > 0 && (mode === "own" || saved);
 
@@ -97,14 +126,21 @@ export default function Agents() {
       <p className="lede">Let your bot play. You set the rules. You can pull the plug any time.</p>
       <details className="howfund">
         <summary>How agent funding works</summary>
-        <dl className="readout" style={{ marginTop: 10 }}>
-          <dt>Whose money</dt><dd>Yours. At each bet the Agent Gateway takes your MUSD (or your Yield and Principal chips) from your wallet. The agent&apos;s wallet holds none.</dd>
-          <dt>How much</dt><dd>Giving permission lets the gateway use up to ten times the max per bet in total (500 → 5,000 MUSD), and only within the rules.</dd>
-          <dt>Fees</dt><dd>Each bet pays MUSDash&apos;s trading fee and the agent fee, from your MUSD.</dd>
-          <dt>Winnings</dt><dd>Everything a closed bet returns goes straight to your wallet (or your Loop), never to the agent.</dd>
-          <dt>Gas</dt><dd>The agent&apos;s wallet pays its own gas in BTC. Mezo gas is tiny: the 0.00002 BTC the app can send lasts a long time.</dd>
-          <dt>Chips</dt><dd>The app approves MUSD only. To let an agent bet Yield or Principal chips, approve those tokens for the gateway too.</dd>
-        </dl>
+        <div className="howfund-grid">
+          {[
+            ["WHOSE MONEY", "Yours. At each bet the Agent Gateway takes your MUSD (or your Yield and Principal chips) from your wallet. The agent's wallet holds none."],
+            ["HOW MUCH", "Giving permission lets the gateway use up to ten times the max per bet in total (500 → 5,000 MUSD), and only within the rules."],
+            ["FEES", "Each bet pays MUSDash's trading fee and the agent fee, from your MUSD."],
+            ["WINNINGS", "Everything a closed bet returns goes straight to your wallet (or your Loop), never to the agent."],
+            ["GAS", "The agent's wallet pays its own gas in BTC. Mezo gas is tiny: the 0.00002 BTC the app can send lasts a long time."],
+            ["CHIPS", "The app approves MUSD only. To let an agent bet Yield or Principal chips, approve those tokens for the gateway too."],
+          ].map(([k, v]) => (
+            <div key={k}>
+              <div className="label" style={{ color: "var(--ink)" }}>{k}</div>
+              <p>{v}</p>
+            </div>
+          ))}
+        </div>
       </details>
       <div className="agents">
         {!w.address && (
@@ -121,14 +157,18 @@ export default function Agents() {
           const expired = new Date(a.expires).getTime() <= Date.now();
           const on = a.active && !expired;
           const key = "agent-" + a.agent;
+          const isOwnWallet = Boolean(own && a.agent.toLowerCase() === own);
           return (
             <section className="agent" key={a.agent} style={{ opacity: on ? 1 : 0.6 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontFamily: "var(--fD)", fontWeight: 700, fontSize: 22 }} title={a.agent}>{shortAddr(a.agent)}</span>
                 <span className={"st" + (on ? " on" : "")}>{on ? "ACTIVE" : expired && a.active ? "EXPIRED" : "REVOKED"}</span>
               </div>
-              {own && a.agent.toLowerCase() === own && on && (
+              {isOwnWallet && on && (
                 <p className="txnote error" style={{ marginTop: 8 }}>This agent is your own wallet, so its key is your main key. Revoke it and create a new agent below.</p>
+              )}
+              {isOwnWallet && !on && (
+                <p className="txnote" style={{ marginTop: 8 }}>This was your own wallet, so it can&apos;t be restored: an agent needs its own wallet. Remove it and create a new agent.</p>
               )}
               <div className={"mono " + (a.netTodayMUSD > 0.005 ? "c-bull" : a.netTodayMUSD < -0.005 ? "c-bear" : "c-ink")} style={{ fontSize: 30, marginTop: 10 }}>
                 {a.netTodayMUSD > 0.005 ? "+" + fmt(a.netTodayMUSD, 2) : a.netTodayMUSD < -0.005 ? "−" + fmt(-a.netTodayMUSD, 2) : "0.00"}
@@ -140,19 +180,29 @@ export default function Agents() {
                 <dt>Daily loss stop</dt><dd>{fmt(a.lossTodayMUSD, 2)} of {fmt(a.dailyLossLimitMUSD)} MUSD used</dd>
                 <dt>Expires</dt><dd>{expiresText(a.expires)}</dd>
               </dl>
-              <button
-                type="button"
-                className={"btn-line" + (on ? " btn-on" : "")}
-                style={{ marginTop: 16, width: "100%", height: 50, fontSize: 13, letterSpacing: "0.06em" }}
-                disabled={busy(w.tx, key)}
-                onClick={() =>
-                  on
-                    ? w.run(key, [(s) => call(gw(s), "revoke", [a.agent])], "Revoked. The agent can't play for you any more.")
-                    : grant(a.agent, a.maxChipsMUSD, a.maxFloor, a.dailyLossLimitMUSD, 7, key)
-                }
-              >
-                {on ? "REVOKE NOW" : "RESTORE PERMISSION"}
-              </button>
+              {on ? (
+                <button
+                  type="button"
+                  className="btn-line btn-on"
+                  style={{ marginTop: 16, width: "100%", height: 50, fontSize: 13, letterSpacing: "0.06em" }}
+                  disabled={busy(w.tx, key)}
+                  onClick={() => w.run(key, [(s) => call(gw(s), "revoke", [a.agent])], "Revoked. The agent can't play for you any more.")}
+                >
+                  REVOKE NOW
+                </button>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: isOwnWallet ? "1fr" : "1fr 1fr", gap: 6, marginTop: 16 }}>
+                  {!isOwnWallet && (
+                    <button type="button" className="btn-line" style={{ height: 50, fontSize: 12, letterSpacing: "0.06em" }} disabled={busy(w.tx, key)} onClick={() => grant(a.agent, a.maxChipsMUSD, a.maxFloor, a.dailyLossLimitMUSD, 7, key)}>
+                      RESTORE PERMISSION
+                    </button>
+                  )}
+                  <button type="button" className="btn-line" style={{ height: 50, fontSize: 12, letterSpacing: "0.06em" }} disabled={removing === a.agent} onClick={() => remove(a.agent)}>
+                    {removing === a.agent ? "SIGN IN YOUR WALLET…" : "REMOVE"}
+                  </button>
+                </div>
+              )}
+              {removeMsg?.agent === a.agent && <p className={"txnote " + (removeMsg.ok ? "done" : "error")}>{removeMsg.text}</p>}
               <TxNote k={key} wallet={false} />
             </section>
           );
