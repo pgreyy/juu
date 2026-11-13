@@ -13,14 +13,18 @@ Juu's keeper bot runs the scheduled steps that keep Juu working. It is part of t
 | `rewards` | 6 h | Collects series rewards for Y holders, sMUSD yield, the Banks' Y rewards and matured P; once a week reports the weekly yield to the Pricers. |
 | `killSwitch` | 1 min | Checks the Climb Premium kill switch after each epoch ends. |
 | `jackpot` | 1 min | Commits a secret for each epoch, seals each finished epoch's tickets, reveals within 256 blocks, or skips. |
-| `bank` | 30 min | Rebalances each Bank's Mezo loan when it leaves its band or has idle BTC. |
-| `guards` | 1 min | Calls the safety guard on any Juu account whose loan nears danger or when Mezo nears Recovery Mode. |
+| `bank` | 5 min | Tops up each Bank's cash reserve (20% of its value in MUSD) from its trove, within 300%; warns if still short. Rebalances the loan when it leaves its band or has idle BTC. |
+| `guards` | 1 min | Calls `guard(1)` (one bet per call, 9.5 million gas) on any Juu account whose loan nears danger or when Mezo nears Recovery Mode, until it is safe. |
 | `prices` | 1 min | Samples each stack's BTC price for the price history. |
 | `events` | 30 s | Scans game, gateway, jackpot and account events for the API and leaderboard. |
 
 ## Never slipping a payout
 
 A series' unlock must happen in the week that opens 30 days before its end date; if it happens later, Mezo sets the lock to end on a later Thursday. The `series` job checks every two minutes and calls `startUnlock` as soon as Mezo allows it in that week (one hour after the week opens). The `voting` job skips any lock whose unlock is still due, because a vote cast that week would block the unlock until the next week. The payout (`mature`) is called from one hour after the end date and retried every two minutes until it succeeds.
+
+## Mezo RPC hiccups
+
+Mezo's testnet RPC sometimes fails a receipt lookup. The keeper polls receipts itself and retries, and any unexpected error becomes a warning instead of stopping the bot.
 
 ## Warnings
 

@@ -212,6 +212,7 @@ export function api() {
 
   app.get("/api/:stack/bank", wrap(async (req) => {
     const s = st(req);
+    const [reserve, reserveShare, maxWin] = await Promise.all([s.bank.reserveTarget(), s.bank.reserveShare(), s.game.maxWinShare()]);
     const [capital, maxExp, liq, trove, cr, target, gap, tokens] = await Promise.all([
       s.bank.capitalMUSD(),
       s.bank.maxExposure(),
@@ -229,6 +230,9 @@ export function api() {
       currentGapMUSD: fmt(gap),
       roomLeftMUSD: Math.max(0, fmt(maxExp) - fmt(gap)),
       liquidityMUSD: fmt(liq),
+      cashReserve: { targetMUSD: fmt(reserve), share: fmt(reserveShare), short: liq < reserve },
+      winCapShareOfSize: fmt(maxWin),
+      largestBetSizeNowMUSD: fmt(liq) / fmt(maxWin),
       yAndPHeldMUSD: fmt(tokens),
       trove: { collateralBTC: fmt(trove.coll), debtMUSD: fmt(trove.debt), collateralRatio: fmt(cr), target: fmt(target) },
     };

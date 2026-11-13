@@ -38,6 +38,8 @@ Juu is an experiment on Mezo **testnet**. Read this before you use it.
 
 ## MUSDash
 
+* **Wins are capped.** A bet wins at most 100% of its size. A Bull bet stops gaining once BTC has doubled since it opened.
+* **Bets can be refused.** If the Bank doesn't hold enough MUSD to pay a bet's worst-case win, the bet won't open.
 * **You can lose all your chips.** A floor collapses when what your position is worth falls to 2% of its size. On floor 10 that is an 8% move against you.
 * **Fast moves.** If the price jumps past your collapse price before anyone collapses your floor, you lose all your margin.
 * **Climb Premium.** Seat premiums on floors 7 to 10 reward early climbers with later climbers' money. They stop for good once new top-floor seats drop below half of the week before. Don't count on them continuing.

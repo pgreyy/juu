@@ -23,6 +23,10 @@ import {JuuPricer} from "./JuuPricer.sol";
 /// While Mezo is in Recovery Mode it blocks taking collateral out of troves, so withdrawals that need
 /// trove BTC wait until it ends.
 ///
+/// Cash reserve: the Bank keeps at least `reserveShare` (20%) of its value as MUSD on hand, so winners can be paid.
+/// When it is short, topUpReserve() (the keeper calls it) borrows the difference from the trove, but never past the
+/// target collateral ratio (300%). Repaying in rebalance() never takes MUSD on hand below the reserve.
+///
 /// Y and P chips: when a player loses Y or P chips in MUSDash, the Bank pays the MUSD and takes the tokens at
 /// the Pricer's value. The Bank counts the Y and P it holds in its value (at the Pricer's value), anyone can make
 /// it claim Y rewards or redeem matured P, and a withdrawing saver also gets their share of those tokens.
@@ -42,6 +46,7 @@ contract JuuBank is ERC20, Ownable, ReentrancyGuard {
     uint256 public lowerCR = 2.7e18; // rebalance repays below this
     uint256 public upperCR = 3.3e18; // rebalance borrows above this
     uint256 public exposureCap = 0.2e18; // MUSDash keeps the Bank's uncovered exposure under 20% of capital
+    uint256 public reserveShare = 0.2e18; // MUSD on hand the Bank aims to keep, as a share of its value
     JuuSplitter public splitter; // P and Y the Bank may hold
     JuuPricer public pricer; // values them
 
@@ -55,6 +60,9 @@ contract JuuBank is ERC20, Ownable, ReentrancyGuard {
     event RatiosSet(uint256 target, uint256 lower, uint256 upper);
     event ExposureCapSet(uint256 cap);
     event ValuationSet(address splitter, address pricer);
+    event ReserveShareSet(uint256 share);
+    event ReserveToppedUp(uint256 borrowed, uint256 musdOnHand, uint256 target);
+    event ReserveShort(uint256 musdOnHand, uint256 target);
 
     error NotGame();
     error ZeroAmount();
@@ -95,6 +103,12 @@ contract JuuBank is ERC20, Ownable, ReentrancyGuard {
         splitter = JuuSplitter(payable(splitter_));
         pricer = JuuPricer(pricer_);
         emit ValuationSet(splitter_, pricer_);
+    }
+
+    function setReserveShare(uint256 share) external onlyOwner {
+        if (share > 1e18) revert BadValue();
+        reserveShare = share;
+        emit ReserveShareSet(share);
     }
 
     function setExposureCap(uint256 cap) external onlyOwner {
@@ -147,6 +161,11 @@ contract JuuBank is ERC20, Ownable, ReentrancyGuard {
             uint256 pb = s.p.balanceOf(address(this));
             if (pb > 0) v += pricer.pValue(i, pb);
         }
+    }
+
+    /// @notice MUSD the Bank aims to keep on hand: its value x reserveShare.
+    function reserveTarget() public view returns (uint256) {
+        return (capitalMUSD() * reserveShare) / 1e18;
     }
 
     /// @notice MUSD the Bank can pay out right now.
@@ -237,17 +256,15 @@ contract JuuBank is ERC20, Ownable, ReentrancyGuard {
         if (cr > upperCR) {
             uint256 amount = _amountForNetDebt(targetDebt - debt);
             if (amount == 0) return;
-            // Mezo fixes a trove's borrowing cap when it opens; refinancing resets it to today's collateral.
-            uint256 cap = troveManager.getTroveMaxBorrowingCapacity(address(this));
-            if (cap < debt + amount + borrowerOperations.getBorrowingFee(amount)) {
-                borrowerOperations.refinance(address(0), address(0));
-            }
-            borrowerOperations.withdrawMUSD(amount, address(0), address(0));
+            _borrow(amount, debt);
             emit Borrowed(amount);
         } else if (cr < lowerCR) {
             uint256 repay = debt - targetDebt;
             uint256 m = musd.balanceOf(address(this));
-            if (repay > m) repay = m;
+            // Never repay below the cash reserve.
+            uint256 reserve = reserveTarget();
+            uint256 spare = m > reserve ? m - reserve : 0;
+            if (repay > spare) repay = spare;
             uint256 floor = borrowerOperations.minNetDebt() + GAS_COMPENSATION;
             uint256 maxRepay = debt > floor ? debt - floor : 0;
             if (repay > maxRepay) repay = maxRepay;
@@ -255,6 +272,31 @@ contract JuuBank is ERC20, Ownable, ReentrancyGuard {
             borrowerOperations.repayMUSD(repay, address(0), address(0));
             emit Repaid(repay);
         }
+    }
+
+    /// @notice Top the cash reserve up to its target by borrowing from the trove, but never past the target
+    ///         collateral ratio. Callable by anyone (the keeper calls it). Returns what was borrowed.
+    function topUpReserve() external nonReentrant returns (uint256 borrowed) {
+        uint256 onHand = musd.balanceOf(address(this));
+        uint256 target = reserveTarget();
+        if (onHand >= target) return 0;
+        if (!hasTrove()) {
+            emit ReserveShort(onHand, target);
+            return 0;
+        }
+        (uint256 coll, uint256 debt) = trove();
+        uint256 maxDebt = (coll * price()) / targetCR;
+        if (maxDebt <= debt) {
+            emit ReserveShort(onHand, target);
+            return 0;
+        }
+        uint256 room = _amountForNetDebt(maxDebt - debt);
+        uint256 need = target - onHand;
+        borrowed = need < room ? need : room;
+        if (borrowed == 0) return 0;
+        _borrow(borrowed, debt);
+        emit ReserveToppedUp(borrowed, onHand + borrowed, target);
+        if (borrowed < need) emit ReserveShort(onHand + borrowed, target);
     }
 
     // ---------------------------------------------------------------- Y and P held
@@ -331,6 +373,16 @@ contract JuuBank is ERC20, Ownable, ReentrancyGuard {
         if (m >= debt) return btcSide + ((m - debt) * 1e18) / p;
         uint256 shortBTC = ((debt - m) * 1e18) / p;
         return btcSide > shortBTC ? btcSide - shortBTC : 0;
+    }
+
+    /// @dev Borrows MUSD from the trove. Mezo fixes a trove's borrowing cap when it opens; refinancing resets it
+    ///      to today's collateral when the cap is in the way.
+    function _borrow(uint256 amount, uint256 debt) internal {
+        uint256 cap = troveManager.getTroveMaxBorrowingCapacity(address(this));
+        if (cap < debt + amount + borrowerOperations.getBorrowingFee(amount)) {
+            borrowerOperations.refinance(address(0), address(0));
+        }
+        borrowerOperations.withdrawMUSD(amount, address(0), address(0));
     }
 
     /// @dev Amount to request so that amount + Mezo's borrowing fee is about `netDebt`.

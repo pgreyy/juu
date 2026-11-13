@@ -25,29 +25,45 @@
       "label": "main",
       "priceFeed": "0x86bCF0841622a5dAC14A313a15f96A95421b9366",
       "pricer": "0xe25F6095665626342ffF7FeA7d8BE0c40517Cf34",
-      "bank": "0x42428f3c928c9af20E4d10Ca1D91aBDd565c5959",
+      "bank": "0x55726A86c321347db688f2C6A331445465eeE9BE",
       "buffer": "0xAB61604F82f645110A062b49F2bC204cbb473d39",
-      "game": "0xfD5c96497Ae439f88023EFa78D13Afa6C0ca40E7",
-      "jackpot": "0x508d6449FCb235c92D79f0011Dd09f3833233D62",
+      "game": "0xb86Ef40aB59dFbc9fAE812Bc379D248DB3D6Defd",
+      "jackpot": "0xAca44212b5Ac418E17B750142F9152314eccdE5e",
       "loop": "0x33c807030053b821B1efCEcbF40F9A7025edec28",
-      "gateway": "0x29da0243E5604CAf1490d148B7dB5f0835Ab2394",
-      "accountFactory": "0xECEf17Da15D530dB1bb0B906a35A8DCB6545d084",
-      "fromBlock": 16744663,
+      "gateway": "0x87968C86f9728FB0f946453e6DECD0Cea70204Fd",
+      "accountFactory": "0x6Fe844B458829e60CCe1dcd0000eeA94B96C76e4",
+      "fromBlock": 16745655,
       "deployedAt": 1794531190
     },
     "demo": {
       "label": "demo (DEMO ONLY: price can be set by the owner)",
       "priceFeed": "0x01297A4923330BC49EAA21777284b3e6440498E8",
       "pricer": "0x009BcfeC38cF0F15215E87B44fF1DF53c868A0D1",
-      "bank": "0x0A2acca04fD2fEbd2BB9e6eE30762b487A51F420",
+      "bank": "0x136fc7b4f5C7A2028C33d27055cf1ab8387Aa4fD",
       "buffer": "0xaa07cCbd7DC5662321D0E2bc7D4CFa34a9eB62A0",
-      "game": "0x3DC2CfdF76fa127abf5486357e79082A9b2E37Cd",
-      "jackpot": "0xD5109C77e5C5ce383c4aD716281882B00B0F7e6c",
+      "game": "0x652C3Db601a194f4f7BD4294e7447f1fDbe99525",
+      "jackpot": "0x357B24D3dc36f8F40601aD50E7325c5D076d8296",
       "loop": "0x6509684FF00DE88c0E233Ca16c2082b01Ce450a1",
-      "gateway": "0xb57abA53d416832974f3036A2c32Fe05f106DCAb",
+      "gateway": "0x5E2DFd2992CACb5d8ca505069FD79154Bf15e4F5",
       "accountFactory": null,
-      "fromBlock": 16744685,
+      "fromBlock": 16745681,
       "deployedAt": 1794531282
     }
+  },
+  "retired": {
+    "v3 main": {
+      "bank": "0x42428f3c928c9af20E4d10Ca1D91aBDd565c5959",
+      "game": "0xfD5c96497Ae439f88023EFa78D13Afa6C0ca40E7",
+      "jackpot": "0x508d6449FCb235c92D79f0011Dd09f3833233D62",
+      "gateway": "0x29da0243E5604CAf1490d148B7dB5f0835Ab2394",
+      "accountFactory": "0xECEf17Da15D530dB1bb0B906a35A8DCB6545d084"
+    },
+    "v3 demo": {
+      "bank": "0x0A2acca04fD2fEbd2BB9e6eE30762b487A51F420",
+      "game": "0x3DC2CfdF76fa127abf5486357e79082A9b2E37Cd",
+      "jackpot": "0xD5109C77e5C5ce383c4aD716281882B00B0F7e6c",
+      "gateway": "0xb57abA53d416832974f3036A2c32Fe05f106DCAb"
+    },
+    "v4 account factory (guard closed all bets at once; replaced)": "0xA7e5a0051496C46a199c2328E8d4bF479E2d6983"
   }
 }

@@ -1,6 +1,6 @@
 # Bank in detail
 
-Contract: `JuuBank`, an ERC-20 share token (jBANK).
+Contract: `JuuBank` (v5), an ERC-20 share token (jBANK).
 
 ## Value
 
@@ -36,6 +36,16 @@ The saver's share of the debt is repaid from the MUSD that backs it, down to Mez
 
 The last saver's withdrawal closes the trove. Closing needs MUSD equal to the debt minus 200.
 
+## Cash reserve
+
+```
+reserveTarget = capitalMUSD x reserveShare        (reserveShare = 20%, setReserveShare)
+```
+
+* `topUpReserve()` (anyone; the keeper calls it when MUSD on hand < target): borrows `min(target - on hand, room)` where `room` keeps the trove at `targetCR` (300%). Refinances first if Mezo's borrowing cap is in the way. Emits `ReserveToppedUp`, and `ReserveShort` if it couldn't reach the target (or has no trove).
+* `rebalance()` repays only from MUSD above the reserve.
+* MUSDash checks `liquidity()` against each new bet's worst-case win.
+
 ## Rebalance
 
 `rebalance()` (anyone; the keeper calls it on a schedule):
@@ -63,9 +73,10 @@ See the transaction list on [Contracts and addresses](contracts-and-addresses.md
 
 ## Live state
 
-Bank v4 opened its Mezo loan at 300% with 0.09 BTC (about 2,133 MUSD of debt) and is the main game's Bank. The 0.09 BTC moved over from Bank v3, which was closed.
+Bank v5 (main) opened its Mezo loan at 300% with 0.09 BTC and is MUSDash v4's Bank. The 0.09 BTC moved over from Bank v4, which was closed. The demo Bank v5 holds 0.02 BTC and 150 MUSD, with no Mezo loan.
 
 ## Known limits
 
 * If game losses leave the Bank owing more MUSD than it holds, the last saver can't close the trove until MUSD is added.
-* **Winners are paid from MUSD on hand.** The exposure cap counts the Bank's whole capital, but payouts need MUSD. A Bank without its Mezo loan (like the small demo Bank) has only the MUSD it has earned, so a winner's close can fail until the Bank has enough. This happened on the demo Bank (0.73 MUSD on hand, 2 MUSD to pay) and was fixed by adding 20 test MUSD. The keeper warns when MUSD on hand is less than a 20% move on the gap the Bank carries.
+* MUSDash checks each **new** bet against MUSD on hand, not the sum of all open bets. A win that arrives after MUSD on hand has fallen (paid to other winners first) can still have to wait for the next top-up.
+* Mezo trove operations without position hints cost millions of gas (Mezo re-sorts its list of ~370 troves). Passing hints would cut this a lot; it is a planned improvement.

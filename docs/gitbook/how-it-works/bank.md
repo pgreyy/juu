@@ -30,6 +30,14 @@ The Bank earns:
 
 It pays out the wins of players on the winning side. Over time, savers earn when the Bank's income is bigger than what it pays out plus Mezo's interest.
 
+## The cash reserve
+
+Winners are paid in MUSD, so the Bank keeps **at least 20% of its value as MUSD on hand** (a setting).
+
+* If MUSD on hand drops below that, the keeper tops it up by borrowing from the Bank's Mezo loan, but never past the 300% safety ratio. If there is no room left within 300%, the shortfall is recorded and shown in the API.
+* When the Bank repays debt, it never takes MUSD on hand below the reserve.
+* MUSDash refuses a new bet if the Bank couldn't pay that bet's worst-case win from MUSD on hand. See [MUSDash](musdash.md).
+
 ## Keeping the loan healthy
 
 The Bank's keeper calls **rebalance** on a schedule:

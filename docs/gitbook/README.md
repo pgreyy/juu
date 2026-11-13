@@ -32,13 +32,13 @@ A safety jar under the building, the **Buffer**, catches bad falls.
 | Splitter, P and Y, series (Doors 1 and 4) | Live on testnet |
 | sMUSD door (Door 2) | Live on testnet |
 | Pricer | Live on testnet |
-| Bank | Live on testnet |
+| Bank (with a 20% cash reserve) | Live on testnet |
 | MUSDash with MUSD, Y and P chips | Live on testnet (plus a separate demo deployment) |
 | Climb Premium, Buffer and jackpot | Live on testnet |
 | Loop | Live on testnet |
 | P Market | Live on testnet (small seed pools) |
 | Juu Agents (gateway, data API, MCP server, leaderboard) | Live on testnet |
-| Juu account (Door 3) | Deployed; trove test pending |
+| Juu account (Door 3) | Live on testnet |
 | Keeper bot | Running from the project's backend |
 
 See [Contracts and addresses](technical/contracts-and-addresses.md) for every address and the transactions that show each part working.

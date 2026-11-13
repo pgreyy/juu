@@ -1,6 +1,6 @@
 # MUSDash in detail
 
-Contract: `MUSDash` (v3), with `JuuBuffer` (v2) and `JuuJackpot`. Live on testnet; addresses and the test transactions are on [Contracts and addresses](contracts-and-addresses.md). The epoch length is set when deployed: 1 week on main, 15 minutes on the demo deployment.
+Contract: `MUSDash` (v4), with `JuuBuffer` (v2) and `JuuJackpot`. Live on testnet; addresses and the test transactions are on [Contracts and addresses](contracts-and-addresses.md). The epoch length is set when deployed: 1 week on main, 15 minutes on the demo deployment.
 
 The protocol's 20% of trading fees goes to a treasury address, currently the deployer's testnet wallet.
 
@@ -51,6 +51,14 @@ cash = pnl - funding - fee + survivor reward
 * `cash < 0`: the Bank pays `-cash` in MUSD and takes chips worth that much: `chips taken = tokens x owed / chip value` (rounded up, in the Bank's favour). You get the rest back.
 * Collapse: all chips go to the Bank. The Bank pays the survivors' and Buffer's shares in MUSD.
 * Moving floors with Y or P: a gain is paid to you in MUSD; the chips stay on the new floor at their value now.
+
+## Win cap and Bank cash check (v4)
+
+```
+worstCaseWin(size) = size x maxWinShare           (maxWinShare = 100%, setMaxWinShare)
+pnl is capped at worstCaseWin(size)
+open / move: refused with BankCannotCoverWin if bank.liquidity() < worstCaseWin(new size)
+```
 
 ## Y rewards on posted Y
 

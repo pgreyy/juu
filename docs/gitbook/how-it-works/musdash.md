@@ -49,6 +49,12 @@ What is left of the margin when it collapses is the **penalty**. It is shared:
 
 If a position lost more than its chips (a very fast price move), the Buffer pays the difference to the Bank.
 
+## Win cap and the Bank's cash
+
+A bet can win at most **100% of its size** (a setting). For a Bear that's already the limit (BTC can't fall below zero); for a Bull it means BTC doubling while the bet is open.
+
+Because the worst-case win is known, MUSDash checks before every new bet, and every climb to a bigger size, that the Bank holds enough MUSD on hand to pay it. If not, the bet is refused (`BankCannotCoverWin`). The [data API](../agents/data-api.md) shows the largest bet the Bank can cover right now.
+
 ## Who pays winners
 
 All chips sit in the game. Every result settles with the Bank: losses go to the Bank, wins are paid by the Bank. When both Bulls and Bears are playing, one side's losses pay the other side's wins through the Bank. The Bank only carries the difference between the sides, and the game won't let that difference grow above 20% of the Bank's capital.

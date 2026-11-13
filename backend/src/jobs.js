@@ -31,8 +31,8 @@ export function warn(job, level, message) {
   console.log(`[${level}] ${job}: ${message}`);
 }
 
-async function act(job, label, contract, fn, args = []) {
-  const r = await send(contract, fn, args);
+async function act(job, label, contract, fn, args = [], opts = {}) {
+  const r = await send(contract, fn, args, opts);
   const row = { time: new Date().toISOString(), job, label, tx: r.hash, block: r.blockNumber };
   actions.push(row);
   if (actions.length > 300) actions.shift();
@@ -272,6 +272,13 @@ register("jackpot", 60, "Jackpot draw: commit, seal tickets, reveal", async () =
 register("bank", 300, "Keep each Bank's loan near its target ratio", async () => {
   for (const name of STACKS) {
     const s = stack(name);
+    // Cash reserve: top up MUSD on hand from the trove (never past the target ratio); warn if still short.
+    if ((await s.bank.liquidity()) < (await s.bank.reserveTarget())) {
+      if (await s.bank.hasTrove()) await act("bank", `${name} topUpReserve`, s.bank, "topUpReserve");
+      const left = await s.bank.liquidity();
+      const target = await s.bank.reserveTarget();
+      if (left < target) warn("bank", "warn", `${name} Bank cash reserve short: ${fmt(left).toFixed(2)} of ${fmt(target).toFixed(2)} MUSD (no trove room within the target ratio)`);
+    }
     const idle = await provider.getBalance(s.addr.bank);
     if (!(await s.bank.hasTrove())) {
       const gap0 = await s.game.imbalance();
@@ -292,14 +299,18 @@ register("bank", 300, "Keep each Bank's loan near its target ratio", async () =>
 // 9. Juu account safety guards.
 register("guards", 60, "Close Juu account bets when a trove nears danger or Mezo nears Recovery Mode", async () => {
   for (const name of STACKS) {
-    if (!addresses.stacks[name].accountFactory) continue;
-    for (const ev of byEvent(name, "accountFactory", "AccountCreated")) {
-      const acct = c(ev.args.account, ABI.account);
+    if (!addresses.stacks[name].accountFactory && !addresses.stacks[name].watchAccounts) continue;
+    const accounts = [...byEvent(name, "accountFactory", "AccountCreated").map((e) => e.args.account), ...(addresses.stacks[name].watchAccounts || [])];
+    for (const account of [...new Set(accounts)]) {
+      const ev = { args: { account } };
+      const acct = c(account, ABI.account);
       if ((await acct.openPositions()).length === 0) continue;
       const [trip, reason] = await acct.shouldGuard();
       if (trip) {
         warn("guards", "warn", `${name} account ${ev.args.account}: ${reason}`);
-        await act("guards", `${name} guard ${ev.args.account}`, acct, "guard");
+        // One close per call: a close costs millions of gas on Mezo and the block limit is 10 million. guard()
+        // catches a failed close, so a fixed gas limit is used instead of an estimate. Repeats each minute.
+        await act("guards", `${name} guard ${ev.args.account}`, acct, "guard", [1], { gasLimit: 9500000n });
       }
     }
   }

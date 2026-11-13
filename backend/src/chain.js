@@ -45,12 +45,13 @@ export const shared = {
 
 /// Sends a transaction from the keeper with Mezo's gas estimate padded by half (Mezo can underestimate
 /// precompile calls). Returns the receipt.
-export async function send(contract, fn, args = [], { value } = {}) {
+export async function send(contract, fn, args = [], { value, gasLimit } = {}) {
   const signer = keeper();
   const writable = contract.connect(signer);
   const overrides = value ? { value } : {};
-  const est = await writable[fn].estimateGas(...args, overrides);
-  const tx = await writable[fn](...args, { ...overrides, gasLimit: (est * 3n) / 2n });
+  // A fixed gas limit is needed where the contract catches inner failures (estimates would starve them).
+  const limit = gasLimit ?? ((await writable[fn].estimateGas(...args, overrides)) * 3n) / 2n;
+  const tx = await writable[fn](...args, { ...overrides, gasLimit: limit });
   const receipt = await waitReceipt(tx.hash);
   if (receipt.status !== 1) throw new Error(`${fn} reverted in ${tx.hash}`);
   return receipt;

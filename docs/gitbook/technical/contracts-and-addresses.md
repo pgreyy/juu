@@ -8,13 +8,13 @@ All addresses are on **Mezo testnet** (chain id 31611). Explorer: [explorer.test
 | --- | --- |
 | JuuSplitter | `0xC97F652387E213a92DD2DaBDb41754CdD535ce5e` |
 | JuuPricer | `0xe25F6095665626342ffF7FeA7d8BE0c40517Cf34` |
-| JuuBank (v4) | `0x42428f3c928c9af20E4d10Ca1D91aBDd565c5959` |
-| MUSDash (v3) | `0xfD5c96497Ae439f88023EFa78D13Afa6C0ca40E7` |
+| JuuBank (v5, cash reserve) | `0x55726A86c321347db688f2C6A331445465eeE9BE` |
+| MUSDash (v4, win cap and Bank cash check) | `0xb86Ef40aB59dFbc9fAE812Bc379D248DB3D6Defd` |
 | JuuBuffer (v2) | `0xAB61604F82f645110A062b49F2bC204cbb473d39` |
-| JuuJackpot | `0x508d6449FCb235c92D79f0011Dd09f3833233D62` |
+| JuuJackpot | `0xAca44212b5Ac418E17B750142F9152314eccdE5e` |
 | JuuLoop | `0x33c807030053b821B1efCEcbF40F9A7025edec28` |
-| AgentGateway | `0x29da0243E5604CAf1490d148B7dB5f0835Ab2394` |
-| JuuAccountFactory (Door 3) | `0xECEf17Da15D530dB1bb0B906a35A8DCB6545d084` |
+| AgentGateway | `0x87968C86f9728FB0f946453e6DECD0Cea70204Fd` |
+| JuuAccountFactory (Door 3) | `0x6Fe844B458829e60CCe1dcd0000eeA94B96C76e4` |
 | JuuPMarket | `0x6748eA3C557B03611Fb360889ea61B4fB72B891c` |
 | JuuSavingsSplitter (Door 2, sMUSD) | `0xF7857dB1d1Aa1Aa60a8576EBc1b2F8236b4A22f4` |
 | Keeper bot wallet | `0x01cd4ca24A84ce336798bFedC6276a0c7D28F547` |
@@ -43,12 +43,12 @@ A separate set of contracts for showing MUSDash on demand. Its price feed follow
 | --- | --- |
 | DemoPriceFeed (DEMO ONLY) | `0x01297A4923330BC49EAA21777284b3e6440498E8` |
 | JuuPricer (demo) | `0x009BcfeC38cF0F15215E87B44fF1DF53c868A0D1` |
-| JuuBank (demo, v4) | `0x0A2acca04fD2fEbd2BB9e6eE30762b487A51F420` |
-| MUSDash (demo, v3, 15-minute epochs) | `0x3DC2CfdF76fa127abf5486357e79082A9b2E37Cd` |
+| JuuBank (demo, v5) | `0x136fc7b4f5C7A2028C33d27055cf1ab8387Aa4fD` |
+| MUSDash (demo, v4, 15-minute epochs) | `0x652C3Db601a194f4f7BD4294e7447f1fDbe99525` |
 | JuuBuffer (demo, v2) | `0xaa07cCbd7DC5662321D0E2bc7D4CFa34a9eB62A0` |
-| JuuJackpot (demo) | `0xD5109C77e5C5ce383c4aD716281882B00B0F7e6c` |
+| JuuJackpot (demo) | `0x357B24D3dc36f8F40601aD50E7325c5D076d8296` |
 | JuuLoop (demo) | `0x6509684FF00DE88c0E233Ca16c2082b01Ce450a1` |
-| AgentGateway (demo) | `0xb57abA53d416832974f3036A2c32Fe05f106DCAb` |
+| AgentGateway (demo) | `0x5E2DFd2992CACb5d8ca505069FD79154Bf15e4F5` |
 
 The first demo set (MUSDash `0x756e4aA5a229bEB93591785CaB6dEd40a121E376`, Bank `0x35D4D57507F33805a0b62b3852396a394088a390`, Buffer `0x955eB2cFCE5204a818e3E506F9060300Edbf479C`) ran the MUSD-only tests below.
 
@@ -56,6 +56,9 @@ The first demo set (MUSDash `0x756e4aA5a229bEB93591785CaB6dEd40a121E376`, Bank `
 
 | Contract | Address | Why |
 | --- | --- | --- |
+| Main v3 set: MUSDash `0xfD5c96497Ae439f88023EFa78D13Afa6C0ca40E7`, Bank v4 `0x42428f3c928c9af20E4d10Ca1D91aBDd565c5959`, Jackpot `0x508d6449FCb235c92D79f0011Dd09f3833233D62`, Gateway `0x29da0243E5604CAf1490d148B7dB5f0835Ab2394`, account factory `0xECEf17Da15D530dB1bb0B906a35A8DCB6545d084` | | Replaced by v4 with the cash reserve and the Bank cash check. Bank v4's loan closed and its funds moved to Bank v5. |
+| Demo v3 set: MUSDash `0x3DC2CfdF76fa127abf5486357e79082A9b2E37Cd`, Bank v4 `0x0A2acca04fD2fEbd2BB9e6eE30762b487A51F420`, Jackpot `0xD5109C77e5C5ce383c4aD716281882B00B0F7e6c`, Gateway `0xb57abA53d416832974f3036A2c32Fe05f106DCAb` | | Replaced by the demo v4 set. The demo v3 tests below (Agents, Loop, Climb Premium, jackpot) ran on it. |
+| Account factory `0xA7e5a0051496C46a199c2328E8d4bF479E2d6983` | | Its guard closed all bets in one call, which can exceed Mezo's block gas limit; replaced the same day, never used. |
 | MUSDash v1 (MUSD chips only) | `0xC5C8064985ee3FcF8529228038265CC87a049AC6` | Replaced by v2 with Y and P chips |
 | MUSDash v2 (main) | `0xBc8d6C76BcabF0A4370828CEeb20ffF2F2d0b2Bf` | Replaced by v3 (Y rewards credited to positions, Climb Premium, jackpot tickets, Loop) |
 | JuuBuffer v1 (main) | `0x264305bb088cA727433FF8dCe791840D0E75cff4` | Replaced by v2 (jackpot payouts) |
@@ -210,3 +213,25 @@ The epoch before had positions open at the draw, so the Buffer was below its 5% 
 | Main: agent opens a floor-7 seat; the gateway collects the 1.00 MUSD seat premium from the user | `0x1a150549e65b262b8893fa4f8e6c42ab3d9f68a8ab9800aee64d2e9ffeb83255` |
 | Main: agent turns the user's Loop on (allowed by the session) | `0x9f30acb9b34abf0cb0c1c8e4a2b4ec4e8202a40bf398f06f81bc87a378803ec9` |
 | Demo: agent's winning close; 1.96 MUSD goes through the user's Loop into 0.0000250 BTC of series 2 | `0x4b010a4768cd837d517db35c24e4dc9b994e3d5862da85305efb7db440a6a0e7` |
+
+### Cash reserve and Bank cash check (v5 / v4)
+
+| What | Transaction |
+| --- | --- |
+| Bank v4's loan closed, funds withdrawn for the move | `0x5178fb66d2d8b3b7134695474035a5c142f446ef37cb76068055b65034e51d01` |
+| Bank v5 opens its loan at 300% with 0.09 BTC | `0x622ea8f69b4d079d219f98cd232d3fba22f8b9d716a7c4930c8b7d53a67a37a9` |
+| Top-up with a temporary 45% reserve: borrows 943.98 MUSD, stops at 300%, records the shortfall | `0x9b481d20d5d9a21143eecfa0ea056ade7dbe214389e74b308bb330c9b0719c03` |
+| Refinance: borrowing past the opening cap; Mezo's `RefinancingFeePaid`, cap 5,764 to 8,341 MUSD | `0xdac713db550bc7440fd97a3d68964e9c3da07e5643d556b559af3396d17c67ec` |
+| Settings back to 300% and 20%, loan repaid down (never below the reserve) | `0xac6c11e4267be89639f94aff0003a55cbaa8121437a0c29e17e38e10654365c1` |
+| Demo Bank with no MUSD: bet refused with `BankCannotCoverWin` (simulated); after adding 150 MUSD it opens | `0x794e261f45c6e1e097cffd3fa138b0c1ee073b50112644b0a2ceba547f484b2b` |
+
+### Juu account (Door 3, main)
+
+| What | Transaction |
+| --- | --- |
+| Open the account's own Mezo loan (0.0405 BTC, borrow 1,800 MUSD) | `0x21a9fd65810d4d1518be967df061bda74d38bc4aa7516bbc406d998d7c6f6337` |
+| Close a bet: returned chips repay debt down to Mezo's 2,000 MUSD floor | `0x34277d2842a7491d1bbc1cd08d95b0d113936699574aa4426ac68be337801294` |
+| Close a winning bet: 0.177 MUSD profit swapped to 0.00000226 BTC and added as collateral | `0xd91df3100e8567170124aedd171430856d8c0c147791ff2ccdcc2e465fdd986c` |
+| Close the loan (all BTC back) | `0xd2838f2beb4eca4cf6a6963b3afed2643b35d01eec4630d5c49356da63f5f659` |
+| New account, guard tripped (150% guard on a 143% loan): keeper `guard(1)` closes bet 1 | `0xef6b712f9ac4aab24daa89d8c26e1622a18c8e464f95530878752baf08eebe45` |
+| Keeper `guard(1)` closes bet 2 a minute later | `0x5c4d77ba2bee1346166cfd0cab4d239a615e992e079dab4656b2d60d7a8a983c` |

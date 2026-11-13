@@ -45,6 +45,9 @@ const gateway = new ethers.Contract(
     "error NotYourPosition()",
     "error AlreadySettled()",
     "error LoopNotAllowed()",
+    "error BankCannotCoverWin()",
+    "error ExposureCap()",
+    "error MarginTooSmall()",
   ],
   agent || provider,
 );

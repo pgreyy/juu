@@ -275,6 +275,39 @@ demo v2 Bank (withdraw tx 0x66f520d9…bcfb) and 300 MUSD swapped to 0.00382 BTC
 - play #3 Bull f10 20 (tx 0x6baf3869…99df) and #4 Bear f10 20 (tx 0x556f127f…c23c); a background watcher closes the
   first one to profit after fees (profit -> BTC collateral path).
 
+## Cash reserve rule: Bank v5 + MUSDash v4 (13 Nov 2026, owner's decision)
+Bank v5: reserveShare (20%, setting); reserveTarget = capital x 20%; topUpReserve() borrows the shortfall from the trove
+but never past targetCR (300%), emits ReserveToppedUp / ReserveShort; rebalance never repays below the reserve.
+MUSDash v4: maxWinShare (100% of size, setting) caps a bet's win so its worst case is known; open and climb are refused
+(BankCannotCoverWin) if bank.liquidity() < worst-case win. Sizes: MUSDash 21.2 KB, JuuBank 12.9 KB.
+Deploy (script/DeployV4.s.sol, reuses Buffer v2 and Loop): main 15/15 status 1 (first 0xa41412dd…4614; one RPC receipt
+failure mid-run, finished with --resume): Bank v5 0x55726A86c321347db688f2C6A331445465eeE9BE, MUSDash v4
+0xb86Ef40aB59dFbc9fAE812Bc379D248DB3D6Defd, Jackpot 0xAca44212b5Ac418E17B750142F9152314eccdE5e, Gateway
+0x87968C86f9728FB0f946453e6DECD0Cea70204Fd. Demo 14/14 (first 0x4527d880…7b0f): Bank v5 0x136fc7b4f5C7A2028C33d27055cf1ab8387Aa4fD,
+MUSDash v4 0x652C3Db601a194f4f7BD4294e7447f1fDbe99525, Jackpot 0x357B24D3dc36f8F40601aD50E7325c5D076d8296, Gateway
+0x5E2DFd2992CACb5d8ca505069FD79154Bf15e4F5. Account factory: first v4 one 0xA7e5…6983 replaced (see guard) by
+0x6Fe844B458829e60CCe1dcd0000eeA94B96C76e4 (tx 0x8ba65843…73e1).
+Funds moved: Bank v4 withdraw all (closes trove) tx 0x5178fb66…1d01; Bank v5 deposit 0.09 BTC tx 0x9645235a…dc9e,
+rebalance tx 0x622ea8f6…a37a9 (CR 300.2%, MUSD 1911, reserve 1268); P1/Y1 fee chips passed to v5.
+Tests (main v5): +0.04 BTC deposit; reserveShare 45% -> topUpReserve tx 0x9b481d20…9c03 borrowed 943.98 (CR 300.16%),
+ReserveShort (2855 of 4128). Refinance: target 150% -> rebalance tx 0xdac713db…67ec, RefinancingFeePaid, cap
+5763.6 -> 8341.0, debt 6117 > old cap. Restored 300% / 20% + rebalance tx 0xac6c11e4…65c1 (repaid down, MUSD stayed
+above reserve); withdrew the extra shares tx 0x406e1cb2…77af8 (+0.03998 BTC), CR 291% (in band).
+Demo cash check: Bank v5 with 0.02 BTC, 0 MUSD -> open refused BankCannotCoverWin (0x357e9431); 150 MUSD added (tx
+0x0d387195…6896) -> open tx 0x794e261f…4b2b; size 200 > 150 refused; close tx 0x297b37a2…f320. topUpReserve without a
+trove emits ReserveShort (tx 0xb92ed0d9…6f52d).
+
+## Juu account guard fix (13 Nov 2026)
+Finding: one account close costs 4.4-6.4M gas on Mezo (trove re-sorted in a ~370-trove list without hints); block gas
+limit is 10M. The first guard() tried every bet in one call; with gas estimation, the try/catch let inner closes run
+out of gas and skip (Guarded closed 0, txs 0x8e6552c2…, 0xf2a61d66…). Fix: guard(maxCloses); keeper calls guard(1) with
+a fixed 9.5M gas limit each minute. Test on a new account 0x4eefd06CFCEE98057767fA24152783D596914a06 (v4 factory):
+trove tx 0xf8cd3335…d6db, two 50 MUSD bets, setGuard 150% -> keeper guard(1) tx 0xef6b712f…ebe45 (closed 1, 4.75M gas)
+and tx 0x5c4d77ba…983c (closed 1, 6.18M gas). Guard back to 130%; trove closed tx 0x7930fbf6…fcc1, BTC back.
+Earlier account (v3) 0x6B09…9BC5: profit path tx 0xd91df310…986c (0.177 MUSD profit -> 0.00000226 BTC collateral);
+closed bet 3 by owner, trove closed tx 0xd2838f2b…f659.
+Follow-up: pass Mezo hints (HintHelpers.getApproxHint) in Bank and account trove calls to cut gas.
+
 ## Public docs
 docs/gitbook/ (GitBook, SUMMARY.md). Standing task: update them with every contract build or change, in the same task.
 

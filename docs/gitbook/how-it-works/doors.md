@@ -6,7 +6,7 @@ A door is a way to bring something you already hold on Mezo into Juu.
 | --- | --- | --- | --- |
 | 1 | A veBTC lock (NFT) | P and Y of a series | Live on testnet |
 | 2 | sMUSD (Mezo's MUSD savings token) | P and Y of an sMUSD series | Live on testnet |
-| 3 | A fresh Mezo loan in a personal Juu account, or the MUSD you borrowed | Margin in MUSDash | Live on testnet; Juu account not yet tested on chain |
+| 3 | A fresh Mezo loan in a personal Juu account, or the MUSD you borrowed | Margin in MUSDash | Live on testnet |
 | 4 | Plain BTC | P and Y of a series | Live on testnet |
 
 ## Door 1: a veBTC lock
@@ -40,7 +40,7 @@ Mezo has no way to move a loan (a "trove") from one owner to another, so Door 3 
 * **Borrow straight into the game.** When you bet, the account borrows the MUSD it needs from its own loan at Mezo's fixed rate.
 * **Wins go back into the loan.** The borrowed chips repay debt and the profit is swapped to BTC (with a price loss limit) and added as collateral.
 * **Losses come out of the loan.** Lost chips were borrowed, so their debt stays on the loan.
-* **Safety guard.** If the loan's collateral falls below 130% of its debt, or Mezo's whole system falls below 160% (before Recovery Mode at 150%), the keeper closes the account's bets, well before Mezo's 110% liquidation line.
+* **Safety guard.** If the loan's collateral falls below 130% of its debt, or Mezo's whole system falls below 160% (before Recovery Mode at 150%), the keeper closes the account's bets, one per call, well before Mezo's 110% liquidation line. (Each close costs a lot of gas on Mezo, so closing them one at a time keeps every call inside the block gas limit.)
 
 **Bring the MUSD (Option A).** Borrow MUSD at Mezo yourself and play with it as MUSD chips.
 

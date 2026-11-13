@@ -11,6 +11,7 @@ import {JuuSplitter} from "./JuuSplitter.sol";
 interface IJuuBank {
     function payOut(address to, uint256 amount) external;
     function maxExposure() external view returns (uint256);
+    function liquidity() external view returns (uint256);
 }
 
 interface IJuuBuffer {
@@ -27,7 +28,7 @@ interface IJuuLoop {
     function loopWinnings(address user, uint256 amount) external;
 }
 
-/// @title MUSDash (v3)
+/// @title MUSDash (v4)
 /// @notice The game. Bet on BTC going up (Bull) or down (Bear) on one of ten floors; higher floors use more
 ///         leverage. Positions are synthetic: priced by a BTC price feed and settled in MUSD.
 ///
@@ -37,6 +38,9 @@ interface IJuuLoop {
 /// Money flow: every win or loss settles against the Bank. With both sides open, one side's losses fund the
 /// other side's wins through the Bank, so the Bank only carries the gap, capped by its exposure limit. When a
 /// Y or P position owes MUSD (fee, premium or loss), the Bank pays it and takes that value of chips.
+///
+/// Win cap and cash check: a bet can win at most maxWinShare (100%) of its size, so its worst-case win is known. A
+/// new bet (or a climb to a bigger size) is refused if the Bank's MUSD on hand couldn't pay that worst-case win.
 ///
 /// Floor collapse: at equity <= 2% of size. The penalty goes 50% to survivors on the same side (size x time),
 /// 25% Buffer, 25% Bank. Bad debt is paid by the Buffer.
@@ -115,6 +119,7 @@ contract MUSDash is Ownable, ReentrancyGuard {
     uint256 public premiumGrowth = 0.1e18; // r
     uint256 public killLevel = 0.5e18;
     bool public premiumOn = true;
+    uint256 public maxWinShare = 1e18; // a bet wins at most this share of its size (1e18 = 100%)
 
     uint256[2] public openInterest;
     int256[2] public fundingIndex;
@@ -166,6 +171,7 @@ contract MUSDash is Ownable, ReentrancyGuard {
     error SameFloor();
     error EpochNotOver();
     error AlreadySealed();
+    error BankCannotCoverWin();
 
     constructor(
         address musd_,
@@ -222,6 +228,17 @@ contract MUSDash is Ownable, ReentrancyGuard {
         premiumGrowth = growth;
         killLevel = killLevel_;
         emit SettingsChanged();
+    }
+
+    function setMaxWinShare(uint256 share) external onlyOwner {
+        if (share == 0) revert BadValue();
+        maxWinShare = share;
+        emit SettingsChanged();
+    }
+
+    /// @notice The most a bet of `size` can win, which the Bank must hold in MUSD to accept it.
+    function worstCaseWin(uint256 size) public view returns (uint256) {
+        return (size * maxWinShare) / 1e18;
     }
 
     function setTreasury(address treasury_) external onlyOwner {
@@ -546,6 +563,7 @@ contract MUSDash is Ownable, ReentrancyGuard {
         floorSize[p.floor] += p.size;
         uint256 gapAfter = imbalance();
         if (gapAfter > gapBefore && gapAfter > bank.maxExposure()) revert ExposureCap();
+        if (bank.liquidity() < worstCaseWin(p.size)) revert BankCannotCoverWin();
 
         p.openedAt = uint64(block.timestamp);
         p.ticketsFrom = uint64(block.timestamp);
@@ -579,10 +597,12 @@ contract MUSDash is Ownable, ReentrancyGuard {
         delete _openIndex[id];
     }
 
-    function _pnl(Position memory p, uint256 price) internal pure returns (int256) {
+    function _pnl(Position memory p, uint256 price) internal view returns (int256 pnl) {
         int256 move = int256(price) - int256(p.entryPrice);
         if (p.side == Side.Bear) move = -move;
-        return (int256(p.size) * move) / int256(p.entryPrice);
+        pnl = (int256(p.size) * move) / int256(p.entryPrice);
+        int256 cap = int256(worstCaseWin(p.size));
+        if (pnl > cap) pnl = cap;
     }
 
     function _value(uint256 id, Position memory p, uint256 price) internal view returns (Valued memory v) {

@@ -18,8 +18,8 @@ import {MUSDash} from "./MUSDash.sol";
 ///           loss limit) and added as collateral. If the swap would lose too much, the profit repays debt.
 ///   Losses come out of the trove: lost chips were borrowed, so their debt stays on the trove.
 ///   Safety guard: if the trove's collateral ratio falls below the guard level (130%), or Mezo's whole system
-///           falls below 160% (before Recovery Mode at 150%), anyone (the keeper) can call guard() and the
-///           account closes its bets before Mezo's 110% liquidation line is near.
+///           falls below 160% (before Recovery Mode at 150%), anyone (the keeper) can call guard(n) and the
+///           account closes its bets, n per call, before Mezo's 110% liquidation line is near.
 contract JuuAccount is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
@@ -167,14 +167,16 @@ contract JuuAccount is ReentrancyGuard {
         _close(id);
     }
 
-    /// @notice Safety guard: when the trove nears danger or Mezo nears Recovery Mode, close every bet that can be
-    ///         closed and put the MUSD back into the trove. Anyone can call it once the guard condition holds.
-    function guard() external nonReentrant {
+    /// @notice Safety guard: when the trove nears danger or Mezo nears Recovery Mode, close up to `maxCloses` bets
+    ///         and put the MUSD back into the trove. Anyone can call it once the guard condition holds; the keeper
+    ///         calls it again until the account is safe. One close costs millions of gas on Mezo (the trove list is
+    ///         re-sorted), so closing them all in one transaction could exceed the block gas limit.
+    function guard(uint256 maxCloses) external nonReentrant {
         (bool trip, string memory reason) = shouldGuard();
         if (!trip) revert NoGuardNeeded();
         uint256 closed;
         uint256[] memory ids = _openIds;
-        for (uint256 i = 0; i < ids.length; i++) {
+        for (uint256 i = 0; i < ids.length && closed < maxCloses; i++) {
             try this.closeForGuard(ids[i]) {
                 closed++;
             } catch {}
