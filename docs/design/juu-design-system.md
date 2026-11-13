@@ -64,7 +64,12 @@ Contrast (4.5:1 or more, checked by computation and on the rendered pages at 12 
   (#12804A gave 4.46 with sand text).
 * On the ink band, bull and bear use their dark-theme shades (#3DDC84, #F24A2C).
 
-Width: the landing stops at 1280px and the app at 1440px, centred, so big monitors don't stretch them.
+Width: the landing stops at 1280px, centred. The app fills the whole window like a trading app: olive top bar and
+ticker edge to edge, the sidebar flush left at full height, no outer frame. On MUSDash the Ladder takes the flexible
+space and the order panel keeps 380px on the right (it moves under the Ladder below 1100px). The Ladder has an empty
+flexible edge on each side, so pool, price and floor stay together in the middle and the pool bars grow from the outer
+edges toward the centre; under 600px of Ladder width the edges go and the five columns share the width. Tables use the
+full width; running text stops at 72 characters a line.
 The ticker strip is one line tall (about 30px).
 
 ## 2. Type

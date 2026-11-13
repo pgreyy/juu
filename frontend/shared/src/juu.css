@@ -65,8 +65,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .juu-burst-core { position: absolute; left: 50%; top: 50%; border-radius: 50%; background: var(--surf); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--fN); text-align: center; }
 
 /* The Ladder */
-.ladder { border: 1.5px solid var(--rule); }
-.ladder-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.ladder { border: 1.5px solid var(--rule); container-type: inline-size; }
+.ladder-grid { display: grid; grid-template-columns: minmax(0, 1fr) 84px 104px 64px 104px 84px minmax(0, 1fr); gap: 8px; }
+.ladder-head .r { text-align: right; }
 .ladder-head { padding: 10px 14px; font-family: var(--fN); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); border-bottom: 1px solid var(--rule2); }
 .ladder-mark { display: flex; justify-content: center; align-items: baseline; gap: 12px; padding: 10px; background: var(--strong); color: var(--onStrong); font-family: var(--fN); }
 .ladder-mark .k { font-size: 11px; letter-spacing: 0.12em; }
@@ -109,8 +110,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 @media (max-width: 1000px) { .juu-footer-brand { flex-basis: 100%; max-width: none; } }
 
-/* Narrow screens: the Ladder keeps all five columns, tighter. */
-@media (max-width: 560px) {
+/* A narrower Ladder (under 600px wide, wherever it sits): no empty edges, the five columns share the width. */
+@container (max-width: 600px) {
+  .ladder-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) 56px minmax(0, 1fr) minmax(0, 0.8fr); gap: 6px; }
+  .ladder-grid > .edge { display: none; }
+}
+/* A phone-width Ladder: tighter type. */
+@container (max-width: 440px) {
   .ladder-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) 36px minmax(0, 1fr) minmax(0, 0.8fr); gap: 4px; }
   .ladder-head { padding: 10px 8px; font-size: 9px; letter-spacing: 0.06em; }
   .ladder-row { padding: 0 8px; font-size: 12px; }

@@ -131,10 +131,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   ];
   return (
     <div className="page">
-      <div className="card">
-        <Rail />
-        <div className="col">
-          <header className="head juu-head">
+      <header className="head juu-head">
             <Link href="/" className="brand" aria-label="Juu, MUSDash">
               <StackMark size={40} />
               <span className="word">JUU</span>
@@ -145,8 +142,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <ThemeToggle />
               <WalletButton />
             </div>
-          </header>
-          <Ticker items={ticker} />
+      </header>
+      <Ticker items={ticker} />
+      <div className="frame">
+        <Rail />
+        <div className="col">
           <main className="main" id="main">
             {m.apiDown && <p className="txnote error" role="alert">The Juu data API is not answering, so live figures are missing. Start it with: cd backend && npm start</p>}
             {children}

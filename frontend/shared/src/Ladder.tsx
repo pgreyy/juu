@@ -27,12 +27,16 @@ export function Ladder({
   const depth = (v: number) => (max > 0 ? Math.round((v / max) * 48) : 0) + "%";
   return (
     <div className="ladder">
+      {/* Seven columns: an empty flexible edge on each side keeps pool, price and floor together in the middle, and the
+          pool bars grow from the outer edges toward the centre. */}
       <div className="ladder-grid ladder-head">
-        <span>BULL POOL</span>
-        <span style={{ textAlign: "right" }}>BULL FALLS AT</span>
+        <span className="edge" aria-hidden="true" />
+        <span className="r">BULL POOL</span>
+        <span className="r">BULL FALLS AT</span>
         <span style={{ textAlign: "center" }}>FLOOR</span>
         <span>BEAR FALLS AT</span>
-        <span style={{ textAlign: "right" }}>BEAR POOL</span>
+        <span>BEAR POOL</span>
+        <span className="edge" aria-hidden="true" />
       </div>
       <div className="ladder-mark">
         <span className="k">MARK</span>
@@ -51,11 +55,13 @@ export function Ladder({
           >
             <span className="depth bull" aria-hidden="true" style={{ width: depth(r.bullPool) }} />
             <span className="depth bear" aria-hidden="true" style={{ width: depth(r.bearPool) }} />
-            <span className="c-bull">{amt(r.bullPool)}</span>
+            <span className="edge" aria-hidden="true" />
+            <span className="r c-bull">{amt(r.bullPool)}</span>
             <span className="r c-bull">{mark == null ? "—" : usd(collapsePrice(mark, n, "Bull"))}</span>
             <span className={"num " + (n >= 7 ? "c-hi" : "c-ink")}>{pad2(n)}</span>
             <span className="c-bear">{mark == null ? "—" : usd(collapsePrice(mark, n, "Bear"))}</span>
-            <span className="r c-bear">{amt(r.bearPool)}</span>
+            <span className="c-bear">{amt(r.bearPool)}</span>
+            <span className="edge" aria-hidden="true" />
           </Tag>
         );
       })}

@@ -1,18 +1,15 @@
 /* App shell and page styles. Tokens and shared parts live in @juu/ui/juu.css. Values match docs/design/juu-app-reference.html. */
 
-.page { min-height: 100vh; background: var(--bg); color: var(--ink); font-family: var(--fB); padding: 24px 28px 32px; }
-.card { min-width: 0; background: var(--surf); border: 1.5px solid var(--rule); min-height: 1340px; display: flex; overflow: clip; }
-/* Big monitors: the app stops growing at 1440px and sits centred, so the Ladder's pools stay next to their prices. */
-.card { max-width: 1440px; margin: 0 auto; }
+/* Full window, like a trading app: olive top bar and ticker edge to edge, then the sidebar flush left and the page. */
+.page { min-height: 100vh; background: var(--surf); color: var(--ink); font-family: var(--fB); display: flex; flex-direction: column; }
+.frame { flex: 1; display: flex; min-width: 0; }
 
 /* Rail */
-.rail { flex: 0 0 96px; background: var(--bg); border-right: 1.5px solid var(--rule2); padding: 22px 12px; display: flex; flex-direction: column; gap: 8px; }
+.rail { flex: 0 0 96px; background: var(--bg); border-right: 1.5px solid var(--rule2); padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto; }
 .rail.open { flex-basis: 220px; }
 .rail-logo { width: 52px; height: 52px; margin: 0 auto 14px; background: transparent; border: 0; color: var(--ink); display: flex; align-items: center; justify-content: center; }
-.rail-logo .ic-logo { display: flex; width: 32px; height: 32px; }
-.rail-logo .ic-toggle { display: none; width: 26px; height: 26px; align-items: center; justify-content: center; }
-.rail-logo:hover .ic-logo, .rail-logo:focus-visible .ic-logo, .rail.open .rail-logo .ic-logo { display: none; }
-.rail-logo:hover .ic-toggle, .rail-logo:focus-visible .ic-toggle, .rail.open .rail-logo .ic-toggle { display: flex; }
+.rail-logo .ic-logo { display: none; }
+.rail-logo .ic-toggle { display: flex; width: 26px; height: 26px; align-items: center; justify-content: center; }
 .rail-item { min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; background: transparent; color: var(--ink); border: 1.5px solid transparent; font-family: var(--fN); font-size: 13px; text-decoration: none; }
 .rail.open .rail-item { justify-content: flex-start; }
 .rail-item .dot { width: 6px; height: 6px; border-radius: 50%; flex: 0 0 6px; background: transparent; }
@@ -24,7 +21,7 @@
 .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
 /* Header */
-.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 32px; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; }
 .brand { display: flex; align-items: center; min-height: 44px; gap: 14px; flex-wrap: wrap; text-decoration: none; color: inherit; }
 .brand .word { font-family: var(--fD); font-weight: 700; font-size: 38px; letter-spacing: 0.04em; line-height: 1; }
 .brand .tag { font-family: var(--fN); font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
@@ -33,7 +30,9 @@
 .hbtn.quiet { padding: 0 14px; border-color: var(--rule2); color: var(--muted); }
 .stack-badge { height: 46px; display: flex; align-items: center; padding: 0 12px; border: 1.5px dashed var(--rule); font-family: var(--fN); font-size: 11px; letter-spacing: 0.12em; }
 
-main.main { flex: 1; min-width: 0; padding: 24px 32px 32px; }
+main.main { flex: 1; min-width: 0; padding: 24px 32px 40px; }
+/* Tables use the full width; running text keeps a readable line length. */
+main.main p, .lede, .note { max-width: 72ch; }
 
 /* Common blocks */
 .h1 { margin: 0; font-family: var(--fD); font-weight: 700; font-size: 34px; letter-spacing: 0.04em; }
@@ -67,15 +66,19 @@ main.main { flex: 1; min-width: 0; padding: 24px 32px 32px; }
 .tbl td:first-child { text-align: left; }
 
 /* MUSDash */
-.dash { display: flex; flex-wrap: wrap; flex-direction: row; gap: 28px; }
-.tower { flex: 999 1 560px; min-width: 0; }
+.dash { display: flex; flex-direction: row; gap: 32px; align-items: flex-start; }
+.tower { flex: 1 1 0; min-width: 0; }
 .title-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; min-height: 41px; }
 .live { border-top: 1.5px solid var(--rule); padding-top: 18px; margin-top: 56px; }
 .live-row { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule2); font-family: var(--fN); font-size: 12px; }
 .live-row .t { color: var(--muted); flex: 0 0 44px; }
 .live-row a { color: inherit; text-decoration: none; }
 .live-row a:hover { text-decoration: underline; }
-.aside { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 22px; align-items: stretch; }
+.aside { flex: 0 0 380px; width: 380px; min-width: 0; display: flex; flex-direction: column; gap: 22px; align-items: stretch; position: sticky; top: 16px; }
+@media (max-width: 1100px) {
+  .dash { flex-direction: column; align-items: stretch; }
+  .aside { flex: 1 1 auto; width: auto; position: static; }
+}
 .slip { border-top: 1.5px solid var(--rule); padding-top: 18px; }
 .sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .side-btn { height: 52px; font-family: var(--fD); font-weight: 700; font-size: 16px; letter-spacing: 0.06em; background: transparent; }
@@ -147,15 +150,19 @@ main.main { flex: 1; min-width: 0; padding: 24px 32px 32px; }
 .kind.agent { border-style: dashed; }
 
 @media (max-width: 700px) {
-  .page { padding: 12px; }
-  .card { min-height: 0; }
-  .rail { flex-basis: 64px; padding: 16px 6px; }
+  .rail { flex-basis: 64px; padding: 12px 6px; }
   .rail.open { flex-basis: 200px; }
   .rail-item { padding: 0 6px; }
-  .head { padding: 18px 16px 12px; }
+  .head { padding: 12px 16px; }
   .brand .word { font-size: 30px; }
   main.main { padding: 20px 16px 28px; }
   .juu-footer { padding: 36px 20px 24px; }
+}
+@media (max-width: 520px) {
+  /* Keep the top bar on one row on phones. */
+  .brand .tag { display: none; }
+  .head { flex-wrap: nowrap; }
+  .head .hbtn { padding: 0 10px; }
 }
 
 /* Wallet picker (EIP-6963: every installed wallet is listed) */
