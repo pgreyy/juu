@@ -33,7 +33,7 @@ function Rail() {
       {TABS.map((t) => {
         const cur = t.href === "/" ? path === "/" : path.startsWith(t.href);
         return (
-          <Link key={t.href} href={t.href} className="rail-item" aria-current={cur ? "page" : undefined} aria-label={t.label} title={t.label}>
+          <Link key={t.href} href={t.href} className="rail-item" aria-current={cur ? "page" : undefined} aria-label={t.label} data-tip={t.label}>
             <span className="dot" aria-hidden="true" />
             <span className="ic" aria-hidden="true"><Icon name={t.icon} /></span>
             {open && <span className="name" aria-hidden="true">{t.label}</span>}
