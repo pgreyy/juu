@@ -208,3 +208,14 @@ main.main p, .lede, .note { max-width: 72ch; }
 .howfund summary { min-height: 44px; display: flex; align-items: center; font-family: var(--fN); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
 .howfund .readout { grid-template-columns: 120px minmax(0, 1fr); padding-bottom: 12px; font-size: 13px; line-height: 1.5; }
 .howfund .readout dd { text-align: left; font-family: var(--fB); }
+
+/* Swap */
+.swap { max-width: 520px; padding: 22px; }
+.sw-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.sw-picks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+.chip[aria-checked="true"] { background: var(--strong); color: var(--onStrong); }
+.sw-amt { width: 100%; font-family: var(--fN); font-size: 28px; margin-top: 8px; }
+.sw-flip { width: 52px; font-size: 16px; }
+.sw-slip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.4fr); gap: 6px; margin-top: 8px; align-items: center; }
+.sw-slip input.line { margin-top: 0; font-size: 13px; }
+.swap .readout dd { overflow-wrap: anywhere; }

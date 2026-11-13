@@ -9,6 +9,7 @@ import { stackAddr, usePoll, useRead, useStack } from "@/lib/data";
 import { btc, daysLeft, seriesName } from "@/lib/format";
 import { useMarket } from "@/lib/market";
 import type { Pos } from "@/lib/types";
+import { POOL_ABI, SWAP } from "@/lib/swap";
 import { EXPLORER, call, read, useWallet } from "@/lib/wallet";
 
 type Activity = {
@@ -59,6 +60,15 @@ export default function Portfolio() {
   const tickets = usePoll<Tickets>(me ? `/api/${stack}/tickets/${me}` : null, 60000, w.bump);
   const loopOn = useRead(me ? `loop-${stack}-${me}` : null, () => read(A.loop, ABI.loop).isOn(me) as Promise<boolean>, 30000, w.bump);
   const walletBtc = useBtcBalance(me, w.bump);
+  // MEZO in MUSD, from Mezo's MEZO/MUSD pool (reserves ratio). Null where no pool exists.
+  const mezoPrice = useRead(SWAP.pools["MEZO/MUSD"] ? "mezo-price" : null, async () => {
+    const p = read(SWAP.pools["MEZO/MUSD"]!, POOL_ABI);
+    const [t0, r] = await Promise.all([p.token0(), p.getReserves()]);
+    const mezoIs0 = t0.toLowerCase() === SWAP.tokens.MEZO!.toLowerCase();
+    const [rm, ru] = mezoIs0 ? [n18(r[0]), n18(r[1])] : [n18(r[1]), n18(r[0])];
+    return rm > 0 ? ru / rm : 0;
+  }, 60000);
+  const walletMezo = useRead(me && SWAP.tokens.MEZO ? `mezo-${me}` : null, async () => n18(await read(SWAP.tokens.MEZO!, ABI.erc20).balanceOf(me)), 30000, w.bump);
   const walletMusd = useRead(me ? `musd-${me}` : null, async () => n18(await read(ADDR.mezo.musd, ABI.erc20).balanceOf(me)), 20000, w.bump);
   const bank = useRead(me ? `bankshare-${stack}-${me}` : null, async () => {
     const b = read(A.bank, ABI.bank);
@@ -89,14 +99,15 @@ export default function Portfolio() {
   if (me) {
     lines.push({ what: "Wallet", detail: "BTC", amount: `${b8(walletBtc ?? 0)} BTC`, usd: (walletBtc ?? 0) * price });
     lines.push({ what: "Wallet", detail: "MUSD", amount: `${amt(walletMusd ?? 0)} MUSD`, usd: walletMusd ?? 0 });
+    if ((walletMezo ?? 0) > 0) lines.push({ what: "Wallet", detail: "MEZO", amount: `${amt(walletMezo ?? 0)} MEZO`, usd: (walletMezo ?? 0) * (mezoPrice ?? 0), note: mezoPrice == null ? "no MEZO price" : "priced from Mezo's MEZO/MUSD pool" });
     for (const b of bals || []) {
       const name = `${seriesName(b.s.endDate)}${b.s.kind === "sMUSD" ? " · sMUSD" : ""} · ${daysLeft(b.s.endDate)}`;
       const ve = b.s.kind === "veBTC";
       if (b.p > 0) lines.push({ what: "Principal", detail: name, amount: ve ? `${b8(b.p)} P` : `${amt(b.p)} P`, usd: ve ? b.p * (b.s.pMarginValuePerP ?? 0) : b.p });
       if (b.y > 0) lines.push({ what: "Yield", detail: name, amount: ve ? `${b8(b.y)} Y` : `${amt(b.y)} Y`, usd: ve ? b.y * (b.s.yMarginValuePerY ?? 0) : 0, note: ve ? undefined : "valued by what it has earned" });
       for (const e of b.earned.filter((x) => x.v > 0)) {
-        const v = e.sym === "BTC" ? e.v * price : e.sym === "MUSD" ? e.v : 0;
-        lines.push({ what: "Earned, to claim", detail: name, amount: `${e.sym === "BTC" ? b8(e.v) : amt(e.v)} ${e.sym}`, usd: v, note: e.sym === "MEZO" ? "not counted: no MEZO price here" : undefined });
+        const v = e.sym === "BTC" ? e.v * price : e.sym === "MUSD" ? e.v : e.sym === "MEZO" ? e.v * (mezoPrice ?? 0) : 0;
+        lines.push({ what: "Earned, to claim", detail: name, amount: `${e.sym === "BTC" ? b8(e.v) : amt(e.v)} ${e.sym}`, usd: v, note: e.sym === "MEZO" ? (mezoPrice ? "priced from Mezo's MEZO/MUSD pool" : "not counted: no MEZO pool") : undefined });
       }
     }
     lines.push({ what: "Bank", detail: `your share (${stack} stack)`, amount: `${b8(bank ?? 0)} BTC`, usd: (bank ?? 0) * price });

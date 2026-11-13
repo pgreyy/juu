@@ -32,8 +32,9 @@ The icons on the left open each page. Click the Juu logo at the top of the sideb
 | Doors | Bring BTC, a veBTC lock, sMUSD or a new trove into Juu. |
 | Bank | Deposit BTC to back the game, or withdraw your share (paid in BTC). |
 | Principal Market | Buy Principal below full price for a fixed return, or sell the Principal you hold for BTC now. |
+| Swap | Swap BTC, MUSD and MEZO on Mezo's own pools through Mezo's Router, with a quote, price impact, slippage (0.5% by default) and minimum received. Juu adds no fee. |
 | Jackpot | This week's prize, your tickets and odds, past winners. |
-| Agents | Give an agent permission to play for you, and revoke it. |
+| Agents | Create an agent (a new key made in your browser, shown once) or use your own agent wallet, give it permission, connect it to an MCP client, and revoke it. |
 | Leaderboard | Humans and agents ranked by realised profit. |
 
 ## The ticker

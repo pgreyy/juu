@@ -364,3 +364,20 @@ Driven through the app in a headless browser with the deployer as the wallet; ev
 
 Keeper moved to the server (13 Nov 2026, 09:33 UTC): laptop keeper stopped first, state copied (jackpot secrets checksum
 matched), server keeper's first transactions: veBTC harvest series 0 tx 0xf2749c0e28627e5e152e2847a26f3c6dc50866aa1645eab5385f10c5de9f0d3e.
+
+## Agent key flow, Swap page, MEZO (13 Nov 2026)
+
+* New agent made in the browser on the demo stack (agent 0x9301674759618f5Ff3b8A1398855C34311FBdAfa, a test agent whose key
+  was never stored): grant tx 0xcdf38ff2290d039386113dd26d8cf2c74038f94a5d1fffdaa8a6c2ef03b4d44f, MUSD approve tx
+  0x11585bc7e40f3dc83f39414cf07b17d51b4dbf01f8875fac9935af039e12df2b, 0.00002 BTC gas tx
+  0xbb959634dd82e0bbf0bdb5e6abc215541061d10f88708e4f2bf6d8830ea5a4ca. The test checked the key appeared in no network
+  request and no wallet call.
+* Swap page, through Mezo's basic-pool Router 0x9a1ff7FE3a0F69959A3fBa1F1e5ee18e1A9CD7E9 (addresses checked against
+  mezo.org/docs/developers/features/mezo-pools): 0.0001 BTC -> 7.8259 MUSD (approve tx
+  0xa310a422fbec94cc978a638be0dfea0ced8c5205e0daa6ae458c41ec394d457f, swap tx
+  0xd3bd63e39edf43bdf4fe4216f66a321e818eb57aa201f1a93a9f5daa950554c9); 5 MUSD -> 0.0000638 BTC (approve tx
+  0x5d7278bac7622cee35b7409faebe02b90fb3172937e36b30ebe66e059ba920b7, swap tx
+  0x81083bfb5962801c5521fe2f212bb3e04d597a31b78621e3fae493a201fcb37a).
+* MEZO on testnet: 0x7B7c000000000000000000000000000000000001 (18 decimals). An existing MUSD/MEZO volatile pool from
+  Mezo's PoolFactory, 0x8eb88d745B0aFFF9D71AbC40d7F550Cded7bB342 (72.03 MUSD / 88.85 MEZO when checked), so no pool was
+  created or seeded. The Swap page routes MEZO through it (BTC <-> MEZO via MUSD) and Portfolio prices MEZO from it.
